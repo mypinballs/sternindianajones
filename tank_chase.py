@@ -111,7 +111,7 @@ class Tank_Chase(game.Mode):
             self.game.sound.register_sound('tc_s5', speech_path+"great_shot.aiff")
 
             #lamps setup
-            self.lamps = ['leftLoop','rightLoop',]
+            self.lamps = ['leftLoopArrow','rightLoopArrow',]
 
 
         def reset(self):

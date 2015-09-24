@@ -50,9 +50,9 @@ class Multiball(game.Mode):
             super(Multiball, self).__init__(game, priority)
             self.log = logging.getLogger('ij.multiball')
 
-            self.text_layer = dmd.TextLayer(128/2, 7, self.game.fonts['num_09Bx7'], "center", opaque=False)
+            self.text_layer = dmd.TextLayer(128/2, 7, self.game.fonts['9x7_bold'], "center", opaque=False)
             self.jackpot_value_layer = dmd.TextLayer(128/2, 4, self.game.fonts['23x12'], "center", opaque=True)
-            self.score_layer = ModeScoreLayer(90, 1, self.game.fonts['num_09Bx7'], self)
+            self.score_layer = ModeScoreLayer(90, 1, self.game.fonts['9x7_bold'], self)
             self.jackpot_worth_layer = JackpotWorthLayer(62, 25, self.game.fonts['07x5'],self)
 
             self.lock_animation_1 = "dmd/xxx.dmd"
@@ -551,11 +551,29 @@ class Multiball(game.Mode):
             #create display layer
             anim = dmd.Animation().load(game_path+"dmd/shorty_plain.dmd")
             bgnd_layer = dmd.AnimatedLayer(frames=anim.frames,opaque=False)
-            text_layer1 = dmd.TextLayer(88, 2, self.game.fonts['num_09Bx7'], "center", opaque=False)
-            text_layer2 = dmd.TextLayer(88, 15, self.game.fonts['num_09Bx7'], "center", opaque=False)
-            text_layer1.set_text(str(value)+' MORE HITS',blink_frames=10,seconds=timer,color=dmd.CYAN)
-            text_layer2.set_text('TO LITE LOCK',seconds=timer,color=dmd.GREEN)
+            text_layer1 = dmd.TextLayer(88, 0, self.game.fonts['9x7_bold'], "center", opaque=False)
+            text_layer2 = dmd.TextLayer(88, 13, self.game.fonts['07x5'], "center", opaque=False)
+            text_layer3 = dmd.TextLayer(88, 20, self.game.fonts['07x5'], "center", opaque=False)
+            text_layer1.set_text(str(value)+' MORE',blink_frames=10,seconds=timer,color=dmd.CYAN)
+            text_layer2.set_text('HITS TO',seconds=timer,color=dmd.GREEN)
+            text_layer3.set_text('LITE LOCK',seconds=timer,color=dmd.GREEN)
 
+            #set display layer
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,text_layer1,text_layer2,text_layer3])
+            
+            self.delayed_clear(timer)
+
+
+        def lock_lit_display(self):
+            timer=2
+            #create display layer
+            anim = dmd.Animation().load(game_path+"dmd/shorty_plain.dmd")
+            bgnd_layer = dmd.AnimatedLayer(frames=anim.frames,opaque=False)
+            text_layer1 = dmd.TextLayer(88, 5, self.game.fonts['9x7_bold'], "center", opaque=False)
+            text_layer2 = dmd.TextLayer(88, 18, self.game.fonts['9x7_bold'], "center", opaque=False)
+            text_layer1.set_text('LOCK',seconds=timer,color=dmd.GREEN)
+            text_layer2.set_text('IS LIT',blink_frames=10,seconds=timer,color=dmd.GREEN)
+            
             #set display layer
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,text_layer1,text_layer2])
             
@@ -566,6 +584,9 @@ class Multiball(game.Mode):
             self.lock_lit = True;
             #self.game.idol.lock_lit=  self.lock_lit
             self.game.set_player_stats('lock_lit',self.lock_lit)
+            
+            #update display
+            self.lock_lit_display()
             
             #open temple
             self.game.temple.open()
@@ -654,7 +675,7 @@ class Multiball(game.Mode):
                 return procgame.game.SwitchStop
 
         def sw_rightRampMade_active(self, sw):
-            if self.multiball_running:
+            if self.multiball_running and self.game.switches.rightRampMade.time_since_change()>1:
                 self.jackpot('made')
                 return procgame.game.SwitchStop
 
@@ -662,7 +683,7 @@ class Multiball(game.Mode):
 #            pass
 
         def sw_rightRampEnter_active(self, sw):
-            if self.jackpot_status=='lit':
+            if self.jackpot_status=='lit' and self.game.switches.sw_rightRampEnter_active.time_since_change()>1:
                 self.game.sound.play('jackpot_attempt')
 
 

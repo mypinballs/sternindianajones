@@ -122,6 +122,7 @@ class Streets_Of_Cairo(game.Mode):
 
             #lamps setup
             self.lamps = ['leftLoopArrow','rightLoopArrow','templeArrow','rightRampArrow']
+            self.shoot_button_lamp = 'tournamentStartButton'
             
             self.reset()
 
@@ -174,6 +175,9 @@ class Streets_Of_Cairo(game.Mode):
             self.bgnd_layer = dmd.AnimatedLayer(frames=anim.frames,opaque=False,repeat=True,frame_time=6)
             self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.timer_layer,self.info_layer,self.award_layer])
 
+            #turn shoot button lamp on - using tournament buttom
+            self.game.effects.drive_lamp(self.shoot_button_lamp,'fast')
+            
             #play speech & sounds
             self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=1)
             self.cancel_delayed('monkey_chirp_delay')
@@ -192,6 +196,9 @@ class Streets_Of_Cairo(game.Mode):
             self.bgnd_layer.add_frame_listener(-1, self.eject_ball)
             self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.timer_layer,self.info_layer,self.award_layer])
 
+            #turn shoot button lamp off
+            self.game.effects.drive_lamp(self.shoot_button_lamp,'off')
+            
             #play sounds
             self.game.sound.play('gun_shot')
 

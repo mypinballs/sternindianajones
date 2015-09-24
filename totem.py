@@ -463,11 +463,12 @@ class Totem(game.Mode):
                 self.launch_ball()
 
 
-        def sw_captiveBallRear_active(self, sw):
-            self.hit()
+        def sw_captiveBallRear_inactive(self, sw):
+            if not self.multiball_ready_flag:
+                self.hit()
 
 
-        def sw_captiveBallFront_active_for_200ms(self, sw):
+        def sw_captiveBallFront_inactive_for_200ms(self, sw):
             if self.multiball_ready_flag and not self.multiball_running and not self.game.get_player_stats('multiball_running'): #only allow stacking of multiballs if this multiball is started first
                 self.multiball()
             elif self.multiball_running:

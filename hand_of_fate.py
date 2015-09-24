@@ -71,11 +71,12 @@ class Hand_Of_Fate(game.Mode):
         def update_lamps(self):
             if self.status=='lit':
                 self.game.drive_lamp('handOfFate','fast')
-                self.game.lamps.gi05.disable()
+                self.game.drive_lamp('liteMystery','off')
             elif self.status=='ready':
-                self.game.lamps.gi05.enable()
+                self.game.drive_lamp('liteMystery','smarton')
+                self.game.drive_lamp('handOfFate','off')
             elif self.status=='off':
-                self.game.lamps.gi05.disable()
+                self.game.drive_lamp('liteMystery','off')
                 self.game.drive_lamp('handOfFate','off')
 
 
@@ -357,9 +358,9 @@ class Hand_Of_Fate(game.Mode):
                 self.choices()
                 #return procgame.game.SwitchStop
 
-        def sw_leftInlane_active(self,sw):
-            if self.status=='ready':
-                self.set_status('lit')
+#        def sw_leftInlane_active(self,sw):
+#            if self.status=='ready':
+#                self.set_status('lit')
 
         def sw_rightInlane_active(self,sw):
             if self.status=='ready':

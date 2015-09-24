@@ -199,11 +199,11 @@ Gameplay (Feature):
     increments: 5
     default: 30
   'Well Of Souls BIP Start':
-    options: [2,6]
+    options: [2,4]
     increments: 1
-    default: 6
+    default: 4
   'Well Of Souls Ball Save Timer':
-    options: [0,15]
+    options: [5,20]
     increments: 1
     default: 5
   'Monkey Brains Timer':

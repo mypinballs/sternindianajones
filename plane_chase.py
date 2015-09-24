@@ -130,6 +130,7 @@ class Plane_Chase(game.Mode):
 
         def dog_fight(self):
             self.dog_fight_running = True
+            self.game.temple.open()
             
             bgnd = dmd.Animation().load(game_path+"dmd/blank.dmd") #possibly change the bgnd here
             self.bgnd_layer = dmd.FrameLayer(frame=bgnd.frames[0])
@@ -149,6 +150,7 @@ class Plane_Chase(game.Mode):
             self.cancel_delayed('update_time')
             self.cancel_delayed('dog_fight_expired')
             self.game.coils.flasherSankara.disable()
+            self.game.temple.close()
             
             #play animation
             anim = dmd.Animation().load(game_path+"dmd/dog_fight.dmd")
@@ -158,7 +160,7 @@ class Plane_Chase(game.Mode):
             
             #play sound
             self.game.sound.play('plane_crash')
-            
+
         
         def dog_fight_final_score(self):
              self.text_layer.set_text(locale.format("%d",self.dog_fight_value,True),blink_frames=2,seconds=1.5,color=dmd.GREEN)
@@ -186,8 +188,9 @@ class Plane_Chase(game.Mode):
 
 
         def sw_rightRampEnter_active(self,sw):
-            self.game.score(self.ramp_entered_score)
-            self.game.sound.play("stall")
+            if self.game.switches.rightRampEnter.time_since_change()>1:
+                self.game.score(self.ramp_entered_score)
+                self.game.sound.play("stall")
 
 
 #        def sw_leftRampMade_active(self,sw):
@@ -203,14 +206,15 @@ class Plane_Chase(game.Mode):
 
 
         def sw_rightRampMade_active(self,sw):
-            if self.right_ramp_enabled:
-                self.ramps_made+=1
-                self.sequence(self.ramps_made)
-                self.game.sound.play("flight")
-            else:
-                self.game.score(self.ramp_made_score/2)
+            if self.game.switches.rightRampMade.time_since_change()>1:
+                if self.right_ramp_enabled:
+                    self.ramps_made+=1
+                    self.sequence(self.ramps_made)
+                    self.game.sound.play("flight")
+                else:
+                    self.game.score(self.ramp_made_score/2)
 
-            self.game.set_player_stats('ramps_made',self.ramps_made)
+                self.game.set_player_stats('ramps_made',self.ramps_made)
             
             
         def sw_subway_active(self, sw):

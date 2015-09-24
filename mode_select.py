@@ -342,7 +342,11 @@ class Mode_Select(game.Mode):
             elif self.mode_running:
                 self.mode_bonus()
             else:
-                self.delay(name='eject_delay', event_type=None, delay=0.5, handler=self.eject_ball)
+                timer = 0.5
+                #lengthen the timer if these events are running
+                if self.game.get_player_stats('multiball_started') or self.game.get_player_stats('multiball_running') or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress'):
+                    timer =3
+                self.delay(name='eject_delay', event_type=None, delay=timer, handler=self.eject_ball)
 
         def add_selected_scene(self):
 

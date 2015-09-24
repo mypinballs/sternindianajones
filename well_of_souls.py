@@ -75,7 +75,7 @@ class Well_Of_Souls(game.Mode):
             self.game.sound.register_sound('wos_s3', sound_path+"torch.aiff")
 
             #lamps setup
-            self.lamps = ['centerLock']
+            self.lamps = ['templeArrow']
             
             self.reset()
 
@@ -144,10 +144,14 @@ class Well_Of_Souls(game.Mode):
             
 
             #launch required number of balls
-            if self.game.idol.balls_in_idol>0:
-                 self.game.idol.empty()
+#            if self.game.idol.balls_in_idol>0:
+#                 self.game.idol.empty()
+
+            #open temple for shots to subway
+            self.game.temple.open()
                  
-            self.game.trough.launch_balls(self.bip_start-self.game.idol.balls_in_idol-1, self.ball_launch_callback, False)
+            #self.game.trough.launch_balls(self.bip_start-self.game.idol.balls_in_idol-1, self.ball_launch_callback, False)
+            self.game.trough.launch_balls(self.bip_start-self.game.trough.num_balls_in_play, self.ball_launch_callback, False)
             #debug trough
             #self.game.trough.debug()
 
@@ -179,18 +183,22 @@ class Well_Of_Souls(game.Mode):
             self.cancel_delayed('snake_sounds_delay')
             self.cancel_delayed('torch_sounds_delay')
 
+            #cancel flasher
+            self.game.coils.flasherTemple.disable()
+            
             #reset music
             self.game.sound.stop_music()
             self.game.sound.play_music('general_play', loops=-1)
 
             #update idol state
-            self.game.idol.home()
+            #self.game.idol.home()
 
             #clear display
             self.clear()
 
             #reset drops
-            self.reset_drops()
+            #self.reset_drops()
+            self.game.temple.close()
 
             #reset lamps
             self.reset_lamps()
@@ -205,13 +213,14 @@ class Well_Of_Souls(game.Mode):
             if self.game.trough.num_balls_to_launch==0:
                 self.mode_running=True
                 self.log.info("WOS: Mode Running")
+                self.game.coils.flasherTemple.schedule(0x30003000, cycle_seconds=0, now=True)
 
             self.game.ball_save.start(num_balls_to_save=self.bip_start, time=self.ball_save_time, now=True, allow_multiple_saves=True)
 
                 
 
-        def reset_drops(self):
-            self.game.coils.centerDropBank.pulse(100)
+#        def reset_drops(self):
+#            self.game.coils.centerDropBank.pulse(100)
 
 
         def voice_call(self,count,delay=None,label="wos_s"):
@@ -273,7 +282,7 @@ class Well_Of_Souls(game.Mode):
             self.game.sound.play('wos_shot_hit')
 
             #update idol state
-            self.game.idol.nolock()
+            #self.game.idol.nolock()
 
             #reset drops after certain amount of succesfull shots
             if self.count>=self.reset_drop_count:
@@ -306,7 +315,7 @@ class Well_Of_Souls(game.Mode):
         def sw_subway_active(self, sw):
             self.mode_progression()
 
-            #return procgame.game.SwitchStop
+            return procgame.game.SwitchStop
 
         def sw_shooterLane_active_for_500ms(self,sw):
             self.game.coils.ballLaunch.pulse(50)

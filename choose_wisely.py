@@ -37,7 +37,8 @@ class Choose_Wisely(game.Mode):
             self.game.sound.register_sound('cw_speech3', speech_path+"burning_scream.aiff")
 
             #lamps setup
-            self.lamps = []
+            self.lamps = ['tournamentStartButton']
+            
             
             self.reset()
 
@@ -161,6 +162,9 @@ class Choose_Wisely(game.Mode):
 
             self.info_layer.set_text("FLIPPERS MOVE. GUN PICKS.",blink_frames=6,color=dmd.CYAN)
             self.choose_ready = True
+            
+            #turn selection button lamp on - using tournament buttom
+            self.game.effects.drive_lamp(self.lamps[0],'fast')
 
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,self.grail_cup_layer,self.info_layer,self.timer_layer,self.arrow_layer])
 
@@ -264,6 +268,9 @@ class Choose_Wisely(game.Mode):
 
             #play sound
             self.game.sound.play('gun_shot')
+            
+            #turn selection button lamp off
+            self.game.effects.drive_lamp(self.lamps[0],'off')
 
             #show correct cup
             self.grail_cup_layer.target_x=cup_posns[self.correct_choice-1]
@@ -360,7 +367,7 @@ class Choose_Wisely(game.Mode):
 
             return procgame.game.SwitchStop
 
-        def sw_startButton_active(self, sw):
+        def sw_tournamentStart_active(self, sw):
 
             if self.choose_ready:
                 self.chosen()
