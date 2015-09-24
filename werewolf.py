@@ -9,7 +9,7 @@ import random
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -646,7 +646,7 @@ class Werewolf(game.Mode):
 
             return procgame.game.SwitchStop
 
-        def sw_gunTrigger_active(self, sw):
+        def sw_tournamentStart_active(self, sw):
 
             if self.instructions_completed:
                 self.shoot_wolf(1)

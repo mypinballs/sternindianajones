@@ -17,7 +17,7 @@ game_locale = config.value_for_key_path('std_locale')
 locale.setlocale(locale.LC_ALL, game_locale) # en_GB Used to put commas in the score.
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 fonts_path = base_path+"shared/dmd/"
 shared_sound_path = base_path+"shared/sound/"
 

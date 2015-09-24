@@ -129,7 +129,11 @@ Highscore:
     increments: 50000000
     default: 350000000
 Gameplay (Feature):
-  'A2.01 Timed Plunger':
+  'Max Balls in Ark':
+    options: [2,4]
+    increments: 1
+    default: 4  
+  'Timed Plunger':
     options: [0,120]
     increments: 5
     default: 0
@@ -214,7 +218,7 @@ Gameplay (Feature):
     options: [5,120]
     increments: 5
     default: 30
-  'Castle Grunwald Timer':
+  'Castle Brunwald Timer':
     options: [5,120]
     increments: 5
     default: 30
@@ -331,6 +335,10 @@ Gameplay (Feature):
     options: [5,30]
     increments: 5
     default: 15
+  'Temple Hits For Lock':
+    options: [2,8]
+    increments: 1
+    default: 3
 Network:
   'IP Address':
     options: [0,255]

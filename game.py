@@ -21,8 +21,10 @@ from threading import Thread
 
 from scoredisplay import *
 from player import *
-from idol import *
-from mini_playfield import *
+from ark import *
+from temple import *
+#from idol import *
+#from mini_playfield import *
 from moonlight import *
 from trough import *
 from effects import *
@@ -48,7 +50,7 @@ locale.setlocale(locale.LC_ALL, game_locale) # en_GB Used to put commas in the s
 base_path = config.value_for_key_path('base_path')
 logging.info("Base Path is: "+base_path)
 
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 fonts_path = base_path+"shared/dmd/"
 shared_sound_path = base_path+"shared/sound/"
 
@@ -162,7 +164,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.5.8'
+                self.system_version='0.5.9'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -249,7 +251,7 @@ class Game(game.BasicGame):
 
 		# Note - Game specific item:
 		# The last parameter should be the name of the game's ball save lamp
-		self.ball_save = procgame.modes.BallSave(self, self.coils.flasherEternalLife, 'shooterLane')
+		self.ball_save = procgame.modes.BallSave(self, self.lamps.shootAgain, 'shooterLane')
 
 		trough_switchnames = []
 		# Note - Game specific item:
@@ -290,7 +292,7 @@ class Game(game.BasicGame):
 
                 #register game play lamp show
                 self.lampctrl.register_show('success', game_path +"lamps/game/success.lampshow")
-                self.lampctrl.register_show('ball_lock', game_path +"lamps/game/ball_lock.lampshow")
+                self.lampctrl.register_show('ball_lock', game_path +"lamps/game/success.lampshow")
                 self.lampctrl.register_show('hit', game_path +"lamps/game/success.lampshow")
                 self.lampctrl.register_show('jackpot', game_path +"lamps/game/success.lampshow")
 
@@ -329,10 +331,14 @@ class Game(game.BasicGame):
                 self.screens = Screens(self)
                 #match mode
                 self.match = Match(self,10)
+                #add ark mode for ark logic and control
+                self.ark = Ark(self,15)
+                #add temple mode for temple logic and control
+                self.temple = Temple(self,15)
                 #add idol mode for idol logic and control
-                self.idol = Idol(self,15)
+                #self.idol = Idol(self,15)
                 #setup mini_playfield
-                self.mini_playfield = Mini_Playfield(self,16)
+                #self.mini_playfield = Mini_Playfield(self,16)
                 #------------------
 
 
@@ -395,8 +401,10 @@ class Game(game.BasicGame):
                 self.modes.add(self.utility)
                 self.modes.add(self.effects)
 		self.modes.add(self.ball_save)
-                self.modes.add(self.idol)
-                self.modes.add(self.mini_playfield)
+                self.modes.add(self.ark)
+                self.modes.add(self.temple)
+                #self.modes.add(self.idol)
+                #self.modes.add(self.mini_playfield)
 		self.modes.add(self.trough)
                 self.modes.add(self.tilt)
                 self.modes.add(self.extra_ball)
@@ -519,30 +527,25 @@ class Game(game.BasicGame):
         def enable_flippers(self, enable):
 		
 		"""Enables or disables the flippers AND bumpers."""
-                #wpc flippers
+                #stern flippers
 		for flipper in self.config['PRFlippers']:
 			self.logger.info("Programming flipper %s", flipper)
 			main_coil = self.coils[flipper+'Main']
-			hold_coil = self.coils[flipper+'Hold']
+			
 			switch_num = self.switches[flipper].number
 
 			drivers = []
 			if enable:
-				drivers += [pinproc.driver_state_pulse(main_coil.state(), main_coil.default_pulse_time)]
-				drivers += [pinproc.driver_state_pulse(hold_coil.state(), 0)]
+                                drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
 			self.proc.switch_update_rule(switch_num, 'closed_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
 			
 			drivers = []
 			if enable:
 				drivers += [pinproc.driver_state_disable(main_coil.state())]
-				if not self.paused or flipper=='FlipperLwL':
-					drivers += [pinproc.driver_state_disable(hold_coil.state())]
-	
 			self.proc.switch_update_rule(switch_num, 'open_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
 
 			if not enable:
 				main_coil.disable()
-				hold_coil.disable()
 
 		#bumpers
 		self.enable_bumpers(enable)
@@ -599,7 +602,8 @@ def main():
         root_logger.addHandler(file_handler)
 
         #set invidivual log levels here
-#        logging.getLogger('ij.idol').setLevel(logging.DEBUG)
+        logging.getLogger('ij.ark').setLevel(logging.DEBUG)
+        logging.getLogger('ij.temple').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.trough').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.base').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.poa').setLevel(logging.DEBUG)

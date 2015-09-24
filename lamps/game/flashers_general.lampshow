@@ -1,5 +1,5 @@
-# red flashers
-coil:flasherLeftRamp             | .      .      .      .
-coil:flasherRightRamp            |  .      .      .      .
-coil:flasherLeftSide             |   .      .      .      .
-coil:flasherRightSide            |    .      .      .      .
+#flashers
+coil:flasherCrusade           | .      .      .      .
+coil:flasherTemple            |  .      .      .      .
+coil:flasherRaiders           |   .      .      .      .
+coil:flasherKingdom           |    .      .      .      .

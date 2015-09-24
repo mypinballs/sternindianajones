@@ -10,7 +10,7 @@ import logging
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -303,7 +303,7 @@ class Well_Of_Souls(game.Mode):
             self.layer = None
 
 
-        def sw_centerEnter_active(self, sw):
+        def sw_subway_active(self, sw):
             self.mode_progression()
 
             #return procgame.game.SwitchStop

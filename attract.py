@@ -13,7 +13,7 @@ from time import strftime
 
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -48,21 +48,22 @@ class Attract(game.Mode):
 		self.game.lamps.startButton.schedule(schedule=0x00ff00ff, cycle_seconds=0, now=False)
 
                 # Turn on GI lamps
-		self.delay(name='gi_on_delay', event_type=None, delay=0, handler=self.gi)
-
-                self.log.info("attract mode after gi turn on")
+		#self.delay(name='gi_on_delay', event_type=None, delay=0, handler=self.gi)
+                #self.log.info("attract mode after gi turn on")
 
                 # run feature lamp patterns
                 self.lamp_show_set=True
-                self.change_lampshow()
+                #self.change_lampshow()
+                self.standard_lampshow()
 
                 #debug subway release issues
-                self.game.coils.subwayRelease.pulse(100)
+                #self.game.coils.subwayRelease.pulse(100)
 
                 #check for stuck balls
                 
-                self.delay(name='idol_empty_delay', event_type=None, delay=2, handler=self.init_idol)
+                #self.delay(name='idol_empty_delay', event_type=None, delay=2, handler=self.init_idol)
                 self.delay(name='stuck_balls_release_delay', event_type=None, delay=2, handler=self.game.utility.release_stuck_balls)
+                self.delay(name='map_room_check_delay', event_type=None, delay=2, handler=self.game.utility.check_map_room)
 
 
                 #reset mini playfield code
@@ -103,17 +104,17 @@ class Attract(game.Mode):
                 self.delay(name='music_fadeout_delay', event_type=None, delay=10, handler=lambda:self.game.sound.fadeout_music(3000))
 
 
-        def gi(self):
-            self.game.lamps.gi01.pulse(0)
-            self.game.lamps.gi02.pulse(0)
-            self.game.lamps.gi03.pulse(0)
-            self.game.lamps.gi04.pulse(0)
-
-        def gi_off(self):
-            self.game.lamps.gi01.disable()
-            self.game.lamps.gi02.disable()
-            self.game.lamps.gi03.disable()
-            self.game.lamps.gi04.disable()
+#        def gi(self):
+#            self.game.lamps.gi01.pulse(0)
+#            self.game.lamps.gi02.pulse(0)
+#            self.game.lamps.gi03.pulse(0)
+#            self.game.lamps.gi04.pulse(0)
+#
+#        def gi_off(self):
+#            self.game.lamps.gi01.disable()
+#            self.game.lamps.gi02.disable()
+#            self.game.lamps.gi03.disable()
+#            self.game.lamps.gi04.disable()
 
         def init_idol(self):
             if not self.game.trough.is_full():
@@ -129,10 +130,10 @@ class Attract(game.Mode):
                 self.game.lampctrl.stop_show()
 
                 #turn gi on or off depending on lampshow chosen from shuffle
-                if self.game.lampshow_keys[0].find('flasher',0)>0:
-                    self.gi_off()
-                else:
-                    self.gi()
+#                if self.game.lampshow_keys[0].find('flasher',0)>0:
+#                    self.gi_off()
+#                else:
+#                    self.gi()
 
                 if not self.lamp_show_set:
                     #self.log.info('running pattern lamp show')

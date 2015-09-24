@@ -1,33 +1,33 @@
-lamp:adventureD                    | ..    ..    ..    ..    ..    .     
-lamp:adventureV                    | ..     ..   ..     ..   ..             
-lamp:shorty                        | ...      ..  ..      ..  ..      
+lamp:lastCrusade                    | ..    ..    ..    ..    ..    .     
+lamp:crusadeArrow                   | ..     ..   ..     ..   ..             
+lamp:skillIndy                        | ...      ..  ..      ..  ..      
 lamp:monkeyBrains                  | ..    .     ..   ..     ..   ..        
 lamp:shootAgain                    |     ..      .   ..      .   ..     
 lamp:ropeBridge                    |       ..    .     ..    .     . 
-lamp:drJones                       |    ..   ..     ..   ..     ..     
-lamp:bonus6X                       |     ..    ..    ..    ..    ..      
-lamp:leftPlaneMiddle               |      ..     .    .     ..    .        
-lamp:leftPlanebottom               |    ..      .   ..      .   ..        
-lamp:marrion                       |     .    ..     .    ..     .           
-lamp:bonus8X                       |    ..    .     ..    .     ..       
-lamp:rightPlaneBottom              |      .    .      .    .     ..        
-lamp:adventureA                    | ..   ..     ..   ..     ..   ..        
-lamp:rightPlaneTop                 | ..     .    ..    ..    ..    .     
-lamp:rightPlaneMiddle              |       .    ..     .    ..    ..   
+lamp:skillSwordsman                       |    ..   ..     ..   ..     ..     
+lamp:skillMystery                       |     ..    ..    ..    ..    ..      
+lamp:skillJets               |      ..     .    .     ..    .        
+lamp:skillAdvanceScene               |    ..      .   ..      .   ..        
+lamp:jonesJ                       |     .    ..     .    ..     .           
+lamp:jonesO                       |    ..    .     ..    .     ..       
+lamp:jonesN              |      .    .      .    .     ..        
+lamp:jonesE                    | ..   ..     ..   ..     ..   ..        
+lamp:jonesS                 | ..     .    ..    ..    ..    .     
+lamp:mapM              |       .    ..     .    ..    ..   
 lamp:streetsOfCairo                |      ..    ..    ..    ..    ..    
-lamp:sallah                        |     ..    ..    ..    ..    ..    
+lamp:mapA                        |     ..    ..    ..    ..    ..    
 lamp:getTheIdol                    |     ..     ..   ..     ..   ..    
 lamp:arkJackpot                    |      .     .     .     .    ..    
 lamp:ravenBar                      |      ..   ..     ..   ..     ..   
 lamp:stonesJackpot                 |       ..    .     .     .     .    
-lamp:willie                        |    .      ..   .      ..  ..       
-lamp:bonus2X                       |   ..      .   ..      .   ..   
+lamp:mapP                        |    .      ..   .      ..  ..       
+lamp:kingdom                       |   ..      .   ..      .   ..   
 lamp:grailJackpot                  | ..     ..    .     ..    .       
 lamp:mineCart                      | ..    ..    ..    ..    ..     
 lamp:tankChase                     | ...    ..    ..    ..    ..      
 lamp:chooseWisely                  | ...    ..    ..    ..    ..       
 lamp:rightRampArrow                |   .    ..     .    ..    ..     
-lamp:bonus4X                       |    ..     ..   ..     ..   ..   
+lamp:xMarksTheSpot                       |    ..     ..   ..     ..   ..   
 lamp:stealTheStones                | ..    ..    ..    ..    ..     
 lamp:wellOfSouls                   |      ..    ..    ..    ..    
 lamp:indyI                         | ..  ..      ..  ..      .   
@@ -35,33 +35,32 @@ lamp:indyN                         |     ..     ..   ..     ..
 lamp:indyD                         |      ..    ..    .     ..    
 lamp:indyY                         |      ..    .     ..    .     
 lamp:theThreeChallenges            | ...    ..    ..    ..    ..   
-lamp:adventureE2                   |       ..   ..     ..   ..     
-lamp:adventureR                    |       ..   ..     ..   ..     
-lamp:adventureU                    | ..    ..    ..    ..    ..       
+lamp:jonesJ                   |       ..   ..     ..   ..     
+lamp:jonesO                    |       ..   ..     ..   ..     
+lamp:jonesN                    | ..    ..    ..    ..    ..       
 lamp:castleGrunwald                | ..     ..    .     ..    .       
-lamp:rightLoop                     |   .    ..     .    ..     .      
-lamp:adventureT                    |   .     ..    .     ..   ..     
-lamp:adventureN                    |   .     ..    .     ..    .      
-lamp:adventureE1                   |   .     ..    .     ..    .     
-lamp:leftRampArrow                 |   .     ..   ..     ..   ..     
-lamp:modeStart                     |   .      ..   .      ..  ..      
+lamp:rightLoopArrow                     |   .    ..     .    ..     .      
+lamp:jonesE                    |   .     ..    .     ..   ..     
+lamp:jonesS                    |   .     ..    .     ..    .      
+lamp:jonesJ                   |   .     ..    .     ..    .     
+lamp:grail                     |   .      ..   .      ..  ..      
 lamp:handOfFate                    | ...     ..   ..     ..   ..      
 lamp:extraBall                     | ...     ..   ..     .    ..     
-lamp:leftLoop                      | ...      .   ..     ..   ..     
-lamp:centerLock                    |   ..     ..   ..     .    ..     
-lamp:totemTopArrow                 |     ..    .     ..   ..      
-lamp:miniBottomLeft                | .....        . .         .      
-lamp:miniBottomRight               |    ..       .  ..       . 
-lamp:miniMiddleBottomLeft          | .....        ....             
-lamp:miniMiddleBottomRight         | .. ..        . ..            
-lamp:miniMiddleTopLeft             |   . ..       .. .             
-lamp:miniMiddleTopRight            | ... ..       .. ..      
-lamp:miniTopLeft                   |   ....        ....         
-lamp:miniTopRight                  | ... ..       .. ..        
-lamp:miniTopArrow                  | ... ..       .. ..       
-lamp:miniBottomArrow               | .. ..       .. ..       
-lamp:leftPlaneTop                  | ..    ..    ..    ..
-coil:flasherLeftRamp               | .      .      .      .
-coil:flasherRightRamp              |  .      .      .      .
-coil:flasherLeftSide               |   .      .      .      .
-coil:flasherRightSide              |    .      .      .      .
+lamp:leftLoopArrow                      | ...      .   ..     ..   ..     
+lamp:8Ball                    |   ..     ..   ..     .    ..     
+lamp:cairoSwordsman                 |     ..    .     ..   ..      
+lamp:rightSpinner                | .....        . .         .      
+lamp:leftSpinner               |    ..       .  ..       . 
+lamp:leftJet          | .....        ....             
+lamp:rightJet         | .. ..        . ..            
+lamp:bottomJet             |   . ..       .. .             
+lamp:topJet            | ... ..       .. ..      
+lamp:templeArrow                   |   ....        ....         
+lamp:templeOfDoom                  | ... ..       .. ..        
+lamp:raiders                  | ... ..       .. ..       
+lamp:leftSpecial               | .. ..       .. ..       
+lamp:rightSpecial               | ..    ..    ..    ..
+coil:flasherCrusade                | .      .      .      .
+coil:flasherTemple                 |  .      .      .      .
+coil:flasherRaiders                |   .      .      .      .
+coil:flasherKingdom                |    .      .      .      .

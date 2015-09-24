@@ -10,7 +10,7 @@ from procgame import *
 from random import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -351,7 +351,7 @@ class Hand_Of_Fate(game.Mode):
 #            self.game.coils.leftEject.pulse()
 #            self.clear()
             
-        def sw_leftEject_active_for_500ms(self,sw):
+        def sw_grailEject_active_for_500ms(self,sw):
             if self.status=='lit':
                 #self.animation()
                 self.choices()

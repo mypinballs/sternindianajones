@@ -14,7 +14,7 @@ from procgame import *
 
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -121,7 +121,7 @@ class Streets_Of_Cairo(game.Mode):
             #self.game.sound.register_sound('soc_gun_shot', sound_path+"gun_shot_deep.aiff")
 
             #lamps setup
-            self.lamps = ['leftLoop','rightLoop','leftRampArrow','rightRampArrow']
+            self.lamps = ['leftLoopArrow','rightLoopArrow','templeArrow','rightRampArrow']
             
             self.reset()
 
@@ -345,8 +345,8 @@ class Streets_Of_Cairo(game.Mode):
             #self.monkey_chirp(3)
 
             #open gates
-            self.open_gates('left')
-            self.open_gates('right')
+#            self.open_gates('left')
+#            self.open_gates('right')
 
             #update_lamps
             self.update_lamps()
@@ -376,8 +376,8 @@ class Streets_Of_Cairo(game.Mode):
             self.clear()
 
             #close gates
-            self.close_gates('left')
-            self.close_gates('right')
+#            self.close_gates('left')
+#            self.close_gates('right')
 
             #reset lamps
             self.reset_lamps()
@@ -386,17 +386,17 @@ class Streets_Of_Cairo(game.Mode):
             pass
 
 
-        def open_gates(self,side):
-            if side=='left':
-                 self.game.coils.rightControlGate.pulse(0)
-            elif side=='right':
-                 self.game.coils.leftControlGate.pulse(0)
-
-        def close_gates(self,side):
-            if side=='left':
-                 self.game.coils.rightControlGate.disable()
-            elif side=='right':
-                 self.game.coils.leftControlGate.disable()
+#        def open_gates(self,side):
+#            if side=='left':
+#                 self.game.coils.rightControlGate.pulse(0)
+#            elif side=='right':
+#                 self.game.coils.leftControlGate.pulse(0)
+#
+#        def close_gates(self,side):
+#            if side=='left':
+#                 self.game.coils.rightControlGate.disable()
+#            elif side=='right':
+#                 self.game.coils.leftControlGate.disable()
 
         def voice_call(self,count,delay=None,label="soc_s"):
             if delay==None:
@@ -478,7 +478,7 @@ class Streets_Of_Cairo(game.Mode):
 
             return procgame.game.SwitchStop
 
-        def sw_leftRampMade_active(self, sw):
+        def sw_captiveBallFront_active(self, sw):
             self.mode_progression(1)
 
             return procgame.game.SwitchStop
@@ -494,7 +494,7 @@ class Streets_Of_Cairo(game.Mode):
 
             return procgame.game.SwitchStop
 
-        def sw_leftEject_active(self, sw):
+        def sw_grailEject_active(self, sw):
             if self.dual_enabled:
                 self.load_completed_anim()
                 return procgame.game.SwitchStop
@@ -503,7 +503,7 @@ class Streets_Of_Cairo(game.Mode):
 
             
 
-        def sw_gunTrigger_active(self, sw):
+        def sw_tournamentStart_active(self, sw):
             if self.dual_enabled:
                 self.score_value_dual =  self.score_value_dual/10
                 self.load_completed_anim()

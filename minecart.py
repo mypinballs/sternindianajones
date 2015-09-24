@@ -9,7 +9,7 @@ import random
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -496,7 +496,7 @@ class Minecart(game.Mode):
             self.game.enable_flippers(enable=True)
 
             #eject ball
-            self.game.coils.leftEject.pulse()
+            self.game.coils.grailEject.pulse()
 
             #reset lamps
             self.reset_lamps()

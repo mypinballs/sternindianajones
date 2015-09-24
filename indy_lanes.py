@@ -14,7 +14,7 @@ from hand_of_fate import *
 
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -53,7 +53,7 @@ class Indy_Lanes(game.Mode):
             self.friends = ['marrion','willie','sallah','shorty','drJones']
             shuffle(self.friends)
 
-            self.bonus_lamps = ['bonus2X','bonus4X','bonus6X','bonus8X']
+            #self.bonus_lamps = ['bonus2X','bonus4X','bonus6X','bonus8X']
 
             self.friends_collected = 0
             self.friend_dmd_image =""
@@ -129,8 +129,8 @@ class Indy_Lanes(game.Mode):
 
         def update_lamps(self):
             self.update_lane_lamps()
-            self.update_friend_lamps()
-            self.update_bonus_lamps()
+            #self.update_friend_lamps()
+            #self.update_bonus_lamps()
 
         def update_lane_lamps(self):
             self.log.info("Updating INDY lane Lamps")
@@ -176,7 +176,7 @@ class Indy_Lanes(game.Mode):
                          self.bonusx +=1
 
                     #update bonus lamps
-                    self.update_bonus_lamps()
+                    #self.update_bonus_lamps() - no bonus lamps
 
                     self.game.set_player_stats('bonus_x',self.bonusx)
                     self.log.info("bonus x "+str(self.bonusx))
@@ -251,7 +251,7 @@ class Indy_Lanes(game.Mode):
                 self.game.set_player_stats('friends_collected',self.friends_collected)
 
                 #update friend lamps
-                self.update_friend_lamps()
+                #self.update_friend_lamps() - no friend lamps
                 
                 
         def friend_voice_call(self):

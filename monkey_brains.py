@@ -9,7 +9,7 @@ import locale
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -51,7 +51,7 @@ class Monkey_Brains(game.Mode):
             self.game.sound.register_sound('s1', sound_path+"chomp.aiff")
 
             #lamps setup
-            self.lamps = ['leftLoop','rightLoop','leftRampArrow','rightRampArrow']
+            self.lamps = ['leftLoopArrow','rightLoopArrow','templeArrow','rightRampArrow']
             
             self.reset()
 
@@ -104,8 +104,8 @@ class Monkey_Brains(game.Mode):
             self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=self.count)
 
             #open gates
-            self.open_gates('left')
-            self.open_gates('right')
+            #self.open_gates('left')
+            #self.open_gates('right')
 
             #update_lamps
             self.update_lamps()
@@ -140,8 +140,8 @@ class Monkey_Brains(game.Mode):
             self.clear()
 
             #close gates
-            self.close_gates('left')
-            self.close_gates('right')
+            #self.close_gates('left')
+            #self.close_gates('right')
 
             #reset lamps
             self.reset_lamps()
@@ -150,17 +150,17 @@ class Monkey_Brains(game.Mode):
             pass
 
 
-        def open_gates(self,side):
-            if side=='left':
-                 self.game.coils.rightControlGate.pulse(0)
-            elif side=='right':
-                 self.game.coils.leftControlGate.pulse(0)
+#        def open_gates(self,side):
+#            if side=='left':
+#                 self.game.coils.rightControlGate.pulse(0)
+#            elif side=='right':
+#                 self.game.coils.leftControlGate.pulse(0)
 
-        def close_gates(self,side):
-            if side=='left':
-                 self.game.coils.rightControlGate.disable()
-            elif side=='right':
-                 self.game.coils.leftControlGate.disable()
+#        def close_gates(self,side):
+#            if side=='left':
+#                 self.game.coils.rightControlGate.disable()
+#            elif side=='right':
+#                 self.game.coils.leftControlGate.disable()
 
         def voice_call(self,count,delay=None):
             if delay==None:
@@ -205,7 +205,7 @@ class Monkey_Brains(game.Mode):
             self.layer = None
 
 
-        def sw_leftRampMade_active(self, sw):
+        def sw_captiveBallFront_active(self, sw):
             self.mode_progression()
 
             return procgame.game.SwitchStop

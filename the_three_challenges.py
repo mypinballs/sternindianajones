@@ -9,7 +9,7 @@ import locale
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -51,7 +51,7 @@ class The_Three_Challenges(game.Mode):
             self.game.sound.register_sound('ttc_s3', speech_path+"the_path_of_god.aiff")
 
             #lamps setup
-            self.lamps = ['leftRampArrow']
+            self.lamps = ['templeArrow']
             
             self.reset()
 
@@ -129,9 +129,9 @@ class The_Three_Challenges(game.Mode):
             self.info_layer.set_text("SHOOT RIGHT RAMP",blink_frames=4,color=dmd.PURPLE)
 
             #turn on coils and flashers
-            self.game.coils.flasherPOA.schedule(0x30003000, cycle_seconds=0, now=True)
-            self.game.coils.divertorMain.pulse(50)
-            self.game.coils.divertorHold.pulse(0)
+            self.game.coils.flasherKingdom.schedule(0x30003000, cycle_seconds=0, now=True)
+            #self.game.coils.divertorMain.pulse(50)
+            #self.game.coils.divertorHold.pulse(0)
 
             #load animation
             self.load_bgnd_anim()
@@ -154,8 +154,8 @@ class The_Three_Challenges(game.Mode):
             self.game.set_player_stats('last_mode_score',score_value)
 
             #turn off coils & flashers
-            self.game.coils.flasherPOA.disable()
-            self.game.coils.divertorHold.disable()
+            self.game.coils.flasherKingdom.disable()
+            #self.game.coils.divertorHold.disable()
 
             #cancel speech calls
             self.cancel_delayed('mode_speech_delay')
@@ -197,7 +197,7 @@ class The_Three_Challenges(game.Mode):
             self.game.mini_playfield.sts_path_sequence(self.poa_lanes_needed)
 
             #turn off flasher
-            self.game.coils.flasherPOA.disable()
+            self.game.coils.flasherKingdom.disable()
             
             #load progression animations
             self.load_mp_instructions()
@@ -236,25 +236,26 @@ class The_Three_Challenges(game.Mode):
             self.load_scene_anim()
             self.cancel_delayed('load_bgnd_anim')
             self.delay(name='load_bgnd_anim', event_type=None, delay=4, handler=self.load_bgnd_anim)
+            
 
-        def sw_topPost_active(self, sw):
-
-            self.mode_progression()
-            return procgame.game.SwitchStop
-
-        def sw_miniBottomLeft_active(self, sw):
-            self.poa_exited()
-
-        def sw_miniBottomRight_active(self, sw):
-            self.poa_exited()
-
-        def sw_miniTopHole_active(self, sw):
-            self.poa_exited()
-            return procgame.game.SwitchStop
-
-        def sw_miniBottomHole_active(self, sw):
-            self.poa_exited()
-            return procgame.game.SwitchStop
+#        def sw_topPost_active(self, sw):
+#
+#            self.mode_progression()
+#            return procgame.game.SwitchStop
+#
+#        def sw_miniBottomLeft_active(self, sw):
+#            self.poa_exited()
+#
+#        def sw_miniBottomRight_active(self, sw):
+#            self.poa_exited()
+#
+#        def sw_miniTopHole_active(self, sw):
+#            self.poa_exited()
+#            return procgame.game.SwitchStop
+#
+#        def sw_miniBottomHole_active(self, sw):
+#            self.poa_exited()
+#            return procgame.game.SwitchStop
 
 
         

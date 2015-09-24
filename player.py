@@ -38,12 +38,14 @@ class Player(procgame.game.Player):
                 self.player_stats['path_mode_started'] = False
                 self.player_stats['lock_lit'] = False
                 self.player_stats['lock_in_progress'] = False
+                self.player_stats['lock_progress_hits'] =0
                 self.player_stats['multiball_ready'] = False
                 self.player_stats['multiball_started'] = False
                 self.player_stats['multiball_running'] = False
                 self.player_stats['quick_multiball_ready'] = False
                 self.player_stats['quick_multiball_started'] = False
                 self.player_stats['quick_multiball_running'] = False
+                self.player_stats['qm_jackpots_collected'] = 0
                 self.player_stats['jackpots_collected'] = 0
                 self.player_stats['cheat_count'] = 0
                 self.player_stats['treasures_collected']=0
@@ -69,4 +71,6 @@ class Player(procgame.game.Player):
                 self.player_stats['choose_wisely_level']=1#int(self.game.user_settings['Gameplay (Feature)']['Choose Wisely Level Start'])
                 self.player_stats['moonlight_total']=0
                 self.player_stats['moonlight_status']=False
+                self.player_stats['extra_ball_lit']=False
+                self.player_stats['map_banks_completed']=0
 		

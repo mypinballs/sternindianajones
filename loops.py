@@ -13,7 +13,7 @@ from random import *
 
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 
@@ -49,7 +49,7 @@ class Loops(game.Mode):
             self.ramps_made=self.game.get_player_stats('ramps_made')
             self.friends_collected=self.game.get_player_stats('friends_collected')
 
-            self.loop_lamps = ['leftLoop','rightLoop']
+            self.loop_lamps = ['leftLoopArrow','rightLoopArrow']
             self.loop_flag = [False,False]
 
 
@@ -67,8 +67,8 @@ class Loops(game.Mode):
             self.loop_multiplier=1
             self.side=None
             
-            self.game.coils.leftControlGate.disable()
-            self.game.coils.rightControlGate.disable()
+            #self.game.coils.leftControlGate.disable()
+            #self.game.coils.rightControlGate.disable()
             
             self.reset_lamps()
             
@@ -105,7 +105,7 @@ class Loops(game.Mode):
         def sequence(self,side):
             if self.loop_active:
 
-                self.open_gate(side)
+                #self.open_gate(side)
                 
                 if self.loops_completed==5:
                     self.jackpot()
@@ -148,11 +148,11 @@ class Loops(game.Mode):
         def jackpot(self):
             pass
 
-        def open_gate(self,side):
-            if side=='left':
-                 self.game.coils.rightControlGate.pulse(0)
-            elif side=='right':
-                 self.game.coils.leftControlGate.pulse(0)
+#        def open_gate(self,side):
+#            if side=='left':
+#                 self.game.coils.rightControlGate.pulse(0)
+#            elif side=='right':
+#                 self.game.coils.leftControlGate.pulse(0)
 
         def loop_stall(self):
             self.game.score(self.loop_unlit_value)

@@ -10,7 +10,7 @@ import logging
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -467,8 +467,8 @@ class Mini_Playfield(game.Mode):
             self.clear()
 
 
-        def sw_topPost_active(self,sw):
-            if not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_running'):
+        def sw_topPost_active_for_250ms(self,sw):
+            if self.game.get_player_stats('poa_enabled'): #this mode just needs to look at this flag here, as the poa mode handles the complex game mode state logic and updates this flag accordingly
                 self.game.enable_flippers(enable=False)
                 #update game status
                 self.game_status = 'mode'

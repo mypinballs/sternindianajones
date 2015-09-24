@@ -10,7 +10,7 @@ import logging
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -41,7 +41,7 @@ class Castle_Grunwald(game.Mode):
             self.mode_select = mode_select
 
             #screen setup
-            self.timer = int(self.game.user_settings['Gameplay (Feature)']['Castle Grunwald Timer'])
+            self.timer = int(self.game.user_settings['Gameplay (Feature)']['Castle Brunwald Timer'])
             self.log.info("CG Timer is:"+str(self.timer))
 
             self.score_layer = ModeScoreLayer(128/2, -1, self.game.fonts['07x5'], self)
@@ -124,10 +124,10 @@ class Castle_Grunwald(game.Mode):
             self.delay(name='mode_speech_delay', event_type=None, delay=2, handler=self.voice_call, param=self.count)
 
             #knock target down if needed
-            self.log.debug("Setup Drop Target for cg")
-            if self.game.switches.singleDropTop.is_inactive():
-                self.game.coils.totemDropDown.pulse(30)
-                self.log.debug("drop target should be down")
+#            self.log.debug("Setup Drop Target for cg")
+#            if self.game.switches.singleDropTop.is_inactive():
+#                self.game.coils.totemDropDown.pulse(30)
+#                self.log.debug("drop target should be down")
 
         def voice_call(self,count,delay=None):
             if delay==None:
@@ -175,7 +175,7 @@ class Castle_Grunwald(game.Mode):
             self.clear()
 
             #reset drop target
-            self.game.coils.totemDropUp.pulse()
+            #self.game.coils.totemDropUp.pulse()
             
 
         def mode_progression(self):
@@ -202,20 +202,20 @@ class Castle_Grunwald(game.Mode):
             self.layer = None
 
 
-        def sw_singleDropTop_active(self, sw):
-            return procgame.game.SwitchStop
+#        def sw_singleDropTop_active(self, sw):
+#            return procgame.game.SwitchStop
 
         def sw_captiveBallFront_active(self, sw):
             return procgame.game.SwitchStop
 
-        def sw_captiveBallFront_active_for_200ms(self, sw):
+        def sw_captiveBallFront_inactive_for_200ms(self, sw):
             self.mode_progression()
 
             return procgame.game.SwitchStop
         
 
-        def sw_captiveBallBack_active(self, sw):
-            #add extra points for hitting ball to back of capture ball area
+        def sw_mapEject_active(self, sw):
+            #add extra points for getting ball into map eject
             self.score_value_boost+=self.score_value_extra
 
             return procgame.game.SwitchStop

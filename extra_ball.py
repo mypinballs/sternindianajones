@@ -9,7 +9,7 @@ import locale
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -33,8 +33,9 @@ class Extra_Ball(game.Mode):
             self.game.sound.play('extra_ball_collected')
             #self.game.sound.play_voice('extra_ball_speech')
             self.game.effects.drive_lamp('extraBall','off')
-            self.game.effects.drive_lamp('miniBottomArrow','off')
             self.game.effects.drive_lamp('shootAgain','smarton')
+            
+            self.game.set_player_stats('extra_ball_lit',False)
             self.game.extra_ball_count()
 
 
@@ -50,3 +51,27 @@ class Extra_Ball(game.Mode):
                 self.layer = text_layer
                 self.game.sound.play('extra_ball_lit')
                 self.game.effects.drive_lamp('extraBall','smarton')
+                
+                #set player stats
+                self.game.set_player_stats('extra_ball_lit',True)
+                
+                
+        def update_lamps(self):
+            if self.game.get_player_stats('extra_ball_lit'):
+                self.game.effects.drive_lamp('extraBall','on')
+            else:
+                self.game.effects.drive_lamp('extraBall','off')
+                
+            p = self.game.current_player()
+            
+            if p.extra_balls>=1:
+                self.game.effects.drive_lamp('shootAgain','on')
+            else:
+                self.game.effects.drive_lamp('shootAgain','off')
+                
+        
+        #switch handlers
+        def sw_grailEject_active_for_250ms(self,sw):
+            if self.game.get_player_stats('extra_ball_lit'):
+                self.collect()
+                

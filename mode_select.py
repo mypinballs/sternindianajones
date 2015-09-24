@@ -27,7 +27,7 @@ from raven_bar import *
 
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -110,7 +110,7 @@ class Mode_Select(game.Mode):
             self.mode_start_lamp(self.mode_enabled)
 
         def mode_start_lamp(self,flag):
-            lamp_name ='modeStart'
+            lamp_name ='grail'
             if flag:
                 self.game.effects.drive_lamp(lamp_name,'medium')
             else:
@@ -223,24 +223,24 @@ class Mode_Select(game.Mode):
             
             self.unplayed_scenes('left')
 
-            self.game.coils.flasherLeftRamp.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
-            self.delay(name='disable_flasher', event_type=None, delay=2, handler=self.game.coils.flasherLeftRamp.disable)
+            #self.game.coils.flasherLeftRamp.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
+            #self.delay(name='disable_flasher', event_type=None, delay=2, handler=self.game.coils.flasherLeftRamp.disable)
 
 
         def move_right(self):
             
             self.unplayed_scenes('right')
 
-            self.game.coils.flasherRightRamp.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
-            self.delay(name='disable_flasher', event_type=None, delay=2, handler=self.game.coils.flasherRightRamp.disable)
+            self.game.coils.flasherRamp.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
+            self.delay(name='disable_flasher', event_type=None, delay=2, handler=self.game.coils.flasherRamp.disable)
 
 
         def eject_ball(self):
-            self.game.coils.leftEject.pulse()
+            self.game.coils.grailEject.pulse()
      
 
         def start_scene(self):
-            if self.mode_enabled and self.game.get_player_stats('multiball_running')==False and self.game.get_player_stats('quick_multiball_running')==False:
+            if self.mode_enabled and self.game.get_player_stats('multiball_running')==False and self.game.get_player_stats('quick_multiball_running')==False and self.game.get_player_stats('lock_in_progress')==False:
 
                 #play sound
                 self.game.sound.play("scene_started")
@@ -293,8 +293,8 @@ class Mode_Select(game.Mode):
                     self.info2_text = 'TO CROSS ROPE BRIDGE'
 
                 elif self.current_mode_num==8:
-                    self.timer = self.game.user_settings['Gameplay (Feature)']['Castle Grunwald Timer']
-                    self.name_text = 'CASTLE GRUNWALD'
+                    self.timer = self.game.user_settings['Gameplay (Feature)']['Castle Brunwald Timer']
+                    self.name_text = 'CASTLE BRUNWALD'
                     self.info_text = 'HIT CAPTIVE BALL'
                     self.info2_text = 'TO ESCAPE CASTLE'
 
@@ -482,7 +482,7 @@ class Mode_Select(game.Mode):
             self.layer=None
             
 
-        def sw_leftEject_active_for_500ms(self,sw):
+        def sw_grailEject_active_for_500ms(self,sw):
             #check and enable secret flag if correct sequence
             if self.game.switches.flipperLwR.is_active(0.5):
                 self.secret_mode = True
@@ -495,11 +495,11 @@ class Mode_Select(game.Mode):
                 #return procgame.game.SwitchStop   
 
 
-#        def sw_leftEject_active(self,sw):
+#        def sw_grailEject_active(self,sw):
 #            if self.mode_enabled:
 #                return procgame.game.SwitchStop
 
-        def sw_leftRampMade_active(self, sw):
+        def sw_captiveBallFront_active(self, sw):
             if not self.mode_running:
                 self.move_left()
 

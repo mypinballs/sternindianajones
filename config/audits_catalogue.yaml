@@ -127,6 +127,8 @@ featureAudits:
     label: 'Multiball Started'
   quickMultiballStarted:
     label: 'Quick Multiball Started'
+  lockLit:
+    label: 'Lock Lit'
   ballLocked:
     label: 'Ball Locked'
   jackpotLit:
@@ -135,6 +137,8 @@ featureAudits:
     label: 'Jackpot Collected'
   moonlightMultiballStarted:
     label: 'Moonlight Multiball Started'
+  mapBankCompleted:
+    label: 'Map Bank Completed'
 #this section is for items that o a value against them i.e read and write not just read
 counters:
   credits:

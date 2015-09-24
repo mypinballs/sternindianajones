@@ -10,7 +10,7 @@ import logging
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -110,7 +110,7 @@ class Rope_Bridge(game.Mode):
             self.game.sound.register_sound('rb_s2', sound_path+"bridge_fall.aiff")
 
             #lamps setup
-            self.lamps = ['leftRampArrow','rightRampArrow']
+            self.lamps = ['rightRampArrow','rightLoopArrow']
             
             self.reset()
 
@@ -361,8 +361,8 @@ class Rope_Bridge(game.Mode):
             self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=self.count)
 
             #open gates
-            self.open_gates('left')
-            self.open_gates('right')
+#            self.open_gates('left')
+#            self.open_gates('right')
 
             #update_lamps
             self.update_lamps()
@@ -395,8 +395,8 @@ class Rope_Bridge(game.Mode):
             self.clear()
 
             #close gates
-            self.close_gates('left')
-            self.close_gates('right')
+#            self.close_gates('left')
+#            self.close_gates('right')
 
             #reset lamps
             self.reset_lamps()
@@ -405,17 +405,17 @@ class Rope_Bridge(game.Mode):
             pass
 
 
-        def open_gates(self,side):
-            if side=='left':
-                 self.game.coils.rightControlGate.pulse(0)
-            elif side=='right':
-                 self.game.coils.leftControlGate.pulse(0)
-
-        def close_gates(self,side):
-            if side=='left':
-                 self.game.coils.rightControlGate.disable()
-            elif side=='right':
-                 self.game.coils.leftControlGate.disable()
+#        def open_gates(self,side):
+#            if side=='left':
+#                 self.game.coils.rightControlGate.pulse(0)
+#            elif side=='right':
+#                 self.game.coils.leftControlGate.pulse(0)
+#
+#        def close_gates(self,side):
+#            if side=='left':
+#                 self.game.coils.rightControlGate.disable()
+#            elif side=='right':
+#                 self.game.coils.leftControlGate.disable()
 
 
         def voice_call(self,count,delay=None,label="rb_s"):
@@ -475,7 +475,7 @@ class Rope_Bridge(game.Mode):
             self.layer = None
 
 
-        def sw_leftRampMade_active(self, sw):
+        def sw_rightLoopTop_active(self, sw):
             self.mode_progression()
 
             return procgame.game.SwitchStop

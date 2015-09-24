@@ -8,7 +8,7 @@ import locale
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 
@@ -42,6 +42,7 @@ class Plane_Chase(game.Mode):
             self.top_right_wings = False
 
             self.plane_lamps = ['leftPlaneBottom','rightPlaneBottom','leftPlaneMiddle','rightPlaneMiddle','leftPlaneTop','rightPlaneTop','leftRampArrow','rightRampArrow']
+            self.plane_lamps = []
             self.ramps_made=self.game.get_player_stats('ramps_made')
             self.total_ramps_made = 0
 
@@ -52,10 +53,10 @@ class Plane_Chase(game.Mode):
 
         def reset(self):
             #self.reset_lamps()
-            self.game.coils.flasherDogFight.disable()
+            self.game.coils.flasherSankara.disable()
             self.dog_fight_running = False
 
-            self.left_ramp_enabled = True
+            self.right_ramp_enabled = True
             #self.game.effects.drive_lamp('leftRampArrow','superfast')
             #self.game.effects.drive_lamp(self.plane_lamps[0],'fast')
 
@@ -74,31 +75,31 @@ class Plane_Chase(game.Mode):
                 else:
                     self.game.effects.drive_lamp(self.plane_lamps[i],'off')
 
-            if self.left_ramp_enabled:
-                self.game.effects.drive_lamp('rightRampArrow','off')
-                self.game.effects.drive_lamp('leftRampArrow','superfast')
-
-            elif self.right_ramp_enabled:
-                self.game.effects.drive_lamp('leftRampArrow','off')
-                self.game.effects.drive_lamp('rightRampArrow','superfast')
+#            if self.left_ramp_enabled:
+#                self.game.effects.drive_lamp('rightRampArrow','off')
+#                self.game.effects.drive_lamp('leftRampArrow','superfast')
+#
+#            elif self.right_ramp_enabled:
+#                self.game.effects.drive_lamp('leftRampArrow','off')
+            self.game.effects.drive_lamp('rightRampArrow','superfast')
 
         def sequence(self,number):
             print("sequence: "+str(number))
             if number>0 and number<6:
-                self.game.effects.drive_lamp(self.plane_lamps[number-1],'on')
-                self.game.effects.drive_lamp(self.plane_lamps[number],'fast')
-
-                if self.left_ramp_enabled:
-                    self.right_ramp_enabled = True
-                    self.left_ramp_enabled = False
-                    self.game.effects.drive_lamp('leftRampArrow','off')
-                    self.game.effects.drive_lamp('rightRampArrow','superfast')
-
-                elif self.right_ramp_enabled:
-                    self.right_ramp_enabled = False
-                    self.left_ramp_enabled = True
-                    self.game.effects.drive_lamp('rightRampArrow','off')
-                    self.game.effects.drive_lamp('leftRampArrow','superfast')
+#                self.game.effects.drive_lamp(self.plane_lamps[number-1],'on')
+#                self.game.effects.drive_lamp(self.plane_lamps[number],'fast')
+#
+#                if self.left_ramp_enabled:
+#                    self.right_ramp_enabled = True
+#                    self.left_ramp_enabled = False
+#                    self.game.effects.drive_lamp('leftRampArrow','off')
+#                    self.game.effects.drive_lamp('rightRampArrow','superfast')
+#
+#                elif self.right_ramp_enabled:
+#                    self.right_ramp_enabled = False
+#                    self.left_ramp_enabled = True
+#                    self.game.effects.drive_lamp('rightRampArrow','off')
+#                    self.game.effects.drive_lamp('leftRampArrow','superfast')
 
                 #self.game.lampctrl.save_state('game')
                 
@@ -118,7 +119,7 @@ class Plane_Chase(game.Mode):
 
             else:
                 self.dog_fight()
-                self.game.coils.flasherDogFight.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
+                self.game.coils.flasherSankara.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
                 self.delay(name='dog_fight_expired', event_type=None, delay=self.game.user_settings['Gameplay (Feature)']['Dog Fight Timer'], handler=self.reset)
 
         def ramp_made_text(self):
@@ -147,7 +148,7 @@ class Plane_Chase(game.Mode):
             #cancel timers
             self.cancel_delayed('update_time')
             self.cancel_delayed('dog_fight_expired')
-            self.game.coils.flasherDogFight.disable()
+            self.game.coils.flasherSankara.disable()
             
             #play animation
             anim = dmd.Animation().load(game_path+"dmd/dog_fight.dmd")
@@ -179,9 +180,9 @@ class Plane_Chase(game.Mode):
             self.layer = None
             self.text_layer.set_text('')
 
-        def sw_leftRampEnter_active(self,sw):
-            self.game.score(self.ramp_entered_score)
-            self.game.sound.play("stall")
+#        def sw_leftRampEnter_active(self,sw):
+#            self.game.score(self.ramp_entered_score)
+#            self.game.sound.play("stall")
 
 
         def sw_rightRampEnter_active(self,sw):
@@ -189,15 +190,15 @@ class Plane_Chase(game.Mode):
             self.game.sound.play("stall")
 
 
-        def sw_leftRampMade_active(self,sw):
-            if self.left_ramp_enabled:
-                self.ramps_made+=1
-                self.sequence(self.ramps_made)
-                self.game.sound.play("flight")
-            else:
-                self.game.score(self.ramp_made_score/2)
-
-            self.game.set_player_stats('ramps_made',self.ramps_made)
+#        def sw_leftRampMade_active(self,sw):
+#            if self.left_ramp_enabled:
+#                self.ramps_made+=1
+#                self.sequence(self.ramps_made)
+#                self.game.sound.play("flight")
+#            else:
+#                self.game.score(self.ramp_made_score/2)
+#
+#            self.game.set_player_stats('ramps_made',self.ramps_made)
 
 
 
@@ -212,6 +213,6 @@ class Plane_Chase(game.Mode):
             self.game.set_player_stats('ramps_made',self.ramps_made)
             
             
-        def sw_centerEnter_active(self, sw):
+        def sw_subway_active(self, sw):
             if self.dog_fight_running:
                 self.dog_fight_award()

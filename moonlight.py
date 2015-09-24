@@ -9,7 +9,7 @@ from procgame import *
 from mode_select import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -478,21 +478,21 @@ class Moonlight(game.Mode):
         #switch handlers
         #-------------------------
 
-        def sw_centerEnter_active(self, sw):
+        def sw_subway_active(self, sw):
             if self.multiball_running:
                 #update idol state
                 self.game.idol.nolock()
                 
-        def sw_leftRampMade_active(self, sw):
+        def sw_captiveBallFront_active(self, sw):
             if self.multiball_running and self.jackpot_status!='lit':
                 self.jackpot('lit')
                 self.game.score(500000)
                 return procgame.game.SwitchStop
 
-        def sw_topPost_active(self, sw):
-            if self.multiball_running:
-                self.jackpot('made')
-                return procgame.game.SwitchStop
+#        def sw_topPost_active(self, sw):
+#            if self.multiball_running:
+#                self.jackpot('made')
+#                return procgame.game.SwitchStop
        
 
 

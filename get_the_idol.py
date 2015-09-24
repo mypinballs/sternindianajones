@@ -10,7 +10,7 @@ import logging
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -149,7 +149,7 @@ class Get_The_Idol(game.Mode):
             
             self.game.sound.play_music('gti_play', loops=-1)
 
-            self.reset_drops()
+            #self.reset_drops()
 
             self.delay(name='mode_speech_delay', event_type=None, delay=2, handler=self.voice_call, param=self.count)
 
@@ -166,12 +166,18 @@ class Get_The_Idol(game.Mode):
 #
 #            self.game.set_player_stats('mode_status_tracking',updated_list)
 
+            #reset temple if required
+            if not self.game.get_player_stats('lock_lit'):
+                self.game.temple.close()
+
             #stop music
             self.game.sound.stop_music()
             self.game.sound.play_music('general_play', loops=-1)
             
             #clear display
             self.clear()
+            
+            
 
 
         def mode_progression(self,type):
@@ -193,7 +199,9 @@ class Get_The_Idol(game.Mode):
                 self.game.sound.play('target_hit')
                 self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=self.count)
            
-                self.reset_drops()
+                #self.reset_drops()
+                if self.count==self.hits:
+                    self.game.temple.open()
 
                 
             elif self.count==self.hits and type==1:
@@ -229,18 +237,21 @@ class Get_The_Idol(game.Mode):
             self.layer = None
 
 
-        def reset_drops(self):
-            self.game.coils.centerDropBank.pulse(100)
+#        def reset_drops(self):
+#            self.game.coils.centerDropBank.pulse(100)
 
 
-        def sw_dropTargetLeft_active(self, sw):
+#        def sw_dropTargetLeft_active(self, sw):
+#            self.mode_progression(0)
+#
+#        def sw_dropTargetMiddle_active(self, sw):
+#            self.mode_progression(0)
+#
+#        def sw_dropTargetRight_active(self, sw):
+#            self.mode_progression(0)
+
+        def sw_templeStandup_active(self, sw):
             self.mode_progression(0)
-
-        def sw_dropTargetMiddle_active(self, sw):
-            self.mode_progression(0)
-
-        def sw_dropTargetRight_active(self, sw):
-            self.mode_progression(0)
-
-        def sw_centerEnter_active(self, sw):
+            
+        def sw_subway_active(self, sw):
             self.mode_progression(1)

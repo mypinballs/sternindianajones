@@ -7,10 +7,11 @@ __date__ ="$14/12/2012$"
 import procgame
 import locale
 import logging
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -37,6 +38,8 @@ class Totem(game.Mode):
 
             self.game.sound.register_sound('rubble', sound_path+"rubble.aiff")
             self.game.sound.register_sound('explosion', sound_path+"explosion.aiff")
+            self.game.sound.register_sound('map_target', sound_path+"adv_target4.aiff")
+            self.game.sound.register_sound('map_target', sound_path+"adv_target2.aiff")
             self.game.sound.register_music('qm_ready', music_path+"quick_multiball_ready.aiff")
             self.game.sound.register_music('qm_running', music_path+"quick_multiball_play.aiff")
             self.game.sound.register_sound('qm_jackpot0', speech_path+"the_idol_of_the_incas.aiff")
@@ -50,27 +53,43 @@ class Totem(game.Mode):
             self.totem_value_boost = 1000000
 
             self.jackpot_base_value = 10000000
-            self.jackpot_boost_value = 5000000
+            self.jackpot_boost_value = 500000
 
             self.add_ball_value = 1000000
 
-            self.mulitball_started = False
+            self.multiball_started = False
             self.multiball_running = False
             self.balls_needed = 2
+            
+            self.map_lamps = ['mapM','mapA','mapP']
+            self.map_bank_timer = 30
+            self.map_target_score = 1000
+            self.map_bank_score = 100000
+            
 
 
         def reset(self):
             self.timer = int(self.game.user_settings['Gameplay (Feature)']['Captive Multiball Start Timer'])
             self.hits_needed = int(self.game.user_settings['Gameplay (Feature)']['Captive Multiball Start'])
             self.count = 0
-            self.jackpot_count = 0
+            self.jackpot_count = self.game.get_player_stats('qm_jackpots_collected')
             self.multiball_started= False
             self.multiball_ready_flag = False
-            self.game.coils.totemDropUp.pulse()
-            self.game.effects.drive_flasher('flasherTotem','off')
+            #self.game.coils.totemDropUp.pulse()
+            self.game.effects.drive_flasher('flasherSwordsman','off')
+            self.game.effects.drive_flasher('flasherBackpanel','off')
             
             self.cancel_delayed('timeout_delay') #clear delay in case reset called directly from other modes
+            
+            #map specific
+            self.map_banks_completed = self.game.get_player_stats('map_banks_completed')
+            self.reset_map()
+            
 
+        def reset_map(self):
+            self.map_flags = [False,False,False]
+            self.reset_map_lamps()
+            
 
         def mode_started(self):
             self.reset()
@@ -124,9 +143,31 @@ class Totem(game.Mode):
             self.score_layer.set_text(locale.format("%d", score, True),color=dmd.YELLOW)
 
         def update_lamps(self):
-            #print("Update Lamps")
-            pass
+            self.update_map_lamps()
+        
+        
+        def set_map_lamps(self,id):
+            self.game.effects.drive_lamp(self.map_lamps[id],'smarton')
+            for i in range(len(self.map_lamps)):
+                if not self.map_flags[i]:
+                    self.game.effects.drive_lamp(self.map_lamps[i],'medium')
+        
+        def update_map_lamps(self):
+            for i in range(len(self.map_lamps)):
+                if self.map_flags[i]:
+                    self.game.effects.drive_lamp(self.map_lamps[i],'on')
+                else:
+                    self.game.effects.drive_lamp(self.map_lamps[i],'medium')
 
+        def reset_map_lamps(self):
+            for i in range(len(self.map_lamps)):
+                self.game.effects.drive_lamp(self.map_lamps[i],'off')
+        
+        def completed_map_lamps(self):
+            for i in range(len(self.map_lamps)):
+                self.game.effects.drive_lamp(self.map_lamps[i],'superfast')
+
+                
         def clear(self):
             self.layer = None
             
@@ -136,9 +177,51 @@ class Totem(game.Mode):
 
         def setup_target(self):
             if self.count<self.hits_needed:
-                self.game.coils.totemDropUp.pulse()
+                #self.game.coils.totemDropUp.pulse()
+                pass
             elif not self.game.get_player_stats('multiball_running'):
                 self.multiball_ready()
+                
+        def inc_jackpot(self,value):
+            self.jackpot_boost_value+=value
+
+        def map_progress(self,num):
+            if not self.map_flags[num]:
+                self.map_flags[num]=True
+
+                #test for a completed set of targets
+                complete=True
+                for i in range(len(self.map_lamps)):
+                    if self.map_flags[i]==False:
+                        complete=False
+
+                if complete:
+                    #update banks
+                    self.map_banks_completed+=1
+                    self.map_completed()
+                    audits.record_value(self.game,'mapBankCompleted')
+                else:
+                    self.set_map_lamps(num)
+                    self.inc_jackpot(self.map_target_score*10)
+                    self.game.score(self.map_target_score)
+                    self.game.sound.play('map_target')
+                    self.game.effects.drive_flasher("flasherBackpanel", "fade", time=0.3)
+
+                    #reset the timer
+                    self.cancel_delayed('reset_map')
+                    self.delay(name='reset_map', delay=self.map_bank_timer, handler=self.reset_map)
+                    
+                    
+        def map_completed(self):
+            self.completed_map_lamps()
+            self.game.effects.drive_flasher("flasherBackpanel", "fade", time=1)
+            self.game.sound.play('explosion')
+            
+            self.inc_jackpot(self.map_bank_score*10)
+            self.game.score(self.map_bank_score)
+            
+            self.cancel_delayed('reset_map')
+            self.delay(name='reset_map', delay=1, handler=self.reset_map)        
 
 
         def multiball_ready(self):
@@ -167,7 +250,8 @@ class Totem(game.Mode):
 
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer1,info_layer2,ball_layer,self.score_layer,timer_layer])
             
-            self.game.effects.drive_flasher('flasherTotem','fast',time=0)
+            self.game.effects.drive_flasher('flasherSwordsman','fast',time=0)
+            self.game.effects.drive_flasher('flasherBackpanel','fast',time=0) 
 
             self.game.sound.stop_music()
             self.game.sound.play_music('qm_ready', loops=-1)
@@ -262,12 +346,12 @@ class Totem(game.Mode):
             
 
         def launch_ball(self):
-            self.game.trough.launch_balls(1,callback=self.launch_callback,stealth=False) #stealth false, bip +1
-            self.game.ball_save.start(time=5)
+            if self.game.trough.num_balls_in_play<4:
+                self.game.trough.launch_balls(1,callback=self.launch_callback,stealth=False) #stealth false, bip +1
             
             
         def launch_callback(self):
-            pass
+            self.game.ball_save.start(time=5)
         
         
         def multiball_tracking(self):
@@ -343,6 +427,7 @@ class Totem(game.Mode):
 
             #inc the counter
             self.jackpot_count+=1
+            self.game.set_player_stats('qm_jackpots_collected',self.jackpot_count)
 
             self.delay(name='reset_display',delay=3,handler=self.multiball)
 
@@ -372,13 +457,13 @@ class Totem(game.Mode):
             #set target
             self.delay(name='reset_display',delay=3,handler=self.multiball)
 
-        def sw_leftEject_active(self, sw):
-            if self.multiball_running and not self.game.get_player_stats('multiball_running'): #only do this is the main multiball is not running also
+        def sw_grailEject_active(self, sw):
+            if self.multiball_running and not self.game.get_player_stats('multiball_running'): #only do this if the main multiball is not running also
                 self.game.screens.add_ball(2,self.add_ball_value)
                 self.launch_ball()
 
 
-        def sw_singleDropTop_active(self, sw):
+        def sw_captiveBallRear_active(self, sw):
             self.hit()
 
 
@@ -396,3 +481,16 @@ class Totem(game.Mode):
                 self.game.coils.ballLaunch.pulse()
 
             return procgame.game.SwitchStop
+        
+        
+        def sw_mapM_active(self,sw):
+            self.map_progress(0)
+        
+        def sw_mapA_active(self,sw):         
+            self.map_progress(1)
+            
+        def sw_mapP_active(self,sw):
+            self.map_progress(2)
+            
+        def sw_mapEject_active_for_250ms(self,sw): #work out what to do with this rules wise
+            self.game.coils.mapEject.pulse()

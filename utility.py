@@ -10,7 +10,7 @@ import logging
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 
@@ -42,39 +42,31 @@ class Utility(game.Mode):
 
                 self.log.info('Trough is full::%s',self.game.trough.is_full())
                 self.log.info('Balls in trough::%s',self.game.trough.num_balls())
-                self.log.info('Subway Switch::%s',self.game.switches.subwayLockup.is_active())
-                self.log.info('Popper Switch::%s',self.game.switches.rightPopper.is_active())
+                self.log.info('Balls in Ark::%s',self.game.ark.num_balls())
+                self.log.info('Subway Switch::%s',self.game.switches.subway.is_active())
+                self.log.info('Scoop Switch::%s',self.game.switches.grailEject.is_active())
+                
                 self.log.info('Balls Locked::%s',self.game.trough.num_balls_locked)
 
-                if self.game.switches.leftEject.is_active():
-                    self.game.coils.leftEject.pulse()
-
-                #popper
-                if self.game.switches.rightPopper.is_active():
-                    self.game.coils.ballPopper.pulse(50)
-
-                #subway
-                if self.game.switches.subwayLockup.is_active():
-                    self.game.coils.subwayRelease.pulse()
-
-                #reset drops
-                if self.game.switches.dropTargetLeft.is_active() or self.game.switches.dropTargetMiddle.is_active() or self.game.switches.dropTargetRight.is_active():
-                    self.game.coils.centerDropBank.pulse(100)
-
-                if self.game.switches.singleDropTop.is_active():
-                    self.game.coils.totemDropUp.pulse()
+                if self.game.switches.grailEject.is_active():
+                    self.game.coils.grailEject.pulse()
 
                 #check shooter lane
                 if self.game.switches.shooterLane.is_active():
                     self.game.coils.ballLaunch.pulse()
 
-                if self.game.switches.topPost.is_active():
-                    self.game.coils.topLockupMain.pulse()
-                    self.game.coils.topLockupHold.pulse(200)
 
                 self.delay(name='release_stuck_balls_loop', event_type=None, delay=5, handler=self.release_stuck_balls)
             else:
                 self.cancel_delayed('release_stuck_balls_loop')
+            
+
+        def check_map_room(self):
+            #check for ball in map eject
+            self.log.info('Map Eject Switch::%s',self.game.switches.mapEject.is_active())
+            if self.game.switches.mapEject.is_active():
+                self.game.coils.mapEject.pulse()
+        
 
 
         def pause_game(self,active=True):

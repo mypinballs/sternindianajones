@@ -11,7 +11,7 @@ from random import *
 from service import *
 from bonus import *
 from pops import *
-from narrow_escape import *
+#from narrow_escape import *
 from loops import *
 from poa import *
 from hand_of_fate import *
@@ -20,7 +20,7 @@ from ij_modes import *
 from indy_lanes import *
 from plane_chase import *
 from mode_select import *
-from skillshot import *
+#from skillshot import *
 from multiball import *
 
 from time import strftime
@@ -28,7 +28,7 @@ from time import strftime
 
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -86,10 +86,10 @@ class BaseGameMode(game.Mode):
 
 		# Turn on the GIs
 		# Some games don't have controllable GI's (ie Stern games)
-		self.game.lamps.gi01.pulse(0)
-		self.game.lamps.gi02.pulse(0)
-		self.game.lamps.gi03.pulse(0)
-		self.game.lamps.gi04.pulse(0)
+		#self.game.lamps.gi01.pulse(0)
+		#self.game.lamps.gi02.pulse(0)
+		#self.game.lamps.gi03.pulse(0)
+		#self.game.lamps.gi04.pulse(0)
 
 		# Enable the flippers
                 #print "Game Config: "+str(self.game.config)
@@ -120,7 +120,8 @@ class BaseGameMode(game.Mode):
                 self.game.ball_save.callback = self.ball_save_callback
 
                 #reset drop targets
-                self.game.coils.centerDropBank.pulse(100)
+                #self.game.coils.centerDropBank.pulse(100)
+
 
         def add_basic_modes(self,ball_in_play):
 
@@ -128,12 +129,12 @@ class BaseGameMode(game.Mode):
         #if self.game.ball==1:
             #lower priority basic modes
             self.pops = Pops(self.game, 40)
-            self.narrow_escape = Narrow_Escape(self.game, 41)
+            #self.narrow_escape = Narrow_Escape(self.game, 41)
 
             #medium priority basic modes
             self.totem = Totem(self.game, 51)
             self.plane_chase = Plane_Chase(self.game, 52)
-            self.skillshot = Skillshot(self.game, 54)
+            #self.skillshot = Skillshot(self.game, 54)
 
             #higher priority basic modes
             self.mode_select = Mode_Select(self.game, 60)
@@ -146,7 +147,7 @@ class BaseGameMode(game.Mode):
 
             #start modes
             self.game.modes.add(self.pops)
-            self.game.modes.add(self.narrow_escape)
+            #self.game.modes.add(self.narrow_escape)
             self.game.modes.add(self.indy_lanes)
             self.game.modes.add(self.loops)
             self.game.modes.add(self.totem)
@@ -212,7 +213,7 @@ class BaseGameMode(game.Mode):
 
             #if self.game.ball==0:
                 self.game.modes.remove(self.pops)
-                self.game.modes.remove(self.narrow_escape)
+                #self.game.modes.remove(self.narrow_escape)
                 self.game.modes.remove(self.indy_lanes)
                 self.game.modes.remove(self.loops)
                 self.game.modes.remove(self.totem)
@@ -295,23 +296,27 @@ class BaseGameMode(game.Mode):
 	# Note: Game specific item
 	# Set the switch name to the launch button on your game.
 	# If manual plunger, remove the whole section.
-	def sw_gunTrigger_active(self, sw):
-		if self.game.switches.shooterLane.is_active():
-			self.game.coils.ballLaunch.pulse()
-                        self.game.coils.flasherRightSide.schedule(0x00003333, cycle_seconds=2, now=True)
-                        self.game.sound.play("gun_shot")
-                if self.game.switches.flipperLwL.is_active() and self.ball_starting:
-                        self.game.modes.add(self.skillshot)
+#	def sw_tournamentStart_active(self, sw):
+#		if self.game.switches.shooterLane.is_active():
+#			self.game.coils.ballLaunch.pulse()
+#                        self.game.coils.flasherRightSide.schedule(0x00003333, cycle_seconds=2, now=True)
+#                        
+#                if self.game.switches.flipperLwL.is_active() and self.ball_starting:
+#                        self.game.modes.add(self.skillshot)
+                        
+        def sw_shooterLane_inactive_for_50ms(self,sw):
+            if self.ball_served:
+                self.game.sound.play("gun_shot")
 
-        #skillshot preview
-        def sw_flipperLwL_active_for_500ms(self, sw):
-            if self.ball_starting and self.game.switches.shooterLane.is_active():
-                self.skillshot.activate_lamps()
-
-        #skillshot preview
-        def sw_flipperLwL_inactive(self, sw):
-            if self.ball_starting and self.game.switches.shooterLane.is_active():
-                self.skillshot.clear_lamps()
+#        #skillshot preview
+#        def sw_flipperLwL_active_for_500ms(self, sw):
+#            if self.ball_starting and self.game.switches.shooterLane.is_active():
+#                self.skillshot.activate_lamps()
+#
+#        #skillshot preview
+#        def sw_flipperLwL_inactive(self, sw):
+#            if self.ball_starting and self.game.switches.shooterLane.is_active():
+#                self.skillshot.clear_lamps()
 
 
 	# Allow service mode to be entered during a game.
@@ -337,7 +342,7 @@ class BaseGameMode(game.Mode):
         def sw_rightInlane_active(self,sw):
             self.inlane()
 
-        def sw_rightOutlaneBottom_active(self,sw):
+        def sw_rightOutlane_active(self,sw):
             self.outlane()
 
         def sw_leftOutlane_active(self,sw):
@@ -361,7 +366,7 @@ class BaseGameMode(game.Mode):
 
 
         #pause game logic
-        def sw_buyInButton_active_for_250ms(self,sw): 
+        def sw_tournamentStart_active_for_250ms(self,sw): 
              if self.game.ball>0: 
                 if self.game.switches.flipperLwR.is_active(0.5) and not self.game.paused:
                     self.game.utility.pause_game(True)

@@ -9,7 +9,7 @@ import logging
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
-game_path = base_path+"games/indyjones/"
+game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
 music_path = game_path +"music/"
@@ -56,8 +56,8 @@ class Idol(game.Mode):
 
         def mode_tick(self):
             #self.move_to_posn(1)
-            self.idol_control()
-            #pass
+            #self.idol_control()
+            pass
 
 
         def move_to_posn(self,posn_num,delay=0,callback1=None,callback2=None,delay1=0,delay2=0):
@@ -245,35 +245,35 @@ class Idol(game.Mode):
             self.set_state('initialise')
            
 
-        def sw_wheelPosition2_active(self, sw):
-            if self.game.switches.wheelPosition1.is_inactive() and self.game.switches.wheelPosition3.is_active():
-                self.position =1
-            self.log.info("Position: "+str(self.position))
-
-        def sw_wheelPosition2_inactive(self, sw):
-            if self.game.switches.wheelPosition1.is_active() and self.game.switches.wheelPosition3.is_inactive():
-                self.position =4
-            self.log.info("Position: "+str(self.position))
-
-        def sw_wheelPosition1_active(self, sw):
-            if self.game.switches.wheelPosition2.is_active() and self.game.switches.wheelPosition3.is_inactive():
-                self.position =3
-            self.log.info("Position: "+str(self.position))
-
-        def sw_wheelPosition1_inactive(self, sw):
-            if self.game.switches.wheelPosition2.is_inactive() and self.game.switches.wheelPosition3.is_active():
-                self.position =6
-            self.log.info("Position: "+str(self.position))
-
-        def sw_wheelPosition3_active(self, sw):
-            if self.game.switches.wheelPosition1.is_active() and self.game.switches.wheelPosition2.is_inactive():
-                self.position =5
-            self.log.info("Position: "+str(self.position))
-
-        def sw_wheelPosition3_inactive(self, sw):
-            if self.game.switches.wheelPosition1.is_inactive() and self.game.switches.wheelPosition2.is_active():
-                self.position =2
-            self.log.info("Position: "+str(self.position))
+#        def sw_wheelPosition2_active(self, sw):
+#            if self.game.switches.wheelPosition1.is_inactive() and self.game.switches.wheelPosition3.is_active():
+#                self.position =1
+#            self.log.info("Position: "+str(self.position))
+#
+#        def sw_wheelPosition2_inactive(self, sw):
+#            if self.game.switches.wheelPosition1.is_active() and self.game.switches.wheelPosition3.is_inactive():
+#                self.position =4
+#            self.log.info("Position: "+str(self.position))
+#
+#        def sw_wheelPosition1_active(self, sw):
+#            if self.game.switches.wheelPosition2.is_active() and self.game.switches.wheelPosition3.is_inactive():
+#                self.position =3
+#            self.log.info("Position: "+str(self.position))
+#
+#        def sw_wheelPosition1_inactive(self, sw):
+#            if self.game.switches.wheelPosition2.is_inactive() and self.game.switches.wheelPosition3.is_active():
+#                self.position =6
+#            self.log.info("Position: "+str(self.position))
+#
+#        def sw_wheelPosition3_active(self, sw):
+#            if self.game.switches.wheelPosition1.is_active() and self.game.switches.wheelPosition2.is_inactive():
+#                self.position =5
+#            self.log.info("Position: "+str(self.position))
+#
+#        def sw_wheelPosition3_inactive(self, sw):
+#            if self.game.switches.wheelPosition1.is_inactive() and self.game.switches.wheelPosition2.is_active():
+#                self.position =2
+#            self.log.info("Position: "+str(self.position))
 
 
         def check_popper(self):
@@ -324,9 +324,9 @@ class Idol(game.Mode):
                 
 
         #idol upkicker
-        def sw_rightPopper_active_for_500ms(self, sw):
-            self.check_popper()
-        
+#        def sw_rightPopper_active_for_500ms(self, sw):
+#            self.check_popper()
+#        
         
 
 
@@ -337,7 +337,7 @@ class Idol(game.Mode):
 #            if self.game.switches.rightPopper.is_inactive():
 #                self.game.coils.subwayRelease.pulse()
 
-        def sw_centerEnter_active(self, sw):
+        def sw_subway_active(self, sw):
             if self.game.ball>0 or len(self.game.players)>0:
                 self.balls_in_subway+=1
                 if not self.subway_active:
@@ -351,10 +351,10 @@ class Idol(game.Mode):
            
 
         #idol entrance
-        def sw_topIdolEnter_active(self, sw):
-            if self.game.ball>0 or len(self.game.players)>0:
-                self.balls_in_idol+=1
-                self.update_ball_tracking(-1)
+#        def sw_topIdolEnter_active(self, sw):
+#            if self.game.ball>0 or len(self.game.players)>0:
+#                self.balls_in_idol+=1
+#                self.update_ball_tracking(-1)
 
 
 #        def sw_topIdolEnter_time_since_change_500ms(self, sw):
@@ -372,16 +372,16 @@ class Idol(game.Mode):
 #                self.game.coils.subwayRelease.pulse(20)
 
 
-        def sw_exitIdol_active(self, sw):
-            if self.game.ball>0 or len(self.game.players)>0:
-                self.balls_in_idol-=1
-                self.update_ball_tracking(1)
-                self.check_popper()
+#        def sw_exitIdol_active(self, sw):
+#            if self.game.ball>0 or len(self.game.players)>0:
+#                self.balls_in_idol-=1
+#                self.update_ball_tracking(1)
+#                self.check_popper()
                 
 
 
         #hidden debug button combination
-        def sw_buyInButton_active_for_250ms(self, sw):
+        def sw_tournamentStart_active_for_250ms(self, sw):
             if self.game.switches.gunTrigger.is_active(0.5):
                 self.idol_state='empty'
             elif self.game.switches.flipperLwL.is_active(0.5):
