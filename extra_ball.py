@@ -72,6 +72,7 @@ class Extra_Ball(game.Mode):
         
         #switch handlers
         def sw_grailEject_active_for_250ms(self,sw):
-            if self.game.get_player_stats('extra_ball_lit'):
-                self.collect()
+            if self.game.ball >0:
+                if self.game.get_player_stats('extra_ball_lit'):
+                    self.collect()
                 

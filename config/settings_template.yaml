@@ -64,7 +64,7 @@ Machine (Standard):
     default: 'Yes'
   'Color Display Pixel Size':
     options: [14,10,8]
-    default: 8
+    default: 10
   'Color Display X Offset':
     options: [-2500,2500]
     increments: 1
@@ -72,7 +72,7 @@ Machine (Standard):
   'Color Display Y Offset':
     options: [-2500,2500]
     increments: 1
-    default: 195
+    default: 35
 Sound:
   'Initial volume':
     options: [0.1,1.0]

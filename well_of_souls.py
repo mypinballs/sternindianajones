@@ -286,7 +286,10 @@ class Well_Of_Souls(game.Mode):
 
             #reset drops after certain amount of succesfull shots
             if self.count>=self.reset_drop_count:
-                self.reset_drops()
+#                self.reset_drops()
+                pass #TODO change this to close temple scoop then open again after some hits etc
+            
+
 
 
 

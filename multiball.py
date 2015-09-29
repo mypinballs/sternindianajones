@@ -683,7 +683,7 @@ class Multiball(game.Mode):
 #            pass
 
         def sw_rightRampEnter_active(self, sw):
-            if self.jackpot_status=='lit' and self.game.switches.sw_rightRampEnter_active.time_since_change()>1:
+            if self.jackpot_status=='lit' and self.game.switches.rightRampEnter.time_since_change()>1:
                 self.game.sound.play('jackpot_attempt')
 
 

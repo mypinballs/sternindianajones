@@ -116,7 +116,7 @@ class Game(game.BasicGame):
                         self.desktop = Desktop()
                     # otherwise run the color display
                     else:
-                        self.log.info("Color Desktop")
+                        self.log.info("Colour Desktop")
                         from ep import EP_Desktop
                         self.desktop = EP_Desktop()
 

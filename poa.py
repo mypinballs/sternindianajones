@@ -335,14 +335,15 @@ class POA(game.Mode):
             
             self.game.sound.play("adventure_start")
             
-            self.delay(name='instructions', event_type=None, delay=timer, handler=self.game.mini_playfield.instructions)
+            #self.delay(name='instructions', event_type=None, delay=timer, handler=self.game.mini_playfield.instructions)
             self.delay(name='instructions', event_type=None, delay=timer+2, handler=self.release_ball)
             
             self.adventure_continue()
 
 
         def adventure_continue(self):
-            if self.game.mini_playfield.get_status()=='countdown':
+            #if self.game.mini_playfield.get_status()=='countdown':
+            if self.game.switches.leftInlane.time_since_change()<1:
                 self.adventure_continuing  = True
 
                 bgnd_anim = dmd.Animation().load(game_path+"dmd/poa_continue_bgnd.dmd")
@@ -662,7 +663,8 @@ class POA(game.Mode):
             #set text layers
             text_layer1 = dmd.TextLayer(64, 18, self.game.fonts['tiny7'], "center", opaque=False)
             text_layer2 = dmd.TextLayer(64, 24, self.game.fonts['tiny7'], "center", opaque=False)
-            text_layer1.set_text(("Adventure "+str(self.game.mini_playfield.get_level())+". Pit lit at "+str(self.pit_active_level)).upper(), color=dmd.CYAN)
+            #text_layer1.set_text(("Adventure "+str(self.game.mini_playfield.get_level())+". Pit lit at "+str(self.pit_active_level)).upper(), color=dmd.CYAN)
+            text_layer1.set_text(("Pit lit at "+str(self.pit_active_level)).upper(), color=dmd.CYAN)
             text_layer2.set_text(("Pit Value:"+locale.format("%d", self.game.get_player_stats('pit_value'), True)).upper(),blink_frames=4, color=dmd.PURPLE)
 
             #set display layer
