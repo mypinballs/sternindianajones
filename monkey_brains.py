@@ -45,7 +45,7 @@ class Monkey_Brains(game.Mode):
             self.award_layer.composite_op ="blacksrc"
             
             #sound setup
-            self.game.sound.register_music('background_play', music_path+"monkey_brains.aiff")
+            self.game.sound.register_music('monkey_brains_play', music_path+"monkey_brains.aiff")
             self.game.sound.register_sound('shot_hit', sound_path+"monkey_brains_jingle_eat.aiff")
             self.game.sound.register_sound('s0', speech_path+"chilled_monkey_brains.aiff")
             self.game.sound.register_sound('s1', sound_path+"chomp.aiff")
@@ -100,7 +100,7 @@ class Monkey_Brains(game.Mode):
             self.load_bgnd_anim()
             
             #start mode music & speech
-            self.game.sound.play_music('background_play', loops=-1)
+            self.game.sound.play_music('monkey_brains_play', loops=-1)
             self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=self.count)
 
             #open gates

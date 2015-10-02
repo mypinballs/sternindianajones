@@ -619,6 +619,9 @@ class Multiball(game.Mode):
                 self.game.effects.drive_lamp('templeArrow','medium')
             else:
                 self.game.effects.drive_lamp('templeArrow','off')
+                
+            for i in range(self.jackpot_collected):
+                self.game.effects.drive_lamp(self.jackpot_lamps[i],'on')
 
 
         def delayed_clear(self,timer=2):

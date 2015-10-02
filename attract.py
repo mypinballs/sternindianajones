@@ -309,13 +309,13 @@ class Attract(game.Mode):
 
 	# Outside of the service mode, up/down control audio volume.
 	def sw_down_active(self, sw):
-		volume = self.game.sound.volume_down()
-		self.game.set_status("Volume Down : " + str(volume))
+		volume = int(self.game.sound.volume_down())
+		self.game.set_status("Volume Down : " + str(volume*10)+"%")
 		return True
 
 	def sw_up_active(self, sw):
-		volume = self.game.sound.volume_up()
-		self.game.set_status("Volume Up : " + str(volume))
+		volume = int(self.game.sound.volume_up())
+		self.game.set_status("Volume Up : " + str(volume*10)+"%")
 		return True
             
         

@@ -236,6 +236,13 @@ class Mode_Select(game.Mode):
 
 
         def eject_ball(self):
+            timer=1
+            self.game.effects.drive_flasher('flasherCrusade',style='fast',time=timer-0.1)
+            self.delay(name='eject_kick_delay',delay=timer,handler=self.eject_kick)
+            
+            
+        def eject_kick(self):
+            self.game.effects.drive_flasher('flasherCrusade',style='super',time=0.2)
             self.game.coils.grailEject.pulse()
      
 
@@ -342,11 +349,13 @@ class Mode_Select(game.Mode):
             elif self.mode_running:
                 self.mode_bonus()
             else:
-                timer = 0.5
+                timer = 0
                 #lengthen the timer if these events are running
                 if self.game.get_player_stats('multiball_started') or self.game.get_player_stats('multiball_running') or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress'):
-                    timer =3
+                    timer =2
                 self.delay(name='eject_delay', event_type=None, delay=timer, handler=self.eject_ball)
+                
+                
 
         def add_selected_scene(self):
 
@@ -423,7 +432,7 @@ class Mode_Select(game.Mode):
                     self.delay(name='scene_timeout', event_type=None, delay=self.timer+time, handler=self.end_scene)
                 self.delay(name='scene_delay', event_type=None, delay=time, handler=self.add_selected_scene)
                 if self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=11:#don't eject ball for video modes, scene will eject it itself at end
-                    self.delay(name='eject_delay', event_type=None, delay=time, handler=self.eject_ball)
+                    self.delay(name='eject_delay', event_type=None, delay=time-1, handler=self.eject_ball)
                 self.delay(name='clear_delay', event_type=None, delay=time, handler=self.clear)
                 self.ssd_count+=1
 
@@ -471,7 +480,7 @@ class Mode_Select(game.Mode):
         def mode_bonus(self):
             timer=2
             self.game.screens.mode_bonus(timer,self.mode_bonus_value)
-            self.delay(name='eject_delay', event_type=None, delay=timer, handler=self.eject_ball)
+            self.delay(name='eject_delay', event_type=None, delay=timer-1, handler=self.eject_ball)
 
             audits.record_value(self,'modeBonus')
 

@@ -103,7 +103,7 @@ class Rope_Bridge(game.Mode):
             self.award_layer.composite_op ="blacksrc"
             
             #sound setup
-            self.game.sound.register_music('background_play', music_path+"rope_bridge.aiff")
+            self.game.sound.register_music('rope_bridge_play', music_path+"rope_bridge.aiff")
             self.game.sound.register_sound('rb_shot_hit', sound_path+"out_of_breath.aiff")
             self.game.sound.register_sound('rb_s0', speech_path+"come_on_indy.aiff")
             self.game.sound.register_sound('rb_s1', sound_path+"sword_chop.aiff")
@@ -357,7 +357,7 @@ class Rope_Bridge(game.Mode):
             
             
             #start mode music & speech
-            self.game.sound.play_music('background_play', loops=-1)
+            self.game.sound.play_music('rope_bridge_play', loops=-1)
             self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=self.count)
 
             #open gates
