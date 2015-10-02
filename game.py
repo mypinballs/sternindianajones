@@ -164,7 +164,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.5.9'
+                self.system_version='0.1.1'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
