@@ -78,6 +78,9 @@ Sound:
     options: [0.1,1.0]
     increments: 0.1
     default: 0.1
+  'Extended Speech':
+    options: ['Yes','No']
+    default: 'Yes'  
   'Music volume offset':
     options: [-0.4,0.4]
     increments: 0.1
@@ -265,6 +268,14 @@ Gameplay (Feature):
     options: [5,30]
     increments: 5
     default: 20
+  'Jones Vs Aliens Timer':
+    options: [20,90]
+    increments: 5
+    default: 60
+  'Frankenstein Timer':
+    options: [20,90]
+    increments: 5
+    default: 60 
   'Jackport Multiplier Timer':
     options: [5,120]
     increments: 5
@@ -339,6 +350,9 @@ Gameplay (Feature):
     options: [2,8]
     increments: 1
     default: 3
+  'Monster Extras':
+    options: ['Yes','No']
+    default: 'Yes'
 Network:
   'IP Address':
     options: [0,255]

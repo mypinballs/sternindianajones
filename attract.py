@@ -102,6 +102,9 @@ class Attract(game.Mode):
 
                 #fadeout music (if any running)
                 self.delay(name='music_fadeout_delay', event_type=None, delay=10, handler=lambda:self.game.sound.fadeout_music(3000))
+                
+                #temp gi test
+                self.gi_flutter() 
 
 
 #        def gi(self):
@@ -109,6 +112,10 @@ class Attract(game.Mode):
 #            self.game.lamps.gi02.pulse(0)
 #            self.game.lamps.gi03.pulse(0)
 #            self.game.lamps.gi04.pulse(0)
+        
+        def gi_flutter(self):
+            self.log.info("GI FLUTTER")
+            self.game.lamps.playfieldGI.schedule(0x000C0F0F,cycle_seconds=1)
 #
 #        def gi_off(self):
 #            self.game.lamps.gi01.disable()

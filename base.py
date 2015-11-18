@@ -62,6 +62,12 @@ class BaseGameMode(game.Mode):
                 self.game.sound.register_sound('outlane_speech', speech_path+"goodbye.aiff")
                 self.game.sound.register_sound('outlane_speech', speech_path+"argh.aiff")
                 self.game.sound.register_sound('outlane_speech', speech_path+"why_snakes.aiff")
+                if self.game.extended_speech:
+                    self.log.info('Extended speech files added in base')
+                    self.game.sound.register_sound('outlane_speech', speech_path+"big_problem01.aiff")
+                    self.game.sound.register_sound('outlane_speech', speech_path+"lost_your_ball01.aiff")
+                    self.game.sound.register_sound('outlane_speech', speech_path+"situation_not_improved01.aiff")
+                    
                 self.game.sound.register_sound('outlane_speech', speech_path+"blank.aiff")
 
                 #setup flags
@@ -261,6 +267,7 @@ class BaseGameMode(game.Mode):
 		if self.game.ball == 1 and len(self.game.players)<self.game.max_players:
 			p = self.game.add_player()
 			self.log.info(p.name + " added!")
+                        audits.record_value(self,'gameStarted')
 
         def sw_startButton_active_for_2s(self, sw):
 		if self.game.ball > 1 and self.game.user_settings['Machine (Standard)']['Game Restart']:

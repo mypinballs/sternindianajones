@@ -197,7 +197,7 @@ class POA(game.Mode):
 
                 adventure_layer = dmd.GroupedLayer(128, 32, [bgnd,A,D,V,E1,N,T,U,R,E2,completed])
                 
-                if self.game.get_player_stats('mode_running_id')!=0: #do not display adventure graphic if get the idol is running
+                if self.game.get_player_stats('mode_running_id')!=0 and self.game.get_player_stats('mode_running_id')!=12: #do not display adventure graphic if get the idol or jones vs aliens is running
                     self.layer = adventure_layer
                 
 
@@ -405,21 +405,24 @@ class POA(game.Mode):
 
 
 	def begin(self):
-                #self.reset_lamps()
-                pass
+            #self.reset_lamps()
+            pass
+
 
         def update_lamps(self):
             #flags=[self.adventureA_lit,self.adventureD_lit,self.adventureV_lit,self.adventureE1_lit,self.adventureN_lit,self.adventureT_lit,self.adventureU_lit,self.adventureR_lit,self.adventureE2_lit]
-            for i in range(len(self.flag)):
-                if self.flag[i]:
-                    self.game.effects.drive_lamp(self.lamps[i],'on')
-                else:
-                    self.game.effects.drive_lamp(self.lamps[i],'medium')
+#            for i in range(len(self.flag)):
+#                if self.flag[i]:
+#                    self.game.effects.drive_lamp(self.lamps[i],'on')
+#                else:
+#                    self.game.effects.drive_lamp(self.lamps[i],'medium')
+            pass
 
 
 	def reset_lamps(self):
-                for i in range(len(self.lamps)):
-                    self.game.effects.drive_lamp(self.lamps[i],'medium')
+#                for i in range(len(self.lamps)):
+#                    self.game.effects.drive_lamp(self.lamps[i],'medium')
+            pass
                     
 
         def reset_pit_value(self):
@@ -475,12 +478,12 @@ class POA(game.Mode):
 	def sw_adventureA_active(self, sw):
             #self.target_hit(0)
             if self.adventureA_lit == False:
-                self.game.drive_lamp(self.lamps[0],'on')
+                #self.game.drive_lamp(self.lamps[0],'on')
                 self.letters_spotted +=1
                 self.adventureA_lit=True;
                 self.flag[0]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[0]))
+                #print("adventure lamp lit: %s "%(self.lamps[0]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:
@@ -494,12 +497,12 @@ class POA(game.Mode):
         def sw_adventureD_active(self, sw):
 
             if self.adventureD_lit == False:
-                self.game.drive_lamp(self.lamps[1],'on')
+                #self.game.drive_lamp(self.lamps[1],'on')
                 self.letters_spotted +=1
                 self.adventureD_lit=True;
                 self.flag[1]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[1]))
+                #print("adventure lamp lit: %s "%(self.lamps[1]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:
@@ -512,12 +515,12 @@ class POA(game.Mode):
                 
         def sw_adventureV_active(self, sw):
             if self.adventureV_lit == False:
-                self.game.drive_lamp(self.lamps[2],'on')
+                #self.game.drive_lamp(self.lamps[2],'on')
                 self.letters_spotted +=1
                 self.adventureV_lit=True;
                 self.flag[2]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[2]))
+                #print("adventure lamp lit: %s "%(self.lamps[2]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:
@@ -530,12 +533,12 @@ class POA(game.Mode):
                 
         def sw_adventureE1_active(self, sw):
             if self.adventureE1_lit == False:
-                self.game.drive_lamp(self.lamps[3],'on')
+                #self.game.drive_lamp(self.lamps[3],'on')
                 self.letters_spotted +=1
                 self.adventureE1_lit=True;
                 self.flag[3]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[3]))
+                #print("adventure lamp lit: %s "%(self.lamps[3]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:
@@ -548,12 +551,12 @@ class POA(game.Mode):
         
         def sw_adventureN_active(self, sw):
             if self.adventureN_lit == False:
-                self.game.drive_lamp(self.lamps[4],'on')
+                #self.game.drive_lamp(self.lamps[4],'on')
                 self.letters_spotted +=1
                 self.adventureN_lit=True;
                 self.flag[4]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[4]))
+                #print("adventure lamp lit: %s "%(self.lamps[4]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:
@@ -567,12 +570,12 @@ class POA(game.Mode):
                 
         def sw_adventureT_active(self, sw):
             if self.adventureT_lit == False:
-                self.game.drive_lamp(self.lamps[5],'on')
+                #self.game.drive_lamp(self.lamps[5],'on')
                 self.letters_spotted +=1
                 self.adventureT_lit=True;
                 self.flag[5]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[5]))
+                #print("adventure lamp lit: %s "%(self.lamps[5]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:
@@ -586,12 +589,12 @@ class POA(game.Mode):
                 
         def sw_adventureU_active(self, sw):
             if self.adventureU_lit == False:
-                self.game.drive_lamp(self.lamps[6],'on')
+                #self.game.drive_lamp(self.lamps[6],'on')
                 self.letters_spotted +=1
                 self.adventureU_lit=True;
                 self.flag[6]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[6]))
+                #print("adventure lamp lit: %s "%(self.lamps[6]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:
@@ -604,12 +607,12 @@ class POA(game.Mode):
                 
         def sw_adventureR_active(self, sw):
             if self.adventureR_lit == False:
-                self.game.drive_lamp(self.lamps[7],'on')
+                #self.game.drive_lamp(self.lamps[7],'on')
                 self.letters_spotted +=1
                 self.adventureR_lit=True;
                 self.flag[7]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[7]))
+                #print("adventure lamp lit: %s "%(self.lamps[7]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:
@@ -622,12 +625,12 @@ class POA(game.Mode):
                 
         def sw_adventureE2_active(self, sw):
             if self.adventureE2_lit == False:
-                self.game.drive_lamp(self.lamps[8],'on')
+                #self.game.drive_lamp(self.lamps[8],'on')
                 self.letters_spotted +=1
                 self.adventureE2_lit=True;
                 self.flag[8]=True;
                 self.game.set_player_stats('poa_flag',self.flag)
-                print("adventure lamp lit: %s "%(self.lamps[8]))
+                #print("adventure lamp lit: %s "%(self.lamps[8]))
                 self.game.score(500000)
                 self.spell_adventure()
             else:

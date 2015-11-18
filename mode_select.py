@@ -24,6 +24,7 @@ from the_three_challenges import *
 from choose_wisely import *
 from werewolf import *
 from raven_bar import *
+from jones_vs_aliens import *
 
 
 base_path = config.value_for_key_path('base_path')
@@ -50,9 +51,7 @@ class Mode_Select(game.Mode):
             self.info_text =''
             self.info2_text =''
 
-            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely']
-            self.select_list = [0,0,0,0,0,0,0,0,0,0,0,0]
-            self.current_mode_num = 0
+            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','jonesVsAliens']
             self.choice_id =0
 
             #default mode bonus value
@@ -89,6 +88,7 @@ class Mode_Select(game.Mode):
             self.tank_chase = Tank_Chase(self.game, 89,self)
             self.the_three_challenges = The_Three_Challenges(self.game, 90,self)
             self.choose_wisely = Choose_Wisely(self.game, 91,self)
+            self.jones_vs_aliens = Jones_Vs_Aliens(self.game, 92,self)
             
              #setup the switches which pause an active mode
             self.mode_pausing_switchnames = []
@@ -244,6 +244,8 @@ class Mode_Select(game.Mode):
         def eject_kick(self):
             self.game.effects.drive_flasher('flasherCrusade',style='super',time=0.2)
             self.game.coils.grailEject.pulse()
+            #reset the temple ball count
+            self.game.temple.balls=0
      
 
         def start_scene(self):
@@ -321,6 +323,12 @@ class Mode_Select(game.Mode):
                     #timer = self.game.user_settings['Gameplay (Feature)']['Choose Wisely Timer']
                     self.name_text = 'CHOOSE WISELY'
                     self.info_text = 'VIDEO MODE'
+                
+                elif self.current_mode_num==12:
+                    self.timer = self.game.user_settings['Gameplay (Feature)']['Jones Vs Aliens Timer']
+                    self.name_text = 'JONES VS ALIENS'
+                    self.info_text = 'DESTROY SHIPS'
+                    self.info2_text = 'TO SAVE EARTH'
 
                 anim = dmd.Animation().load(game_path+"dmd/start_scene.dmd")
                 self.animation_layer = dmd.AnimatedLayer(frames=anim.frames,hold=True,frame_time=4)
@@ -351,8 +359,15 @@ class Mode_Select(game.Mode):
             else:
                 timer = 0
                 #lengthen the timer if these events are running
-                if self.game.get_player_stats('multiball_started') or self.game.get_player_stats('multiball_running') or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress'):
+                if self.game.get_player_stats('multiball_started')  or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress'):
                     timer =2
+                    
+                #hold a ball for while multiball running for multiple jackpots use
+                if self.game.get_player_stats('multiball_running'): 
+                    timer = 10
+                    if self.game.temple.balls==self.game.trough.num_balls_in_play: #dont hold if all balls are in temple subway
+                        timer=0
+                    
                 self.delay(name='eject_delay', event_type=None, delay=timer, handler=self.eject_ball)
                 
                 
@@ -387,6 +402,8 @@ class Mode_Select(game.Mode):
                 self.game.modes.add(self.the_three_challenges)
             elif self.current_mode_num==11:
                 self.game.modes.add(self.choose_wisely)
+            elif self.current_mode_num==12:
+                self.game.modes.add(self.jones_vs_aliens)
 
         def remove_selected_scene(self):
             self.log.debug("Removing Movie Scene Mode"+str(self.current_mode_num))
@@ -417,6 +434,8 @@ class Mode_Select(game.Mode):
                 self.game.modes.remove(self.the_three_challenges)
             elif self.current_mode_num==11:
                 self.game.modes.remove(self.choose_wisely)
+            elif self.current_mode_num==12:
+                self.game.modes.remove(self.jones_vs_aliens)
 
                     
         def mode_text(self):

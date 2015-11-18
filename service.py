@@ -1,5 +1,6 @@
 import logging
 import locale
+import audits
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -119,10 +120,10 @@ class ServiceMode(ServiceModeList):
 			self.items.append(self.settings)
 
 
-		if len(self.game.game_data) > 0: 
-			self.statistics = Statistics(self.game, self.priority+1, font, big_font, 'Statistics', self.game.game_data)
-			self.items.append(self.statistics)
-
+		#if len(self.game.game_data) > 0: 
+		self.statistics = Statistics(self.game, self.priority+1, font, big_font, 'Statistics', self.game.game_data)
+		self.items.append(self.statistics)
+                        
 
 class Tests(ServiceModeList):
 	"""Service Mode."""
@@ -451,7 +452,7 @@ class SwitchTest(ServiceModeSkeleton):
 
 	def sw_enter_active(self,sw):
 		return True
-
+            
 class Statistics(ServiceModeList):
 	"""Service Mode."""
 	def __init__(self, game, priority, font, big_font, name, itemlist):
@@ -459,92 +460,81 @@ class Statistics(ServiceModeList):
 
 		self.name = name
 		self.items = []
-		for section in sorted(itemlist.iterkeys()):
-                    self.log.info("Stats Section:"+str(section))
-                    if section=='Audits' or section=='Time Stamps':
-                        self.items.append( AuditDisplay( self.game, priority + 1, font, big_font, str(section),itemlist[section] ))
-
+                audits_list = self.game.displayed_audits
+                
+		#for section in sorted(itemlist.iterkeys()):
+                for audits_section in audits_list.iterkeys():
+                    self.log.info("Stats Section:"+str(audits_section))
+                    self.items.append( AuditDisplay( self.game, priority + 1, font, big_font, section_key=audits_section,itemlist =audits_list[audits_section] ))
+                                
+            
 class AuditDisplay(ServiceModeList):
 	"""Service Mode."""
-	def __init__(self, game, priority, font, big_font, name, itemlist):
+	def __init__(self, game, priority, font, big_font, section_key, itemlist):
 		super(AuditDisplay, self).__init__(game, priority, font)
-		self.name = name
+                self.name = itemlist['label'] #name of section is set as a label, so the key is seperate
 
                 self.item_layer = dmd.TextLayer(1, 8, font, "left")
                 self.value_layer = dmd.TextLayer(1, 16, big_font, "left")
                 self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer])
 
-		self.items = []
+                self.items = []
 		for item in sorted(itemlist.iterkeys()):
-                    self.log.info("Stats Item:"+str(item))
-                    self.items.append( AuditItem(str(item), itemlist[item]) )
-
+                    if item!='label':
+                        self.log.info("Stats Item:"+str(item))
+                        audit_value = audits.display(self.game,section_key,item) #calc the required value from the audits database. formating is also handled in the audits class
+                        self.items.append(AuditItem(name=str(itemlist[item]['label']).upper(), value=audit_value))    
+   
 
 	def mode_started(self):
 		super(AuditDisplay, self).mode_started()
 
+
 	def change_item(self):
 		super(AuditDisplay, self).change_item()
-
-                if "Time" in self.item.name:
-                    self.value_layer.set_text(self.format_time(self.item.value))
-                elif "Score" in self.item.name and isinstance(self.item.value, int ):#"Not Set" not in str(self.item.value):
-                    self.value_layer.set_text(locale.format("%d",self.item.value,True))
-                else:
-                    self.value_layer.set_text(str(self.item.value))
+                self.value_layer.set_text(str(self.item.value))
 
 
 	def sw_enter_active(self, sw):
 		return True
-
-        def format_time(self,time):
-            hrs = int(time/3600)
-            mins = int((time-(hrs*3600))/60)
-            secs = int(time-(mins*60))
-
-            if hrs>0:
-                return str(hrs)+" Hrs "+str(mins)+" Mins"
-            else:
-                return str(mins)+" Mins "+str(secs)+" Secs"
-
             
 
-class StatsDisplay(ServiceModeList):
-	"""Service Mode."""
-	def __init__(self, game, priority, font, big_font, name, itemlist):
-		super(StatsDisplay, self).__init__(game, priority, font)
-		self.name = name
-
-                self.item_layer = dmd.TextLayer(1, 11, font, "left")
-                self.value_layer = dmd.TextLayer(127, 11, big_font, "right")
-                self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer])
-
-		self.items = []
-		for item in sorted(itemlist.iterkeys()):
-                    #self.log.info("Stats Item:"+str(item))
-                    if type(itemlist[item])==type({}):
-			self.items.append( HighScoreItem(str(item), itemlist[item]['inits'], itemlist[item]['score']) )
-                    else:
-			self.items.append( StatsItem(str(item), itemlist[item]) )
-
-		
-	def mode_started(self):
-		super(StatsDisplay, self).mode_started()
-
-	def change_item(self):
-		super(StatsDisplay, self).change_item()
-		try:
-			self.item.score
-		except:
-			self.item.score = 'None'
-
-		if self.item.score == 'None':
-			self.value_layer.set_text(str(self.item.value))
-		else:
-			self.value_layer.set_text(self.item.value + ": " + str(self.item.score))
-
-	def sw_enter_active(self, sw):
-		return True
+#class StatsDisplay(ServiceModeList):
+#	"""Service Mode."""
+#	def __init__(self, game, priority, font, big_font, name, itemlist):
+#		super(StatsDisplay, self).__init__(game, priority, font)
+#		self.name = name
+#
+#                self.item_layer = dmd.TextLayer(1, 11, font, "left")
+#                self.value_layer = dmd.TextLayer(127, 11, big_font, "right")
+#                self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer])
+#
+#		self.items = []
+#		for item in sorted(itemlist.iterkeys()):
+#                    #self.log.info("Stats Item:"+str(item))
+#                    if type(itemlist[item])==type({}):
+#			self.items.append( HighScoreItem(str(item), itemlist[item]['inits'], itemlist[item]['score']) )
+#                    else:
+#			self.items.append( StatsItem(str(item), itemlist[item]) )
+#
+#		
+#	def mode_started(self):
+#		super(StatsDisplay, self).mode_started()
+#
+#	def change_item(self):
+#		super(StatsDisplay, self).change_item()
+#		try:
+#			self.item.score
+#		except:
+#			self.item.score = 'None'
+#
+#		if self.item.score == 'None':
+#			self.value_layer.set_text(str(self.item.value))
+#		else:
+#			self.value_layer.set_text(self.item.value + ": " + str(self.item.score))
+#
+#	def sw_enter_active(self, sw):
+#		return True
 
 class AuditItem:
 	"""Service Mode."""
@@ -555,15 +545,15 @@ class AuditItem:
 	def disable(self):
 		pass
 
-class HighScoreItem:
-	"""Service Mode."""
-	def __init__(self, name, value, score):
-		self.name = name
-		self.value = value
-		self.score = score
-
-	def disable(self):
-		pass
+#class HighScoreItem:
+#	"""Service Mode."""
+#	def __init__(self, name, value, score):
+#		self.name = name
+#		self.value = value
+#		self.score = score
+#
+#	def disable(self):
+#		pass
 
 
 class Settings(ServiceModeList):

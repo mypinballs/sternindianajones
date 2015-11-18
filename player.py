@@ -33,7 +33,7 @@ class Player(procgame.game.Player):
                 self.player_stats['mode_enabled']=False
                 self.player_stats['mode_running'] = False
                 self.player_stats['mode_running_id'] = 99
-                self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0]
+                self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0]
                 self.player_stats['multiball_mode_started'] = False
                 self.player_stats['path_mode_started'] = False
                 self.player_stats['lock_lit'] = False
@@ -57,6 +57,7 @@ class Player(procgame.game.Player):
                 self.player_stats['poa_queued'] = False
                 self.player_stats['poa_enabled'] = False
                 self.player_stats['adventure_letters_spotted']=0
+                self.player_stats['adventure_paused'] = False
                 self.player_stats['last_mode_score']=0
                 self.player_stats['get_the_idol_score']=0
                 self.player_stats['castle_grunwald_score']=0
@@ -73,4 +74,9 @@ class Player(procgame.game.Player):
                 self.player_stats['moonlight_status']=False
                 self.player_stats['extra_ball_lit']=False
                 self.player_stats['map_banks_completed']=0
-		
+                self.player_stats['jva_ships_destroyed'] = 0
+                self.player_stats['jva_smart_bombs'] = 0
+		self.player_stats['jones_vs_aliens_score'] = 0
+                self.player_stats['frankenstein_sets_completed'] = 0
+                self.player_stats['frankenstein_millions_score'] = 0
+                

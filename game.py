@@ -164,7 +164,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.1.1'
+                self.system_version='0.2.0'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -248,6 +248,10 @@ class Game(game.BasicGame):
                 
 		self.setup_ball_search()
                 self.score_display.set_left_players_justify(self.user_settings['Display']['Left side score justify'])
+                
+                #speech setup
+                self.extended_speech = self.boolean_format(self.user_settings['Sound']['Extended Speech'])
+                self.log.info('Extended Speech Enabled:%s',self.extended_speech)
 
 		# Note - Game specific item:
 		# The last parameter should be the name of the game's ball save lamp
@@ -430,7 +434,7 @@ class Game(game.BasicGame):
 
                 #update game start audits
                 self.start_time = time.time()
-                audits.record_value(self,'gameStarted')
+                #audits.record_value(self,'gameStarted')
                 if self.user_settings['Machine (Standard)']['Free Play'].startswith('N'):
                     credits =  audits.display(self,'general','creditsCounter')
                     audits.update_counter(self,'credits',credits-1)
@@ -458,6 +462,12 @@ class Game(game.BasicGame):
                 self.log.info("Moonlight Flag:%s",self.moonlight_flag)
                 #-----------------------------------------
                 
+                
+#        def add_player(self):
+#                super(Game, self).add_player()
+#                audits.record_value(self,'gameStarted')
+                
+                
 	def ball_starting(self):
 		super(Game, self).ball_starting()
 		
@@ -482,10 +492,12 @@ class Game(game.BasicGame):
                 #record audits
                 #-------------
                 self.game_time = time.time()-self.start_time
-                p = self.current_player()
                 audits.record_value(self,'gameTime',self.game_time)
-                audits.record_value(self,'gamePlayed')
-                audits.record_value(self,'gameScore',p.score)
+                
+                #p = self.current_player()
+                for p in self.players:
+                    audits.record_value(self,'gamePlayed')
+                    audits.record_value(self,'gameScore',p.score)
                 #-------------
 
                 #update diagnostics
@@ -569,8 +581,11 @@ class Game(game.BasicGame):
                         #self.mode.delay(name='lamp_on', event_type=None, delay=0.5, handler=self.lamps[lamp_name].enable)
 
 
-
-                
+        def boolean_format(self,value):
+            if value.upper()=='YES':
+                return True
+            elif value.upper()=='NO':
+                return False
 
 
 

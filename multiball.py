@@ -302,6 +302,9 @@ class Multiball(game.Mode):
                 #update poa player stats - moved to jackpot cancelled
                 #self.game.set_player_stats("poa_queued",False)
                 
+                #close the temple scoop if open
+                self.game.temple.close()
+                
                 self.game.sound.stop_music()
                 self.game.sound.play_music('general_play', loops=-1)
 
@@ -326,6 +329,10 @@ class Multiball(game.Mode):
                 self.game.set_player_stats('multiball_started',self.multiball_started) 
                 #update poa player stats
                 #self.game.set_player_stats("poa_queued",False)
+                
+                #close the temple scoop if open
+                self.game.temple.close()
+                
                 #cancel jackpot
                 self.jackpot('cancelled')
                 #clear the display
@@ -644,7 +651,14 @@ class Multiball(game.Mode):
 #            self.lock_enabled()
 
         def sw_templeStandup_active(self, sw):
-            self.lock_progress()
+            if not self.multiball_started and not self.multiball_running:
+                self.lock_progress()
+            else:
+                value = 4000000
+                self.jackpot_value+=value
+                self.game.screens.raise_jackpot(2,value)
+                self.game.temple.open()
+                return procgame.game.SwitchStop
 
         def sw_subway_active(self, sw):
             if not self.multiball_running and not self.game.get_player_stats('multiball_mode_started'):
@@ -654,11 +668,13 @@ class Multiball(game.Mode):
                     self.cheat_display() #play the cheat anim :)
             elif self.multiball_running:
                 #self.game.idol.hold()
+                self.game.temple.balls+=1
+                
                 if not self.super_jackpot_lit:
                     self.jackpot_x+=1
                     if self.jackpot_x==2:
                         self.game.sound.play('prize_doubled')
-                    elif self.jackpot_x==3:
+                    elif self.jackpot_x>=3:
                         self.game.sound.play('prize_tripled')
                 else:
                     self.super_jackpot_collected()

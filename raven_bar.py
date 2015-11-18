@@ -362,14 +362,17 @@ class Raven_Bar(game.Mode):
                 self.game.sound.play('rvb_indy_hit')
                 self.delay(name='shot_delay',delay=0.5,handler=self.indy_hit)
                 
+                #end mode if lives have run out
+                if self.lives==0:
+                    self.cancel_delayed('shot_delay')
+                    self.scene_totals(True)
+                
             else:
                 self.create_bar_bgnd(xposn=self.bar_position,blinded=False)
                 self.indy_shot_flag = False
                 self.cancel_delayed('shot_delay')
                 
-                #end mode if lives have run out
-                if self.lives==0:
-                    self.end_scene_delay(1)
+                
             
             if not self.medallion_collected:
                 self.layer = dmd.GroupedLayer(256, 32, [self.bgnd_layer,self.sprite_layer1,self.sprite_layer2,self.sprite_layer3,self.sprite_layer4,self.medallion_layer,self.extra_ball_layer,self.gun_layer,self.lives_info_layer,self.enemy_info_layer])
@@ -509,6 +512,10 @@ class Raven_Bar(game.Mode):
                 
                 
         def completed_part2(self):
+            self.scene_totals(True)
+            
+        
+        def scene_totals(self,completed=False):
             bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/mode_bonus_bgnd.dmd").frames[0])
 
             #set text layers
@@ -520,20 +527,24 @@ class Raven_Bar(game.Mode):
             #award_layer.composite_op ="blacksrc"
             #info_layer.composite_op ="blacksrc"
 
-            title_layer.set_text("Medallion Found",color=dmd.BROWN)
-            award_layer.set_text(locale.format("%d", self.medallion_value, True),color=dmd.GREEN)
+            if completed:
+                title_layer.set_text("Medallion Found",color=dmd.BROWN)
+                award_layer.set_text(locale.format("%d", self.medallion_value, True),color=dmd.GREEN)
+            else:
+                title_layer.set_text("Medallion Not Found",color=dmd.BROWN)
+                info_layer.target_y = 20
+            
             info_layer.set_text('Level '.upper()+str(self.level)+'. '+str(self.hits)+" Bad Guys Hit".upper()+"="+locale.format("%d", self.hits*self.score_value_start, True),color=dmd.PURPLE)
 
             #set display layer
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,title_layer,award_layer,info_layer])
-
-            self.log.debug('completed running')
+           
             #queue the end of scene cleanup
-            self.cancel_delayed('scene_cleanup')
-            self.delay(name='scene_cleanup', event_type=None, delay=4, handler=self.mode_select.end_scene)
+            self.end_scene_delay(4)
 
 
         def end_scene_delay(self,timer):
+            self.cancel_delayed('scene_cleanup')
             self.delay(name='scene_cleanup', event_type=None, delay=timer, handler=self.mode_select.end_scene)
 
         def update_lives(self,value=0):
@@ -653,6 +664,9 @@ class Raven_Bar(game.Mode):
 
             #turn off flippers
             self.game.enable_flippers(enable=False)
+            
+            #turn off GI
+            self.gi(enable=False)
            
 
             #update_lamps
@@ -689,6 +703,9 @@ class Raven_Bar(game.Mode):
 
             #turn on flippers
             self.game.enable_flippers(enable=True)
+            
+            #turn on GI
+            self.gi(enable=True)
 
             #eject ball
             self.game.coils.grailEject.pulse()
@@ -752,7 +769,14 @@ class Raven_Bar(game.Mode):
         def update_lamps(self):
             for i in range(len(self.lamps)):
                 self.game.effects.drive_lamp(self.lamps[i],'on')
-
+                
+        def gi(self,enable=True):
+            if enable:
+                self.game.lamps.playfieldGI.disable()
+            else:
+                self.game.lamps.playfieldGI.enable()
+ 
+           
         def clear(self):
             self.layer = None
             

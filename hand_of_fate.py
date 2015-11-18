@@ -9,6 +9,8 @@ import logging
 from procgame import *
 from random import *
 
+from frankenstein import *
+
 base_path = config.value_for_key_path('base_path')
 game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
@@ -35,13 +37,16 @@ class Hand_Of_Fate(game.Mode):
             self.game.sound.register_sound('hof_selected', sound_path+"hand_of_fate_2.aiff")
 
 
-            self.list =['Lite Extra Ball','Dog Fight Hurry Up','Eternal Life','Bonus X','10 Million','20 Million','Super Jets','Lock Ball','Lite POA','Lite Loops','Spot Friend','Quick Multi-Ball']
+            self.list =['Lite Extra Ball','Dog Fight Hurry Up','Eternal Life','Bonus X','10 Million','20 Million','Frankenstein Millions','Super Jets','Lock Ball','Lite POA','Lite Loops','Spot Friend','Quick Multi-Ball']
 
             self.mode_select = mode_select
             self.reset()
             
             #mode links
             self.advance_bonusx = None
+            
+            #special modes
+            self.frankenstein = Frankenstein(self.game, 96,self.mode_select)
 
 
         def reset(self):
@@ -56,8 +61,8 @@ class Hand_Of_Fate(game.Mode):
         
         def mode_stopped(self):
             self.set_status('off')
+            
         
-
         def get_status(self):
             value = self.game.get_player_stats('hof_status')
             return value
@@ -82,6 +87,7 @@ class Hand_Of_Fate(game.Mode):
 
         def ready(self):
             self.set_status('ready')
+            self.mode_start_blocking = False #flag to block mode start starting any modes once hof is finished, in case hof has started its own secret addon modes
             self.update_lamps()
             
 
@@ -240,7 +246,7 @@ class Hand_Of_Fate(game.Mode):
             option = self.chosen_list[0]
     
             #debug
-            #option=self.list[0]
+            option=self.list[6]
             clear_time=3
             
             if option==self.list[0]:
@@ -257,6 +263,8 @@ class Hand_Of_Fate(game.Mode):
                 self.score_award(10000000)
             elif option==self.list[5]: #20 mil
                 self.score_award(20000000)
+            elif option==self.list[6]:
+                self.frankenstein_award(type=type)
             else:
                 self.name_award()
                 
@@ -323,6 +331,16 @@ class Hand_Of_Fate(game.Mode):
             #self.game.set_player_stats('bonus_x',bonusx)
 
 
+        def frankenstein_award(self,type):
+            anim = dmd.Animation().load(game_path+"dmd/frankenstein_banner.dmd")
+            #display the animation
+            if type=='banner':
+                self.award_layer = dmd.FrameLayer(frame=anim.frames[0])
+            elif type=='anim':
+                self.game.modes.add(self.frankenstein)
+                self.mode_start_blocking = True
+                
+        
         def score_award(self,score):
             time=3
             value_layer = dmd.TextLayer(128/2, 4, self.game.fonts['23x12'], "center", opaque=True)
@@ -341,8 +359,9 @@ class Hand_Of_Fate(game.Mode):
             self.layer = None
             self.update_lamps()
 
-            #add a callback to mode select to continue logic - start any modes enabled
-            self.mode_select.start_scene()
+            #add a callback to mode select to continue logic - start any modes enabled, if not blocked
+            if not self.mode_start_blocking:
+                self.mode_select.start_scene()
 
             #remove self
             self.game.modes.remove(self)

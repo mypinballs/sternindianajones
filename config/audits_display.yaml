@@ -181,31 +181,73 @@ dateStamps:
     label: 'Last Clock Set Date'
 featureAudits:
   label: 'Game Features'
-  totalMultiballsStarted:
+  totalLeftInlanes:
     type: sum
-    cid1: multiballStarted
-    label: 'Total Multiballs Started'
-  totalJackpotsCollected:
+    cid1: leftInlane
+    label: 'Total Left Inlanes' 
+  totalRightInlanes:
     type: sum
-    cid1: jackpotCollected
-    label: 'Total Jackpots Collected'
+    cid1: rightInlane
+    label: 'Total Right Inlanes' 
+  totalInlanes:
+    type: multiSum
+    cid1: leftInlane
+    cid2: rightInlane
+    label: 'Total Inlanes'
+  totalLeftOutlanes:
+    type: sum
+    cid1: leftOutlane
+    label: 'Total Left Outlanes' 
+  totalRightOutlanes:
+    type: sum
+    cid1: rightOutlane
+    label: 'Total Right Outlanes' 
+  totalOutlanes:
+    type: multiSum
+    cid1: leftOutlane
+    cid2: rightOutlane
+    label: 'Total Right Outlanes' 
+  totalSkillshotsMade:
+    type: sum
+    cid1: skillshotMade
+    label: 'Total Skillshots Made' 
   totalSuperPopsCollected:
     type: sum
     cid1: superPopCollected
     label: 'Total Super Pops Collected'
-  totalSkillshotsMade:
+  totalHandOfFatesCollected:
     type: sum
-    cid1: skillshotMade
-    label: 'Total Skillshots Made'
-  totalTornadoTargetExtraBallsCollected:
+    cid1: handOfFateCollected
+    label: 'Total Hand Of Fates Collected'
+  totalModesStarted:
     type: sum
-    cid1: tornadoTargetExtraBall
-    label: 'Total Tornado Target Extra Balls Collected'
-  totalTornadoTargetQuickMultiballsStarted:
+    cid1: modeStarted
+    label: 'Total Modes Started'
+  totalModesCompleted:
     type: sum
-    cid1: tornadoTargetQuickMulitball
-    label: 'Total Tornado Target Quick Multiballs Started'
+    cid1: modeCompleted
+    label: 'Total Modes Completed'
+  totalGetTheIdolModesStarted:
+    type: sum
+    cid1: getTheIdolModeStarted
+    label: 'Total Get The Idol Modes Started'
+  totalGetTheIdolModesCompleted:
+    type: sum
+    cid1: getTheIdolModeCompleted
+    label: 'Total Get The Idol Modes Completed'
+  totalMultiballsStarted:
+    type: sum
+    cid1: multiballStarted
+    label: 'Total Multiballs Started'
+  totalQuickMultiballsStarted:
+    type: sum
+    cid1: quickMultiballStarted
+    label: 'Total Quick Multiballs Started'
   totalMoonlightMultiballsStarted:
     type: sum
-    cid1: moonlightMulitball
+    cid1: moonlightMultiballStarted
     label: 'Total Moonlight Multiballs Started'
+  totalJackpotsCollected:
+    type: sum
+    cid1: jackpotCollected
+    label: 'Total Jackpots Collected'

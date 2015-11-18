@@ -1,4 +1,4 @@
-# Werewolf Secret Video Mode
+# Minecart Video Mode
 # Jim
 # Nov 2013
 
@@ -462,9 +462,12 @@ class Minecart(game.Mode):
             #turn off flippers
             self.game.enable_flippers(enable=False)
            
-
+            #turn off GI
+            self.gi(enable=False)
+            
             #update_lamps
             #self.update_lamps()
+
 
         def mode_stopped(self):
             #save player stats
@@ -494,6 +497,9 @@ class Minecart(game.Mode):
 
             #turn on flippers
             self.game.enable_flippers(enable=True)
+            
+            #turn on GI
+            self.gi(enable=True)
 
             #eject ball
             self.game.coils.grailEject.pulse()
@@ -536,6 +542,12 @@ class Minecart(game.Mode):
         def update_lamps(self):
             for i in range(len(self.lamps)):
                 self.game.effects.drive_lamp(self.lamps[i],'on')
+                
+        def gi(self,enable=True):
+            if enable:
+                self.game.lamps.playfieldGI.disable()
+            else:
+                self.game.lamps.playfieldGI.enable()
 
         def clear(self):
             self.layer = None

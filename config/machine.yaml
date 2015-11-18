@@ -900,9 +900,9 @@ PRLamps:
         number: L71
         tags: arrow
         label: 'Raiders Arrow'
-    kingdom1:
+    jonesVsAliens:
         number: L72
-        label: 'Kingdom Scene 1'
+        label: 'Jones vs Aliens'
     #col9
     handOfFate: 
     #mystery
@@ -935,7 +935,10 @@ PRLamps:
         number: L80
         tags: movie
         label: 'Grail'
-    
+    playfieldGI:
+        number: G01
+        tags: gi
+        label: 'GI Playfield'
     
 #    grailJackpot:
 #        number: L26

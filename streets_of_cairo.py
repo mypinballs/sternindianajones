@@ -473,7 +473,7 @@ class Streets_Of_Cairo(game.Mode):
 
         def update_lamps(self):
             for i in range(len(self.lamps)):
-                self.game.effects.drive_lamp(self.lamps[i],'on')
+                self.game.effects.drive_lamp(self.lamps[i],'fast')
 
         def clear(self):
             self.layer = None

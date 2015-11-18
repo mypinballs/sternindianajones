@@ -22,6 +22,7 @@ class Temple(game.Mode):
             self.temple_state="boot"
             self.temple_moving = False
             self.cycle_flag = False
+            self.balls = 0
             
             
         def reset(self):
@@ -37,6 +38,9 @@ class Temple(game.Mode):
         
         def get_state(self):
             return self.temple_state
+        
+        def get_balls(self):
+            return self.balls
         
  
         def open(self):

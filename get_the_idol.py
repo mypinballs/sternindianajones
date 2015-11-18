@@ -55,6 +55,9 @@ class Get_The_Idol(game.Mode):
             self.game.sound.register_sound('gti_speech2', speech_path+"give_me_the_whip.aiff")
             self.game.sound.register_sound('gti_speech3', speech_path+"adious_senoir.aiff")
 
+            #lamps setup
+            self.lamps = ['templeArrow']
+            
             #var setup
             self.count = 0
             
@@ -85,6 +88,7 @@ class Get_The_Idol(game.Mode):
 #            anim = dmd.Animation().load(game_path+self.bgnd_anim)
 #            self.bgnd_layer = dmd.AnimatedLayer(frames=anim.frames,opaque=False,repeat=True,frame_time=6)
         
+        
         def load_bgnd_anim(self):
             large_spider_frames = dmd.Animation().load("dmd/gti_lge_spider_sprites.dmd").frames
             sml_spider_frames = dmd.Animation().load("dmd/gti_sml_spider_sprites.dmd").frames
@@ -112,9 +116,8 @@ class Get_The_Idol(game.Mode):
             self.bgnd_layer = dmd.FrameLayer(frame=self.bgnd_anim.frames[0])
             self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.sml_spider_layer1,self.sml_spider_layer2,self.large_spider_layer,self.score_layer,self.timer_layer,self.award_layer])
 
+
         def load_progression_anim(self):
-            
-            
             self.bgnd_anim = dmd.Animation().load(game_path+"dmd/get_the_idol_bgnd.dmd")
             self.bgnd_layer = dmd.AnimatedLayer(frames=self.bgnd_anim.frames[self.progression_anim_posn:self.progression_anim_posn+self.progression_amount],hold=True,opaque=False,repeat=False,frame_time=6)
             self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.sml_spider_layer1,self.sml_spider_layer2,self.large_spider_layer,self.score_layer,self.timer_layer,self.award_layer])
@@ -150,8 +153,13 @@ class Get_The_Idol(game.Mode):
             self.game.sound.play_music('gti_play', loops=-1)
 
             #self.reset_drops()
-
+            #close temple
+            self.game.temple.close()
+            
             self.delay(name='mode_speech_delay', event_type=None, delay=2, handler=self.voice_call, param=self.count)
+            
+            #lamps
+            self.update_lamps()
 
         
         def mode_tick(self):
@@ -166,8 +174,10 @@ class Get_The_Idol(game.Mode):
 #
 #            self.game.set_player_stats('mode_status_tracking',updated_list)
 
-            #reset temple if required
-            if not self.game.get_player_stats('lock_lit'):
+            #restore temple if required
+            if self.game.get_player_stats('lock_lit'):
+                self.game.temple.open()
+            else:
                 self.game.temple.close()
 
             #stop music
@@ -177,7 +187,8 @@ class Get_The_Idol(game.Mode):
             #clear display
             self.clear()
             
-            
+            #lamps
+            self.reset_lamps()
 
 
         def mode_progression(self,type):
@@ -229,8 +240,13 @@ class Get_The_Idol(game.Mode):
             #self.delay(name='end_delay', event_type=None, delay=1, handler=self.mode_select.end_scene)
 
             
+        def reset_lamps(self):
+            for i in range(len(self.lamps)):
+                self.game.effects.drive_lamp(self.lamps[i],'off')
+
         def update_lamps(self):
-            print("Update Lamps")
+            for i in range(len(self.lamps)):
+                self.game.effects.drive_lamp(self.lamps[i],'fast')
 
 
         def clear(self):
@@ -240,7 +256,7 @@ class Get_The_Idol(game.Mode):
 #        def reset_drops(self):
 #            self.game.coils.centerDropBank.pulse(100)
 
-
+        #switch handlers
 #        def sw_dropTargetLeft_active(self, sw):
 #            self.mode_progression(0)
 #
@@ -252,6 +268,8 @@ class Get_The_Idol(game.Mode):
 
         def sw_templeStandup_active(self, sw):
             self.mode_progression(0)
-            
+            return procgame.game.SwitchStop
+        
         def sw_subway_active(self, sw):
             self.mode_progression(1)
+            return procgame.game.SwitchStop

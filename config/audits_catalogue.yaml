@@ -65,6 +65,8 @@ featureAudits:
     label: 'rightInlane'
   skillshotMade:
     label: 'Skillshot Made'
+  superPopCollected:
+     label: 'Super Pop Collected'
   handOfFateCollected:
     label: 'Hand of Fate Collected'
   modeStarted:

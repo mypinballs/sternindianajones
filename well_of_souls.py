@@ -198,7 +198,11 @@ class Well_Of_Souls(game.Mode):
 
             #reset drops
             #self.reset_drops()
-            self.game.temple.close()
+            #restore temple if required
+            if self.game.get_player_stats('lock_lit'):
+                self.game.temple.open()
+            else:
+                self.game.temple.close()
 
             #reset lamps
             self.reset_lamps()
@@ -309,15 +313,16 @@ class Well_Of_Souls(game.Mode):
 
         def update_lamps(self):
             for i in range(len(self.lamps)):
-                self.game.effects.drive_lamp(self.lamps[i],'on')
+                self.game.effects.drive_lamp(self.lamps[i],'fast')
 
         def clear(self):
             self.layer = None
 
 
+        #switch handlers
+        
         def sw_subway_active(self, sw):
             self.mode_progression()
-
             return procgame.game.SwitchStop
 
         def sw_shooterLane_active_for_500ms(self,sw):
