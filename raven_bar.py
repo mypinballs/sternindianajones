@@ -113,6 +113,9 @@ class Raven_Bar(game.Mode):
             self.game.sound.register_sound('rvb_level_completed', sound_path+"werewolfs_completed.aiff")
             self.game.sound.register_sound('rvb_s0', speech_path+"shoot_them_both.aiff")
             self.game.sound.register_sound('rvb_s1', speech_path+"my_medallion.aiff")
+            self.game.sound.register_sound('rvb_s2', speech_path+"oh_shit.aiff")
+            self.game.sound.register_sound('rvb_s3', speech_path+"show_lady_good_time.aiff")
+            self.game.sound.register_sound('rvb_s4', speech_path+"well_done_my_friend.aiff")
            
 
             #lamps setup
@@ -302,7 +305,7 @@ class Raven_Bar(game.Mode):
             
             #create tracking data
             self.badguy_id+=1
-            data = {'id':self.badguy_id,'posn_id':posn_id,'xposn':x,'layer':0,'type':'medallion'}
+            data = {'id':self.badguy_id,'posn_id':posn_id,'xposn':self.badguy_posns[posn_id],'layer':0,'type':'medallion'}
             self.badguy_data.append(data)
             self.log.debug('badguy data: %s',self.badguy_data)
 
@@ -349,34 +352,32 @@ class Raven_Bar(game.Mode):
         
         
         def play_medallion_animation(self):
-            if self.medallion_layer.target_y>-14:
+            if self.medallion_layer.target_y>-22:
                 self.medallion_layer.target_y-=2
                 self.delay(name='animate_medaillion_delay',delay=0.1,handler=self.play_medallion_animation)
                 
         def indy_hit(self):
             
             if not self.indy_shot_flag:
-                self.create_bar_bgnd(xposn=self.bar_position,blinded=True)
                 self.indy_shot_flag = True
-                self.update_lives(-1)
+                self.create_bar_bgnd(xposn=self.bar_position,blinded=True)
                 self.game.sound.play('rvb_indy_hit')
-                self.delay(name='shot_delay',delay=0.5,handler=self.indy_hit)
-                
-                #end mode if lives have run out
-                if self.lives==0:
-                    self.cancel_delayed('shot_delay')
-                    self.scene_totals(True)
-                
+                self.update_lives(-1)
+                self.delay(name='shot_clear_delay',delay=0.5,handler=self.indy_hit) #reset the background after a hit
             else:
-                self.create_bar_bgnd(xposn=self.bar_position,blinded=False)
                 self.indy_shot_flag = False
-                self.cancel_delayed('shot_delay')
-                
-                
+                self.create_bar_bgnd(xposn=self.bar_position,blinded=False)
+                self.cancel_delayed('shot_clear_delay')
             
             if not self.medallion_collected:
                 self.layer = dmd.GroupedLayer(256, 32, [self.bgnd_layer,self.sprite_layer1,self.sprite_layer2,self.sprite_layer3,self.sprite_layer4,self.medallion_layer,self.extra_ball_layer,self.gun_layer,self.lives_info_layer,self.enemy_info_layer])
 
+            if self.lives==0: #end mode if lives have run out
+                self.cancel_delayed('move_repeat')
+                self.cancel_delayed('shot_clear_delay')
+                self.cancel_delayed('next_badguy_delay')
+                self.voice_call(2)
+                self.delay(name='scene_totals_delay',delay=1.1,handler=self.scene_totals)
      
         def start_badguys(self):
 
@@ -419,7 +420,7 @@ class Raven_Bar(game.Mode):
                 #adjust the positioning after creation to be inline with current movements
                 self.extra_ball_layer.target_x+=self.bar_position
                 
-            if not self.medallion_collected:
+            if not self.medallion_collected and self.lives>0:
                 #update layers
                 self.layer = dmd.GroupedLayer(256, 32, [self.bgnd_layer,self.sprite_layer1,self.sprite_layer2,self.sprite_layer3,self.sprite_layer4,self.medallion_layer,self.extra_ball_layer,self.gun_layer,self.lives_info_layer,self.enemy_info_layer])
 
@@ -521,23 +522,28 @@ class Raven_Bar(game.Mode):
             #set text layers
             title_layer = dmd.TextLayer(64, 2, self.game.fonts['8x6'], "center", opaque=False)
             award_layer = dmd.TextLayer(64, 12, self.game.fonts['num_09Bx7'], "center", opaque=False)
-            info_layer = dmd.TextLayer(64, 24, self.game.fonts['7x4'], "center", opaque=False)
+            info_layer1 = dmd.TextLayer(64, 17, self.game.fonts['8x6'], "center", opaque=False)
+            info_layer2 = dmd.TextLayer(64, 24, self.game.fonts['7x4'], "center", opaque=False)
 
             #title_layer.composite_op ="blacksrc"
             #award_layer.composite_op ="blacksrc"
             #info_layer.composite_op ="blacksrc"
 
             if completed:
+                self.voice_call(4)
                 title_layer.set_text("Medallion Found",color=dmd.BROWN)
                 award_layer.set_text(locale.format("%d", self.medallion_value, True),color=dmd.GREEN)
             else:
+                self.voice_call(3)
                 title_layer.set_text("Medallion Not Found",color=dmd.BROWN)
-                info_layer.target_y = 20
+                info_layer1.set_text('Level '.upper()+str(self.level),color=dmd.RED)
+                info_layer1.target_y = 13
+                info_layer2.target_y = 19
             
-            info_layer.set_text('Level '.upper()+str(self.level)+'. '+str(self.hits)+" Bad Guys Hit".upper()+"="+locale.format("%d", self.hits*self.score_value_start, True),color=dmd.PURPLE)
+            info_layer2.set_text(str(self.hits)+" Bad Guys Hit".upper()+"="+locale.format("%d", self.hits*self.score_value_start, True),color=dmd.PURPLE)
 
             #set display layer
-            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,title_layer,award_layer,info_layer])
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,title_layer,award_layer,info_layer1,info_layer2])
            
             #queue the end of scene cleanup
             self.end_scene_delay(4)
@@ -585,6 +591,7 @@ class Raven_Bar(game.Mode):
                 amount=-8
 
             if amount!=0:
+                #move sprites
                 self.bar_position+=amount
                 self.bgnd_layer.target_x+=amount 
                 self.move_bad_guy(self.sprite_layer1,amount)
@@ -595,7 +602,12 @@ class Raven_Bar(game.Mode):
                     self.move_bad_guy(self.medallion_layer,amount)
                 if self.eb_ready:
                     self.move_bad_guy(self.extra_ball_layer,amount)
-                    
+                
+                #redraw bar bgnd for general movement if indy not shot and blinded graphic needed
+                if not self.indy_shot_flag: 
+                    self.create_bar_bgnd(xposn=self.bar_position,blinded=False) 
+                
+                #update display layer
                 self.layer = dmd.GroupedLayer(256, 32, [self.bgnd_layer,self.sprite_layer1,self.sprite_layer2,self.sprite_layer3,self.sprite_layer4,self.medallion_layer,self.extra_ball_layer,self.gun_layer,self.lives_info_layer,self.enemy_info_layer])
 
                 self.log.debug('Bar Position:%s',self.bar_position)
@@ -781,7 +793,7 @@ class Raven_Bar(game.Mode):
             self.layer = None
             
         def move_repeat(self,dirn):
-            if not self.medallion_collected:
+            if not self.medallion_collected and self.lives>0:
                 self.move(dirn)
                 self.delay(name='move_repeat',delay=0.1,handler=lambda:self.move_repeat(dirn))
 
