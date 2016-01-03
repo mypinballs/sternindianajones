@@ -154,12 +154,17 @@ class Mode_Select(game.Mode):
             if self.mode_running:
                 if self.current_mode_num==0:
                     self.timer_layer = self.get_the_idol.timer_layer
+                elif self.current_mode_num==5:
+                    self.timer_layer = self.steal_the_stones.timer_layer
+                elif self.current_mode_num==10:
+                    self.timer_layer = self.the_three_challenges.timer_layer
                 
                 if self.timer_layer:
                     self.timer_layer.pause(True)
                     self.cancel_delayed('scene_timeout')
                     self.cancel_delayed('scene_unpause')
-                    self.delay(name='scene_unpause', delay=self.pause_length,handler=self.mode_unpaused)
+                    if sw !=None:
+                        self.delay(name='scene_unpause', delay=self.pause_length,handler=self.mode_unpaused)
             
             
         def mode_unpaused(self):
@@ -243,6 +248,7 @@ class Mode_Select(game.Mode):
             
         def eject_kick(self):
             self.game.effects.drive_flasher('flasherCrusade',style='super',time=0.2)
+            self.game.lampctrl.play_show('mode_start_eject', repeat=False,callback=self.game.update_lamps)
             self.game.coils.grailEject.pulse()
             #reset the temple ball count
             self.game.temple.balls=0
@@ -288,7 +294,7 @@ class Mode_Select(game.Mode):
                 elif self.current_mode_num==5:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Steal The Stones Timer']
                     self.name_text = 'STEAL THE STONES'
-                    self.info_text = 'GET ALL LIT LANES'
+                    self.info_text = 'GET ALL LIT TARGETS'
 
                 elif self.current_mode_num==6:
                     #timer = self.game.user_settings['Gameplay (Feature)']['Mine Cart Timer']
@@ -316,8 +322,8 @@ class Mode_Select(game.Mode):
                 elif self.current_mode_num==10:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['The 3 Challenges Timer']
                     self.name_text = '3 CHALLENGES'
-                    self.info_text = 'GET LIT LANES ON'
-                    self.info2_text = 'PATH OF ADVENTURE'
+                    self.info_text = 'SHOOT MOVING SHOTS'
+                    self.info2_text = 'TO PASS'
 
                 elif self.current_mode_num==11:
                     #timer = self.game.user_settings['Gameplay (Feature)']['Choose Wisely Timer']
@@ -526,10 +532,9 @@ class Mode_Select(game.Mode):
                  
                 #return procgame.game.SwitchStop   
 
-
-#        def sw_grailEject_active(self,sw):
-#            if self.mode_enabled:
-#                return procgame.game.SwitchStop
+        def sw_grailEject_active(self,sw):
+            self.game.lampctrl.play_show('mode_start_shot', repeat=False,callback=self.game.update_lamps)
+            
 
         def sw_captiveBallFront_active(self, sw):
             if not self.mode_running:

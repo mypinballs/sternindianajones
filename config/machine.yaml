@@ -547,13 +547,13 @@ PRCoils:
         number: C32
         label: 'Crusade Flasher'
     flasherArk:
-        number: C36
+        number: A04
         label: 'Ark Flasher'
     flasherSwordsman:
-        number: C37
+        number: A05
         label: 'Swordman Flasher'
     flasherSkull:
-        number: C38
+        number: A06
         label: 'Skull Flasher'
 #       
 #    divertorMain:
@@ -739,7 +739,7 @@ PRLamps:
     #col4
     skillAdvanceScene:
         number: L25
-        label: 'Skill - Advnace Scene'
+        label: 'Skill - Advance Scene'
     rightLoopArrow:
         number: L26
         tags: arrow
@@ -809,15 +809,15 @@ PRLamps:
         number: L45
         tags: movie
         label: 'Kingdom'
-    xMarksTheSpot:
+    cairoSwordsman:
         number: L46
-        label: 'X Marks the Spot'
+        label: 'Cairo Swordsman'
     8Ball:
         number: L47
         label: '8-ball'
-    cairoSwordsman:
+    xMarksTheSpot:
         number: L48
-        label: 'Cairo Swordsman'
+        label: 'X Marks the Spot'
     #col7
     grailJackpot:
         number: L49
@@ -903,7 +903,7 @@ PRLamps:
     jonesVsAliens:
         number: L72
         label: 'Jones vs Aliens'
-    #col9
+    #col10
     handOfFate: 
     #mystery
         number: L73

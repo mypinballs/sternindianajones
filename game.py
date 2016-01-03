@@ -28,6 +28,7 @@ from temple import *
 from moonlight import *
 from trough import *
 from effects import *
+from volume import *
 from extra_ball import *
 from screens import *
 from mpcballsearch import *
@@ -77,18 +78,9 @@ font_6x6_bold = dmd.Font(fonts_path+"font_8x7_bold.dmd")
 font_23x12 = dmd.font_named("font_23x12_bold.dmd")
 font_8x6_bold = dmd.font_named("font_9x6_bold.dmd")
 
-#lampshow_files = [game_path +"lamps/attract_show_test.lampshow"]
-lampshow_files = [game_path +"lamps/general/colours.lampshow", \
-                  game_path +"lamps/general/updown.lampshow", \
-                  game_path +"lamps/general/downup.lampshow", \
-                  game_path +"lamps/general/leftright.lampshow", \
-                  game_path +"lamps/general/rightleft.lampshow", \
-                  game_path +"lamps/general/quickwindmills.lampshow", \
-                  game_path +"lamps/general/windmills.lampshow", \
-                  game_path +"lamps/general/rollleft.lampshow", \
-                  game_path +"lamps/general/rollright.lampshow"]
-
-
+lampshow_files = [game_path +"lamps/general/centre_fill_64.lampshow", \
+                  game_path +"lamps/general/vertical_wipe_down_64.lampshow", \
+                  game_path +"lamps/general/vertical_wipe_up_64.lampshow"]
 
 
 class Game(game.BasicGame):
@@ -158,13 +150,14 @@ class Game(game.BasicGame):
 		self.load_config(self.yamlpath)
 
                 self.load_settings(settings_template_path, settings_path)
-		self.sound.music_volume_offset = self.user_settings['Sound']['Music volume offset']
-		self.sound.set_volume(self.user_settings['Sound']['Initial volume'])
+		#self.sound.music_volume_offset = self.user_settings['Sound']['Music volume offset']
+                #volume_level = self.user_settings['Sound']['Initial Volume']
+		#self.sound.set_volume(volume_level/30) #make part of volume mode
 		self.load_game_data(game_data_template_path, game_data_path)
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.1'
+                self.system_version='0.2.2'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -299,6 +292,10 @@ class Game(game.BasicGame):
                 self.lampctrl.register_show('ball_lock', game_path +"lamps/game/success.lampshow")
                 self.lampctrl.register_show('hit', game_path +"lamps/game/success.lampshow")
                 self.lampctrl.register_show('jackpot', game_path +"lamps/game/success.lampshow")
+                self.lampctrl.register_show('start_ball', game_path +"lamps/game/start_ball_32.lampshow")
+                self.lampctrl.register_show('end_ball', game_path +"lamps/game/end_ball_32.lampshow")
+                self.lampctrl.register_show('mode_start_shot', game_path +"lamps/game/mode_start_shot_32.lampshow")
+                self.lampctrl.register_show('mode_start_eject', game_path +"lamps/game/mode_start_eject_32.lampshow")
 
                 # Setup High Scores
 		self.setup_highscores()
@@ -333,6 +330,8 @@ class Game(game.BasicGame):
                 self.extra_ball = Extra_Ball(self)
                 #screens mode
                 self.screens = Screens(self)
+                #volume mode
+                self.volume = Volume(self)
                 #match mode
                 self.match = Match(self,10)
                 #add ark mode for ark logic and control
@@ -399,8 +398,7 @@ class Game(game.BasicGame):
 		# Reset the entire game framework
 		super(Game, self).reset()
 
-		# Add the basic modes to the mode queue
-		self.modes.add(self.attract_mode)
+		# Add the basic modes to the mode queue	
 		self.modes.add(self.ball_search)
                 self.modes.add(self.utility)
                 self.modes.add(self.effects)
@@ -413,8 +411,9 @@ class Game(game.BasicGame):
                 self.modes.add(self.tilt)
                 self.modes.add(self.extra_ball)
                 self.modes.add(self.screens)
-
-
+                self.modes.add(self.volume)
+                self.modes.add(self.attract_mode)
+                
 		# Make sure flippers are off, especially for user initiated resets.
 		self.enable_flippers(enable=False)
                 
@@ -625,6 +624,7 @@ def main():
         logging.getLogger('ij.mode_select').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.raven_bar').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.match').setLevel(logging.DEBUG)
+        logging.getLogger('ij.three_challenges').setLevel(logging.DEBUG)
         logging.getLogger('game.vdriver').setLevel(logging.ERROR)
         logging.getLogger('game.driver').setLevel(logging.ERROR)
         logging.getLogger('game.sound').setLevel(logging.ERROR)

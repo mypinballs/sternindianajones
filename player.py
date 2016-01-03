@@ -79,4 +79,6 @@ class Player(procgame.game.Player):
 		self.player_stats['jones_vs_aliens_score'] = 0
                 self.player_stats['frankenstein_sets_completed'] = 0
                 self.player_stats['frankenstein_millions_score'] = 0
+                self.player_stats['music_playing'] = False
+                
                 

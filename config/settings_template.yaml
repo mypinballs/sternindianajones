@@ -74,17 +74,17 @@ Machine (Standard):
     increments: 1
     default: 35
 Sound:
-  'Initial volume':
-    options: [0.1,1.0]
-    increments: 0.1
-    default: 0.1
+  'Initial Volume':
+    options: [1,38]
+    increments: 1
+    default: 10
   'Extended Speech':
     options: ['Yes','No']
     default: 'Yes'  
-  'Music volume offset':
-    options: [-0.4,0.4]
-    increments: 0.1
-    default: 0
+#  'Music Volume Offset':
+#    options: [-0.4,0.4]
+#    increments: 0.1
+#    default: 0.0
 Display:
   'Left side score justify':
     # This example has no default.  The first option (right) will be used as the default.

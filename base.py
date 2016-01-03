@@ -314,6 +314,7 @@ class BaseGameMode(game.Mode):
         def sw_shooterLane_inactive_for_50ms(self,sw):
             if self.ball_served:
                 self.game.sound.play("gun_shot")
+                self.game.lampctrl.play_show('start_ball', repeat=False,callback=self.game.update_lamps)
 
 #        #skillshot preview
 #        def sw_flipperLwL_active_for_500ms(self, sw):
@@ -370,6 +371,8 @@ class BaseGameMode(game.Mode):
             if not self.game.ball_save.is_active() and not self.game.get_player_stats("multiball_started") and not self.game.get_player_stats("quick_multiball_started") and not self.game.get_player_stats('multiball_mode_started'):
                 self.game.sound.play("outlane_sound")
                 self.game.sound.play("outlane_speech")
+                
+                self.game.lampctrl.play_show('end_ball', repeat=False,callback=self.game.update_lamps)
 
 
         #pause game logic

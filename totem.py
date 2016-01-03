@@ -263,8 +263,10 @@ class Totem(game.Mode):
             self.clear()
             self.reset()
 
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+            #self.game.sound.stop_music()
+            #self.game.sound.play_music('general_play', loops=-1)
+            
+            self.game.utility.resume_mode_music()
             
 
         def multiball(self):
@@ -366,10 +368,8 @@ class Totem(game.Mode):
                 self.game.set_player_stats('quick_multiball_started',self.multiball_started) 
                 self.game.set_player_stats('quick_multiball_ready',self.multiball_ready_flag) 
 
-                #self.game.sound.stop_music()
-                #self.game.sound.play_music('general_play', loops=-1)
-
                 self.timeout()
+                
             elif self.balls_in_play==0:
                 #end tracking
                 self.multiball_running=False

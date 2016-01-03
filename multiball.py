@@ -163,6 +163,10 @@ class Multiball(game.Mode):
 
             #up the balls locked count
             self.balls_locked +=1
+            #special error checking in case tracking gets messed up - extra bogus switch activations?
+            if self.balls_locked>self.balls_needed:
+                self.balls_locked=self.balls_needed
+                
             self.lock_in_progress = True
 
             #self.game.trough.num_balls_locked = self.balls_locked #update trough mode regarding locked balls
@@ -233,6 +237,7 @@ class Multiball(game.Mode):
             self.game.score(50000)
             self.game.sound.play('electricity')
             self.game.effects.drive_flasher('flasherArkFront','chaos',time=0.5)
+            self.game.effects.drive_flasher('flasherArk','fast',time=0.5)
             self.cancel_delayed('queue_ark_power')
             self.delay(name='queue_ark_power',delay=0.1,handler=self.ark_power)
             
@@ -663,7 +668,8 @@ class Multiball(game.Mode):
         def sw_subway_active(self, sw):
             if not self.multiball_running and not self.game.get_player_stats('multiball_mode_started'):
                 if self.lock_lit:
-                    self.lock_ball()
+                    if self.game.switches.subway.time_since_change()>1: #add an extra check for switch bounce here
+                        self.lock_ball()
                 else:
                     self.cheat_display() #play the cheat anim :)
             elif self.multiball_running:

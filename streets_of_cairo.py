@@ -121,7 +121,7 @@ class Streets_Of_Cairo(game.Mode):
             #self.game.sound.register_sound('soc_gun_shot', sound_path+"gun_shot_deep.aiff")
 
             #lamps setup
-            self.lamps = ['leftLoopArrow','rightLoopArrow','templeArrow','rightRampArrow']
+            self.lamps = ['leftLoopArrow','cairoSwordsman','rightRampArrow','rightLoopArrow']
             self.shoot_button_lamp = 'tournamentStartButton'
             
             self.reset()
@@ -331,7 +331,7 @@ class Streets_Of_Cairo(game.Mode):
 
         def mode_started(self):
             #load player stats
-            self.baskets_searched = self.game.get_player_stats('soc_baskets_searched');
+            self.baskets_searched = self.game.get_player_stats('soc_baskets_searched')
 
             #shuffle marrion position
             random.shuffle(self.position)
@@ -354,6 +354,9 @@ class Streets_Of_Cairo(game.Mode):
             #open gates
 #            self.open_gates('left')
 #            self.open_gates('right')
+
+            #update effects
+            self.game.effects.drive_flasher('flasherSwordsman','fast',time=0)
 
             #update_lamps
             self.update_lamps()
@@ -385,6 +388,9 @@ class Streets_Of_Cairo(game.Mode):
             #close gates
 #            self.close_gates('left')
 #            self.close_gates('right')
+
+            #update effects
+            self.game.effects.drive_flasher('flasherSwordsman','off')
 
             #reset lamps
             self.reset_lamps()
@@ -485,11 +491,13 @@ class Streets_Of_Cairo(game.Mode):
 
             return procgame.game.SwitchStop
 
-        def sw_captiveBallFront_active(self, sw):
+        def sw_captiveBallRear_inactive(self, sw):
             self.mode_progression(1)
-
             return procgame.game.SwitchStop
 
+        def sw_captiveBallFront_inactive_for_200ms(self, sw):
+            return procgame.game.SwitchStop
+        
         def sw_rightRampMade_active(self, sw):
             self.mode_progression(2)
 

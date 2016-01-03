@@ -469,19 +469,20 @@ class Rope_Bridge(game.Mode):
 
         def update_lamps(self):
             for i in range(len(self.lamps)):
-                self.game.effects.drive_lamp(self.lamps[i],'on')
+                self.game.effects.drive_lamp(self.lamps[i],'fast')
 
         def clear(self):
             self.layer = None
 
 
+        #switch handlers
+        
         def sw_rightLoopTop_active(self, sw):
             self.mode_progression()
-
             return procgame.game.SwitchStop
 
         def sw_rightRampMade_active(self, sw):
-            self.mode_progression()
-
+            if self.game.switches.rightRampMade.time_since_change()>1:
+                self.mode_progression()
             return procgame.game.SwitchStop
         

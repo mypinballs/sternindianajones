@@ -90,6 +90,8 @@ class Frankenstein(game.Mode):
             self.running_total = 0
             self.mode_select.mode_enabled = False
             self.mode_select.mode_running = True
+            self.mode_select.current_mode_num = 13 #set the special hidden mode id
+            self.game.set_player_stats('mode_running_id',13)
             
             #load player stats
             self.sets_completed = self.game.get_player_stats('frankenstein_sets_completed')
@@ -119,6 +121,7 @@ class Frankenstein(game.Mode):
         def mode_stopped(self):
             self.mode_select.mode_enabled = True
             self.mode_select.mode_running = False
+            self.mode_select.move_left() #set the next regular mode
             
             #save player stats
             self.game.set_player_stats('frankenstein_sets_completed',self.sets_completed)
@@ -262,6 +265,15 @@ class Frankenstein(game.Mode):
                 self.game.sound.play("franky_target_unlit")
                 
 
+        def next_letter_id(self):
+            j=0
+            for i in range(len(self.flags)):
+                if self.flags[i] and j<i:
+                    j+=1
+                else:
+                    break
+            return j
+                
             
         def award_score(self,score_value=0):
             score_value = self.score_value_start
@@ -365,6 +377,13 @@ class Frankenstein(game.Mode):
         def sw_jonesS_active(self,sw):
             self.mode_progression(11)
             return procgame.game.SwitchStop
+        
+        def sw_captiveBallRear_inactive(self, sw):
+            self.mode_progression(self.next_letter_id())
+            return procgame.game.SwitchStop
+
+        def sw_captiveBallFront_inactive_for_200ms(self, sw):
+            return procgame.game.SwitchStop
             
         def sw_leftInlane_active(self,sw):
             self.inlane()
@@ -382,6 +401,7 @@ class Frankenstein(game.Mode):
             self.outlane()
             return procgame.game.SwitchStop
  
-#        def sw_grailEject_active_for_250ms(self,sw):
+        #grail eject handler not needed here as is controlled by mode select mdoe and the flags set here at mode_start/mode_stopped
+#        def sw_grailEject_active_for_250ms(self,sw): 
 #            self.eject()
 #            return procgame.game.SwitchStop

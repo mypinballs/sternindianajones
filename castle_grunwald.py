@@ -205,7 +205,7 @@ class Castle_Grunwald(game.Mode):
 #        def sw_singleDropTop_active(self, sw):
 #            return procgame.game.SwitchStop
 
-        def sw_captiveBallFront_active(self, sw):
+        def sw_captiveBallRear_inactive(self, sw):
             return procgame.game.SwitchStop
 
         def sw_captiveBallFront_inactive_for_200ms(self, sw):
@@ -219,4 +219,3 @@ class Castle_Grunwald(game.Mode):
             self.score_value_boost+=self.score_value_extra
 
             return procgame.game.SwitchStop
- 
