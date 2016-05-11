@@ -8,29 +8,31 @@ Gameplay (Feature): {A2.01 Timed Plunger: 0, Adventure Continue Timer: 25, Attra
   Frankenstein Timer: 60, Game Ballsaves: 3, Game ballsaves: 3, Get The Idol Difficulty: Medium,
   Get The Idol Timer: 30, Gun Trigger During Buy-In: Extra Ball, Hand Of Fate Lit Difficulty: Easy,
   Hand Of Fate Timer: 0, Hold Idol Locks At Game Over: 'No', Jackport Multiplier Timer: 30,
-  Jones Vs Aliens Timer: 90, Loop Lit Timer: 15, Lower Playfield Extra Ball Lit Hold: 'On',
-  Max Balls in Ark: 4, Max extra balls lit: 99, Max extra balls per game: 99, Mine Cart Tunnel Inc.: 10,
-  Mine Cart Tunnel Start: 25, Mode Bonus Value (Mil): 2, Mode Start Lit: Ball Start,
-  Mode Start Value (Mil): 3, Mode Timers Pause Length: 2, Monkey Brains Timer: 30,
-  Monster Extras: 'Yes', Moonlight Mins to Midnight: 15, Multiball Ballsaves: 2, Multiball Saver Timer: 5,
-  Multiball ballsave time: 20, Multiball ballsaves: 2, New ball ballsave time: 10,
-  New ball repeating ballsave: false, Outlane Ball Save: 'No', Path Of Adventure Start Level: 1,
-  Path of Adventure Extra Ball/Pit Lit Difficulty: Easy, Path of Adventure Pit Lit Level: 3,
-  Quick Multiball Saver Timer: 5, Ramp Lit Timer: 30, Raven Bar Animate Scores For Hits: 'Yes',
-  Raven Bar Hits For Extra Ball: 15, Raven Bar Hits For Medallion: 20, Raven Bar Level Start: 1,
-  Raven Bar Level Started: 1, Raven Bar Lives: 5, Rope Bridge Timer: 30, Steal The Stones Timer: 30,
-  Streets Of Cairo Timer: 30, Super Jets Start: 100, Tank Chase Timer: 30, Temple Hits For Lock: 3,
-  The 3 Challenges Timer: 30, Time per chain feature: 30, Timed Plunger: 0, Well Of Souls BIP Start: 4,
-  Well Of Souls Ball Save Timer: 10}
+  Jones Vs Aliens Timer: 90, Loop Lit Timer: 15, Loopin Jackpots Start: 20, Loopin Jackpots Timer: 35,
+  Lower Playfield Extra Ball Lit Hold: 'On', Max Balls in Ark: 4, Max extra balls lit: 99,
+  Max extra balls per game: 99, Mine Cart Tunnel Inc.: 10, Mine Cart Tunnel Start: 25,
+  Mode Bonus Value (Mil): 2, Mode Start Lit: Ball Start, Mode Start Value (Mil): 3,
+  Mode Timers Pause Length: 2.0, Monkey Brains Timer: 30, Monster Extras: 'Yes', Moonlight Mins to Midnight: 15,
+  Multiball Ballsaves: 2, Multiball Saver Timer: 5, Multiball ballsave time: 20, Multiball ballsaves: 2,
+  New ball ballsave time: 10, New ball repeating ballsave: false, Outlane Ball Save: 'Yes',
+  Path Of Adventure Start Level: 1, Path of Adventure Extra Ball/Pit Lit Difficulty: Easy,
+  Path of Adventure Pit Lit Level: 3, Plane Chase Memory: 'Yes', Quick Multiball Saver Timer: 5,
+  Ramp Lit Timer: 30, Raven Bar Animate Scores For Hits: 'Yes', Raven Bar Hits For Extra Ball: 15,
+  Raven Bar Hits For Medallion: 20, Raven Bar Level Start: 1, Raven Bar Level Started: 1,
+  Raven Bar Lives: 5, Rope Bridge Timer: 30, Steal The Stones Timer: 30, Streets Of Cairo Timer: 30,
+  Super Jets Start: 100, Tank Chase Timer: 30, Temple Hits For Lock: 3, The 3 Challenges Timer: 30,
+  Time per chain feature: 30, Timed Plunger: 0, Totem Hidden Music: 'Yes', Well Of Souls BIP Start: 4,
+  Well Of Souls Ball Save Timer: 12}
 Highscore: {Grand Champion: 350000000}
 Machine (Standard): {Allow Dim Illumination: 'No', Balls Per Game: 3, Clock Style: AM/PM,
   Color Display Pixel Size: 8, Color Display X Offset: 0, Color Display Y Offset: -400,
   Custom Message: false, Date Style: Euro, Euro. Score Format: 'No', Free Play: 'Yes',
   Game Restart: true, General Illumination Power Saver: 0, Maximum Extra Balls: 4,
   Maximum Extra Balls/Ball In Play: 0, No Bonus Flips: 'Yes', Power Saver Level: 4,
-  Show Date and Time: 'Yes', Tilt Warnings: 3, Tournament Play: 'No', Tournament Type: Local}
+  Shaker Installed: 'No', Show Date and Time: 'Yes', Tilt Warnings: 3, Tournament Play: 'No',
+  Tournament Type: Local}
 Network: {Gateway: 0, IP Address: 0, Subnet: 0, Tournament Server: 0}
 Replay: {Replay Award: Audit, Replay Boost: 100000, Replay Level 1: 100000, Replay Level 2: 200000,
   Replay Level 3: 300000, Replay Level 4: 400000, Replay Levels: 1, Replay Percentage: 10,
   Replay Type: auto, Special: Audit}
-Sound: {Extended Speech: 'Yes', Initial Volume: 29}
+Sound: {Extended Speech: 'Yes', Initial Volume: 26}

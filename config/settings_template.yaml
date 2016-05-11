@@ -4,6 +4,8 @@
 # any setting is saved (via the in-game service menu), the user_settings.yaml file
 # will be updated with ALL of the entries here without overwriting existing settings.
 
+# keep naming to 32 characters or under for best screen display
+
 Machine (Standard):
   'Balls Per Game':
     options: [1,10]
@@ -62,6 +64,9 @@ Machine (Standard):
   'Free Play':
     options: ['Yes','No']
     default: 'Yes'
+  'Shaker Installed':
+    options: ['Yes','No']
+    default: 'No'
   'Color Display Pixel Size':
     options: [14,10,8]
     default: 10
@@ -171,6 +176,9 @@ Gameplay (Feature):
     options: [5,120]
     increments: 5
     default: 30
+  'Plane Chase Memory':
+    options: ['No','Yes']
+    default: 'Yes' 
   'Dog Fight Timer':
     options: [5,30]
     increments: 5
@@ -276,6 +284,14 @@ Gameplay (Feature):
     options: [20,90]
     increments: 5
     default: 60 
+  'Loopin Jackpots Start':
+    options: [20,100]
+    increments: 5
+    default: 50 
+  'Loopin Jackpots Timer':
+    options: [20,90]
+    increments: 5
+    default: 30 
   'Jackport Multiplier Timer':
     options: [5,120]
     increments: 5
@@ -330,7 +346,7 @@ Gameplay (Feature):
     default: 'Extra Ball'
   'Outlane Ball Save':
     options: ['Yes','No']
-    default: 'No'
+    default: 'Yes'
   'Game Ballsaves':
     options: [1,10]
     increments: 1
@@ -353,6 +369,10 @@ Gameplay (Feature):
   'Monster Extras':
     options: ['Yes','No']
     default: 'Yes'
+  'Totem Hidden Music':
+    options: ['Yes','No']
+    default: 'Yes'
+  
 Network:
   'IP Address':
     options: [0,255]

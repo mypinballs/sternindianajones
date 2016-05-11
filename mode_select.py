@@ -56,6 +56,7 @@ class Mode_Select(game.Mode):
 
             #default mode bonus value
             self.mode_bonus_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Bonus Value (Mil)'])*1000000 #2000000
+            self.mode_start_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Start Value (Mil)'])*1000000 #5000000
             
 
             #default timer value
@@ -154,10 +155,22 @@ class Mode_Select(game.Mode):
             if self.mode_running:
                 if self.current_mode_num==0:
                     self.timer_layer = self.get_the_idol.timer_layer
+                elif self.current_mode_num==1:
+                    self.timer_layer = self.streets_of_cairo.timer_layer
+                elif self.current_mode_num==4:
+                    self.timer_layer = self.monkey_brains.timer_layer
                 elif self.current_mode_num==5:
                     self.timer_layer = self.steal_the_stones.timer_layer
+                elif self.current_mode_num==7:
+                    self.timer_layer = self.rope_bridge.timer_layer
+                elif self.current_mode_num==8:
+                    self.timer_layer = self.castle_grunwald.timer_layer
+                elif self.current_mode_num==9:
+                    self.timer_layer = self.tank_chase.timer_layer
                 elif self.current_mode_num==10:
                     self.timer_layer = self.the_three_challenges.timer_layer
+                elif self.current_mode_num==12:
+                    self.timer_layer = self.jones_vs_aliens.timer_layer
                 
                 if self.timer_layer:
                     self.timer_layer.pause(True)
@@ -168,8 +181,9 @@ class Mode_Select(game.Mode):
             
             
         def mode_unpaused(self):
-            self.timer_layer.pause(False) 
-            self.delay(name='scene_timeout', event_type=None, delay=self.timer_layer.get_time_remaining(), handler=self.end_scene)
+            if self.mode_running and self.timer_layer:
+                self.timer_layer.pause(False) 
+                self.delay(name='scene_timeout', event_type=None, delay=self.timer_layer.get_time_remaining(), handler=self.end_scene)
         
         
         def update_lamps(self):
@@ -255,7 +269,7 @@ class Mode_Select(game.Mode):
      
 
         def start_scene(self):
-            if self.mode_enabled and self.game.get_player_stats('multiball_running')==False and self.game.get_player_stats('quick_multiball_running')==False and self.game.get_player_stats('lock_in_progress')==False:
+            if self.mode_enabled and self.game.get_player_stats('multiball_running')==False and self.game.get_player_stats('quick_multiball_running')==False and self.game.get_player_stats('lock_in_progress')==False and self.game.get_player_stats('dog_fight_running')==False:
 
                 #play sound
                 self.game.sound.play("scene_started")
@@ -360,12 +374,15 @@ class Mode_Select(game.Mode):
                 #record audits
                 audits.record_value(self,'modeStarted')
                 
+                #score
+                self.game.score(self.mode_start_value)
+                
             elif self.mode_running:
                 self.mode_bonus()
             else:
                 timer = 0
                 #lengthen the timer if these events are running
-                if self.game.get_player_stats('multiball_started')  or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress'):
+                if self.game.get_player_stats('multiball_started')  or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress') or self.game.get_player_stats('dog_fight_running'):
                     timer =2
                     
                 #hold a ball for while multiball running for multiple jackpots use
@@ -472,8 +489,9 @@ class Mode_Select(game.Mode):
             self.remove_selected_scene()
 
             #display mode total on screen
+            total_score = self.mode_start_value+self.game.get_player_stats('last_mode_score')
             bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/scene_ended_bgnd.dmd").frames[0])
-            self.info_layer.set_text(locale.format("%d",self.game.get_player_stats('last_mode_score'),True), color=dmd.GREEN)
+            self.info_layer.set_text(locale.format("%d",total_score,True), color=dmd.GREEN)
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,self.name_layer,self.info_layer])
 
             #call the common end scene code
@@ -527,7 +545,7 @@ class Mode_Select(game.Mode):
             else:
                 self.secret_mode = False
                 
-            if self.game.get_player_stats('hof_status')!='lit':
+            if self.game.get_player_stats('hof_status')!='lit' and not self.game.get_player_stats('mode_blocking'):
                 self.start_scene()
                  
                 #return procgame.game.SwitchStop   
@@ -536,12 +554,12 @@ class Mode_Select(game.Mode):
             self.game.lampctrl.play_show('mode_start_shot', repeat=False,callback=self.game.update_lamps)
             
 
-        def sw_captiveBallFront_active(self, sw):
+        def sw_captiveBallRear_inactive(self, sw):
             if not self.mode_running:
                 self.move_left()
 
         def sw_rightRampMade_active(self, sw):
-            if not self.mode_running:
+            if not self.mode_running and self.game.switches.rightRampMade.time_since_change()>1:
                 self.move_right()
 
         def sw_leftLoopTop_active(self, sw):

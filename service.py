@@ -6,7 +6,7 @@ from procgame import *
 base_path = config.value_for_key_path('base_path')
 game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
-sound_path = game_path +"sound/"
+sound_path = game_path +"sound/service/"
 music_path = game_path +"music/"
 
 class ServiceModeSkeleton(game.Mode):
@@ -367,22 +367,35 @@ class SwitchTest(ServiceModeSkeleton):
 	def __init__(self, game, priority, font, big_font):
 		super(SwitchTest, self).__init__(game, priority,font)
 		self.name = "Switch Test"
-                self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/switch_test_bgnd.dmd').frames[0])
-		self.matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
+                #layer setup
+                self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_bgnd.dmd').frames[0])
+                self.matrix_grid_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/stern_switch_test_grid.dmd').frames[0])
+		self.matrix_grid_layer.composite_op = "blacksrc"
+                self.matrix_grid_layer.target_x = 78
+                self.matrix_grid_layer.target_y = 1
+                self.matrix_layer_group = []
+                self.matrix_layer = dmd.GroupedLayer(128, 32, self.matrix_layer_group)
                 self.matrix_layer.composite_op = "blacksrc"
-                self.matrix_layer.target_x = 128
-                self.matrix_layer.target_y = 32
+                self.direct_matrix_layer_group = []
+                self.direct_matrix_layer = dmd.GroupedLayer(128, 32, self.direct_matrix_layer_group)
+                self.direct_matrix_layer.composite_op = "blacksrc"
                 self.title_layer = dmd.TextLayer(1, 0, font, "left")
 		self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
                 self.row_layer = dmd.TextLayer(1, 18, font, "left")
                 self.column_layer = dmd.TextLayer(1, 24, font, "left")
-                self.number_layer = dmd.TextLayer(99, 24, font, "right")
-		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.item_layer, self.row_layer,self.column_layer,self.number_layer,self.matrix_layer])
-
+                self.number_layer = dmd.TextLayer(78, 24, font, "left")
+                
+		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.item_layer, self.row_layer,self.column_layer,self.number_layer,self.matrix_grid_layer,self.matrix_layer,self.direct_matrix_layer])
+                
+                #grid indexes setup
+                self.switch_index = []
+                self.direct_switch_index = []
+                
                 #connector setup
-                self.base_colour =['White','Green']
-                self.connector_key = [6,8]
-
+                self.base_colour =['White','Brown','Green','Pink','Grey','Light Green']
+                self.connector_key = [4,5,2,5,3,2]
+                self.wire_colour = []
+                
                 #populate connector colours
                 for j in range (len(self.base_colour)):
                     self.colours = ['Brown','Red','Orange','Yellow','Green','Blue','Purple','Grey','White']
@@ -391,13 +404,12 @@ class SwitchTest(ServiceModeSkeleton):
                     for i in range(len(colour_set)):
                         if colour_set[i]==self.base_colour[j]:
                          colour_set[i] = "Black"
-                    if j==0:
-                        self.row_colour = colour_set
-                    elif j==1:
-                        self.col_colour = colour_set
+                    
+                    self.wire_colour.append(colour_set)
+                             
+                self.log.info("Wire Colours Created:%s",self.wire_colour)
                
-
-                self.direct_colours = ['Green','Brown','Red','Orange','Yellow','Black','Blue','Purple','Grey','Green','','']
+                #self.direct_colours = ['Green','Brown','Red','Orange','Yellow','Black','Blue','Purple','Grey','Green','','']
                 
 		for switch in self.game.switches:
 			if self.game.machine_type == 'sternWhitestar':
@@ -410,48 +422,100 @@ class SwitchTest(ServiceModeSkeleton):
 				self.add_switch_handler(name=switch.name, event_type='inactive', delay=None, handler=self.switch_handler)
 				self.add_switch_handler(name=switch.name, event_type='active', delay=None, handler=self.switch_handler)
 
+
 	def switch_handler(self, sw):
 		if (sw.state):
-			self.game.sound.play('service_switch_edge')
+                    self.game.sound.play('service_switch_edge')
+                
+                matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
+                matrix_layer.composite_op = "blacksrc"
+                matrix_layer.target_x = 128
+                matrix_layer.target_y = 32
+                
+		self.item_layer.set_text(str(sw.label),color=dmd.YELLOW)
 
-		self.item_layer.set_text(str(sw.label))
-
-                #+'-'+str(sw.number)+''+ ' : ' + str(sw.state)
-
-                #if sw.yaml_number.count('/')>0:
-                  #  matrix =sw.yaml_number.split('/')
+                x_offset = 80
+                
                 if sw.yaml_number.count('S')>0 and sw.yaml_number.count('D')==0 and sw.yaml_number.count('F')==0:
-
+                    
                     matrix =[]
-                    matrix.append(int(sw.yaml_number[1])-1)
-                    matrix.append(int(sw.yaml_number[2])-1)
+                    sw_num = int(sw.yaml_number[1:])-1
+                    matrix.append(sw_num/16)
+                    matrix.append(sw_num%16)
                     #self.log.debug(matrix)
-                    row_colour = self.base_colour[0]+' '+self.row_colour[int(matrix[1])]
-                    col_colour = self.base_colour[1]+' '+self.col_colour[int(matrix[0])]
-
-                    sw_num = 32+ 16*int(matrix[0])+int(matrix[1])
-                    self.row_layer.set_text(row_colour)
-                    self.column_layer.set_text(col_colour)
-                    self.number_layer.set_text(sw.yaml_number)
-                    if sw.state:
-                        self.matrix_layer.target_x = 102+int(matrix[0])*3
-                        self.matrix_layer.target_y = 3+int(matrix[1])*3
+                    y_offset = 3
+                    
+                    if int(matrix[1])<8:
+                        row_colour = self.base_colour[0]+'/'+self.wire_colour[0][matrix[1]]
                     else:
-                        self.matrix_layer.target_x = 128
-                        self.matrix_layer.target_y = 32
+                        row_colour = self.base_colour[1]+'/'+self.wire_colour[1][matrix[1]-8]
+                        
+                    col_colour = self.base_colour[2]+'/'+self.wire_colour[2][matrix[0]]
 
-                else:
-                    sw_num = sw.number
-                    row_colour = self.direct_colours[sw_num-8]
-                    self.row_layer.set_text(row_colour)
-                    self.column_layer.set_text("")
-                    self.number_layer.set_text("sd"+str(sw_num))
+                    #sw_num = 32+ 16*int(matrix[0])+int(matrix[1])
+                    self.row_layer.set_text(row_colour,color=dmd.BROWN)
+                    self.column_layer.set_text(col_colour,color=dmd.BROWN)
+                    self.number_layer.set_text(sw.yaml_number,color=dmd.CYAN)
+                    if sw.state:
+                        matrix_layer.target_x = x_offset+(matrix[1]*3)
+                        matrix_layer.target_y = y_offset+(matrix[0]*3)
+                        self.matrix_layer_group.append(matrix_layer)
+                        self.switch_index.append(sw_num)
+                    else:
+                        matrix_layer.target_x = 128
+                        matrix_layer.target_y = 32
+                        num = self.switch_index.index(sw_num)
+                        self.matrix_layer_group.pop(num)
+                        self.switch_index.pop(num)
+                        
+                    #self.log.info(self.matrix_layer_group)
+                    #self.log.info(self.switch_index)
+                    
+                elif sw.yaml_number.count('D')>0:
+                    sw_num = int(sw.yaml_number[2:])-1
+                    matrix =[]
+                    matrix.append(sw_num/8)
+                    matrix.append(sw_num%8)
+                    #self.log.debug(matrix)
+                    y_offset = 14
+                    
+                    if matrix[0]==0:
+                        row_colour = self.base_colour[3]+'/'+self.wire_colour[3][matrix[1]]
+                    elif matrix[0]==1:
+                        row_colour = self.base_colour[4]+'/'+self.wire_colour[4][matrix[1]]
+                        x_offset += 24
+                    else:
+                        row_colour = self.base_colour[5]+'/'+self.wire_colour[5][matrix[1]]
 
+                    col_colour = 'Black'
+                    
+                    self.row_layer.set_text(row_colour,color=dmd.BROWN)
+                    self.column_layer.set_text(col_colour,color=dmd.BROWN)
+                    self.number_layer.set_text(sw.yaml_number,color=dmd.CYAN)
+                    
+                    if sw.state:
+                        matrix_layer.target_x = x_offset+(matrix[1]*3)
+                        matrix_layer.target_y = y_offset+(matrix[0]*3)
+                        self.direct_matrix_layer_group.append(matrix_layer)
+                        self.direct_switch_index.append(sw_num)
+                    else:
+                        try: #try except needed for first enter press
+                            matrix_layer.target_x = 128
+                            matrix_layer.target_y = 32
+                            num = self.direct_switch_index.index(sw_num)
+                            self.direct_matrix_layer_group.pop(num)
+                            self.direct_switch_index.pop(num)
+                        except Exception, err:
+                            return
+                    
+                    #self.log.info(self.direct_matrix_layer_group)
+                    #self.log.info(self.direct_switch_index)
 
 		return True
 
-	def sw_enter_active(self,sw):
-		return True
+	#def sw_enter_active(self,sw):
+	#	return True
+            
             
 class Statistics(ServiceModeList):
 	"""Service Mode."""
@@ -571,21 +635,24 @@ class SettingsEditor(ServiceModeList):
 	"""Service Mode."""
 	def __init__(self, game, priority, font, big_font, name, itemlist):
 		super(SettingsEditor, self).__init__(game, priority, font)
+                small_font = self.game.fonts['7x4']
                 self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_adjust_bgnd.dmd').frames[0])
 		self.title_layer = dmd.TextLayer(1, 0, font, "left")
-		self.item_layer = dmd.TextLayer(1, 11, font, "left")
-		self.instruction_layer = dmd.TextLayer(1, 25, font, "left")
+		self.item_layer = dmd.TextLayer(1, 8, small_font, "left")
+                self.value_layer = dmd.TextLayer(128, 15, big_font, "right")
+		self.instruction_layer = dmd.TextLayer(1, 26, small_font, "left")
                 self.instruction_layer.composite_op = "blacksrc"
 		self.no_exit_switch = game.machine_type == 'sternWhitestar'
 		#self.title_layer.set_text('Settings')
+                
 		self.name = name
 		self.items = []
-		self.value_layer = dmd.TextLayer(127, 11, big_font, "right")
+                
 		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer, self.instruction_layer])
 		for item in itemlist.iterkeys():
 			#self.items.append( EditItem(str(item), itemlist[item]['options'], itemlist[item]['value'] ) )
 			if 'increments' in itemlist[item]:
-				num_options = (itemlist[item]['options'][1]-itemlist[item]['options'][0]) / itemlist[item]['increments']
+				num_options = ((itemlist[item]['options'][1]-itemlist[item]['options'][0]) / itemlist[item]['increments'])+1
 				option_list = []
 				for i in range(0,int(num_options)):
 					option_list.append(itemlist[item]['options'][0] + (i * itemlist[item]['increments']))
@@ -620,7 +687,7 @@ class SettingsEditor(ServiceModeList):
 			self.delay(name='blink', event_type=None, delay=.3, handler=self.blinker)
 		else:
 			self.state = 'nav'
-			self.instruction_layer.set_text("Change saved")
+			self.instruction_layer.set_text("Change saved",color=dmd.GREEN)
 			self.delay(name='change_complete', event_type=None, delay=1, handler=self.change_complete)
 			self.game.sound.play('service_save')
 			self.game.user_settings[self.name][self.item.name]=self.item.value
@@ -639,7 +706,7 @@ class SettingsEditor(ServiceModeList):
 			self.value_layer.set_text(str(self.item.value))
 			self.stop_blinking = True
 			self.game.sound.play('service_cancel')
-			self.instruction_layer.set_text("Change cancelled")
+			self.instruction_layer.set_text("Change cancelled",color=dmd.GREEN)
 			self.delay(name='change_complete', event_type=None, delay=1, handler=self.change_complete)
 			
 	def sw_up_active(self, sw):
@@ -699,6 +766,7 @@ class SettingsEditor(ServiceModeList):
 		self.max = ctr - 1
 		self.item_layer.set_text(self.item.name)
 		self.value_layer.set_text(str(self.item.value))
+                self.log.info('Setting :%s',self.item.name)
 		self.option_index = self.item.options.index(self.item.value)
 			
 	def disable(self):

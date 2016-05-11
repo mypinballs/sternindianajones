@@ -301,6 +301,7 @@ class Attract(game.Mode):
 	# Enter service mode when the enter button is pushed.
 	def sw_enter_active(self, sw):
                 self.game.modes.remove(self.game.coin_door)
+                self.game.lampctrl.stop_show()
 		for lamp in self.game.lamps:
 			lamp.disable()
 		self.game.modes.add(self.game.service_mode)

@@ -141,12 +141,13 @@ class BaseGameMode(game.Mode):
             self.totem = Totem(self.game, 51)
             self.plane_chase = Plane_Chase(self.game, 52)
             #self.skillshot = Skillshot(self.game, 54)
+            self.mode_select = Mode_Select(self.game, 60)
 
             #higher priority basic modes
-            self.mode_select = Mode_Select(self.game, 60)
-            self.multiball = Multiball(self.game, 61)
-            self.poa = POA(self.game, 95)
-
+            self.multiball = Multiball(self.game, 95)#61
+            self.poa = POA(self.game, 96)
+            
+            
             #modes with links to other modes
             self.indy_lanes = Indy_Lanes(self.game, 42, self.mode_select)
             self.loops = Loops(self.game, 43, self.indy_lanes)
@@ -185,15 +186,6 @@ class BaseGameMode(game.Mode):
                 #print("Debug - Starting General Play Music")
                 self.game.sound.play_music('general_play', loops=-1)
         
-                
-        def shoot_again(self):
-            p = self.game.current_player()
-            
-            if p.extra_balls>0:
-                anim = dmd.Animation().load(game_path+"dmd/shoot_again.dmd")
-                self.layer = dmd.AnimatedLayer(frames=anim.frames,hold=False,frame_time=3)
-                self.game.sound.play('shoot_again')
-
 
         def mode_tick(self):
             if self.game.switches.startButton.is_active(1) and self.game.switches.flipperLwL.is_active(1) and self.game.switches.flipperLwR.is_active():
@@ -205,6 +197,7 @@ class BaseGameMode(game.Mode):
                     del self.game.dmd.frame_handlers[0]
 
 		del self.game.proc
+
 
 	def mode_stopped(self):
 

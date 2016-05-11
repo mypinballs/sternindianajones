@@ -42,6 +42,7 @@ class Screens(game.Mode):
 
 
             self.delay(name='clear_display_delay', event_type=None, delay=timer, handler=self.clear)
+            
 
         def raise_jackpot(self,timer,value):
 
@@ -75,6 +76,28 @@ class Screens(game.Mode):
 
             #update display layer
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,name_layer])
+
+
+            self.delay(name='clear_display_delay', event_type=None, delay=timer, handler=self.clear)
+            
+        
+        def monster_bonus(self,timer,value):
+
+            bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/mode_bonus_bgnd.dmd").frames[0])
+            name_layer = dmd.TextLayer(128/2, 7, self.game.fonts['8x6'], "center")
+            info_layer = dmd.TextLayer(128/2, 15, self.game.fonts['num_09Bx7'], "center")
+
+            name_layer.set_text('Monster Bonus'.upper(),color=dmd.BROWN)
+            info_layer.set_text(locale.format("%d",value,True),color=dmd.GREEN)
+
+            #play sound
+            self.game.sound.play('collect')
+
+            #score
+            self.game.score(value)
+
+            #update display layer
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,name_layer,info_layer])
 
 
             self.delay(name='clear_display_delay', event_type=None, delay=timer, handler=self.clear)

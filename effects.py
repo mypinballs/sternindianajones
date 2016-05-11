@@ -6,6 +6,7 @@ __date__ ="$Jan 18, 2011 1:36:37 PM$"
 
 import procgame
 import locale
+import random
 from procgame import *
 
 base_path = config.value_for_key_path('base_path')
@@ -115,4 +116,26 @@ class Effects(game.Mode):
                         timer+=time
                     else:
                         self.cancel_delayed(fname+'strobe')
-                        self.game.coils[fname].disable()          
+                        self.game.coils[fname].disable() 
+        
+        
+        def drive_shaker(self,style='medium',time=0.75):
+
+            if self.game.user_settings['Machine (Standard)']['Shaker Installed'].startswith('Y'): 
+                if style == 'slow':
+                    num=random.randint(130,200)
+                    self.game.coils['shakerMotor'].pulse(num)
+                    #self.game.coils['shakerMotor'].schedule(schedule=0x00003000, cycle_seconds=0, now=True)
+                elif style == 'medium':
+                    #self.game.coils['shakerMotor'].schedule(schedule=0x30003000, cycle_seconds=0, now=True)
+                    time=0.75
+                    self.game.coils['shakerMotor'].enable()
+                elif style == 'fast':
+                    #self.game.coils['shakerMotor'].schedule(schedule=0x11111111, cycle_seconds=0, now=True)
+                    time=1.2
+                    self.game.coils['shakerMotor'].enable()
+                
+                self.delay(name='shaker_off', event_type=None, delay=time, handler=self.game.coils['shakerMotor'].disable)
+                
+                #self.delay(name='spin_wheels_repeat',delay=0.7,handler=self.drive)
+            

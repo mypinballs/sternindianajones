@@ -11,3 +11,5 @@ _notes/
 idol2.py
 idol_bkup.py
 /raven_bar_bkup.py
+/config/serial_lamps.yaml
+/rgb_lamps.py

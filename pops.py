@@ -114,4 +114,11 @@ class Pops(game.Mode):
             self.pops_score()
             self.play_sound()
             self.play_animation()
+            
+        def sw_topJet_active(self, sw):
+            self.update_count()
+
+            self.pops_score()
+            self.play_sound()
+            self.play_animation()
 

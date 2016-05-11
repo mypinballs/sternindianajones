@@ -28,23 +28,23 @@ PRSwitches:
 
     #Dedicated Grounded Swtches
     leftCoinSlot:
-        number: SD1
+        number: SD01
         label: 'Left Coin Slot'
     #using center coin slot and billacceptor plug for cabling (pink/red & black)
     coinDoorClosed: 
-        number: SD2
+        number: SD02
         label: 'coinDoorClosed'
     rightCoinSlot:
-        number: SD3
+        number: SD03
         label: 'Right Coin Slot'
     fourthCoinSlot:
-        number: SD4
+        number: SD04
         label: '4th Coin Slot'
     fifthCoinSlot:
-        number: SD5
+        number: SD05
         label: '5th Coin Slot'
     flipperLwL:
-        number: SD9
+        number: SD09
         label: 'Lower Left Flipper'
     flipperLEOS:
         number: SD10
@@ -66,16 +66,16 @@ PRSwitches:
         label: 'Ticket Notch'
     exit: 
         number: SD21
-        label: 'Service - Exit'
+        label: 'Exit (Service)'
     down: 
         number: SD22
-        label: 'Service - Down'
+        label: 'Down (Service)'
     up: 
         number: SD23
-        label: 'Service - Up'
+        label: 'Up (Service)'
     enter: 
         number: SD24
-        label: 'Service - Enter'
+        label: 'Enter (Service)'
 
     #Matrix Switches
     #col1
@@ -321,7 +321,7 @@ PRSwitches:
         number: S63
         label: 'Swordsman Back'
     swordsmanForward:
-        number: S63
+        number: S64
         label: 'Swordsman Forward'
 
      #Old Switch defs
@@ -1070,7 +1070,7 @@ PRBallSave:
         leftInlane: open
         rightOutlane: open
         rightInlane: open
-        grailEject: open
+        #grailEject: open
     stopSwitches:
         shooterLane: closed
         # don't ball search if a flipper button is pressed

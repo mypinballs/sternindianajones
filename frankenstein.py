@@ -62,17 +62,19 @@ class Frankenstein(game.Mode):
             
             self.game.sound.register_sound('franky_speech1', speech_path+"frankenstein092_live_live_live.aiff")
             self.game.sound.register_sound('franky_speech1', speech_path+"frankenstein140_thats_the_combination.aiff")
-            self.game.sound.register_sound('franky_speech1', speech_path+"frankenstein145_i_keep_my_promises.aiff")
 
+            self.game.sound.register_sound('franky_speech2', speech_path+"frankenstein145_i_keep_my_promises.aiff")
+            self.game.sound.register_sound('franky_speech2', speech_path+"frankenstein129_electricity_is_the_key.aiff")
 
             #lamps setup
             self.lamps = ['indyI','indyN','indyD','indyY','jonesJ','jonesO','jonesN','jonesE','jonesS']
             
             #score setup
-            self.score_value_boost = 1000000
             self.target_lit_score_value = 1000000
             self.target_unlit_score_value = 100000
+            self.score_value_boost = 1000000
             self.score_value_extra = 2000000
+            self.bonus_value = 2500000
             self.set_completed_score =  self.target_lit_score_value *10
 
 
@@ -88,10 +90,10 @@ class Frankenstein(game.Mode):
             
             self.reset()
             self.running_total = 0
-            self.mode_select.mode_enabled = False
-            self.mode_select.mode_running = True
-            self.mode_select.current_mode_num = 13 #set the special hidden mode id
-            self.game.set_player_stats('mode_running_id',13)
+#            self.mode_select.mode_enabled = False
+#            self.mode_select.mode_running = True
+#            self.mode_select.current_mode_num = 13 #set the special hidden mode id
+            self.game.set_player_stats('mode_blocking',True)
             
             #load player stats
             self.sets_completed = self.game.get_player_stats('frankenstein_sets_completed')
@@ -119,9 +121,10 @@ class Frankenstein(game.Mode):
 
 
         def mode_stopped(self):
-            self.mode_select.mode_enabled = True
-            self.mode_select.mode_running = False
-            self.mode_select.move_left() #set the next regular mode
+#            self.mode_select.mode_enabled = True
+#            self.mode_select.mode_running = False
+#            self.mode_select.move_left() #set the next regular mode
+            self.game.set_player_stats('mode_blocking',False)
             
             #save player stats
             self.game.set_player_stats('frankenstein_sets_completed',self.sets_completed)
@@ -134,8 +137,11 @@ class Frankenstein(game.Mode):
             self.cancel_delayed('aux_mode_speech_delay')
 
             #reset music
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+            #continue any previously active mode music if ball still in play
+            if self.game.trough.num_balls_in_play>0:
+                #self.game.sound.stop_music()
+                #self.game.sound.play_music('general_play', loops=-1)
+                self.game.utility.resume_mode_music() 
 
             #clear display
             self.clear()
@@ -301,6 +307,14 @@ class Frankenstein(game.Mode):
         def clear(self):
             self.layer = None
             
+        def bonus(self):
+            timer=2
+            self.game.screens.monster_bonus(timer,self.bonus_value)
+            self.running_total+=self.bonus_value
+            self.voice_call(2)
+            
+            self.delay(name='eject_delay', event_type=None, delay=timer-1, handler=self.eject)
+            
         def eject(self):
             self.mode_select.eject_ball()
 
@@ -401,7 +415,7 @@ class Frankenstein(game.Mode):
             self.outlane()
             return procgame.game.SwitchStop
  
-        #grail eject handler not needed here as is controlled by mode select mdoe and the flags set here at mode_start/mode_stopped
-#        def sw_grailEject_active_for_250ms(self,sw): 
-#            self.eject()
-#            return procgame.game.SwitchStop
+        
+        def sw_grailEject_active_for_250ms(self,sw): 
+            self.bonus()
+            return procgame.game.SwitchStop

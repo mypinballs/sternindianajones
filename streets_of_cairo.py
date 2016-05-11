@@ -97,7 +97,7 @@ class Streets_Of_Cairo(game.Mode):
 
             #screen setup
             self.timer = int(self.game.user_settings['Gameplay (Feature)']['Streets Of Cairo Timer'])
-            print("Monkey Brains Timer is:"+str(self.timer))
+            self.log.info("Streets of Cairo Timer is:%s",self.timer)
 
             self.score_layer = ModeScoreLayer(128/2, -1, self.game.fonts['07x5'], self)
             self.score_layer.composite_op ="blacksrc"
@@ -177,6 +177,8 @@ class Streets_Of_Cairo(game.Mode):
 
             #turn shoot button lamp on - using tournament buttom
             self.game.effects.drive_lamp(self.shoot_button_lamp,'fast')
+            #start swordsman flasher
+            self.game.effects.drive_flasher('flasherSwordsman','fast',time=2)
             
             #play speech & sounds
             self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=1)
@@ -355,8 +357,10 @@ class Streets_Of_Cairo(game.Mode):
 #            self.open_gates('left')
 #            self.open_gates('right')
 
+            #swordsman
+            self.game.swordsman.open()
             #update effects
-            self.game.effects.drive_flasher('flasherSwordsman','fast',time=0)
+            #self.game.effects.drive_flasher('flasherSwordsman','fast',time=2)
 
             #update_lamps
             self.update_lamps()
@@ -389,6 +393,9 @@ class Streets_Of_Cairo(game.Mode):
 #            self.close_gates('left')
 #            self.close_gates('right')
 
+            #swordsman
+            self.game.swordsman.close()
+            
             #update effects
             self.game.effects.drive_flasher('flasherSwordsman','off')
 
@@ -452,6 +459,9 @@ class Streets_Of_Cairo(game.Mode):
                 self.load_scene_anim(self.count,1,num)
             else:
                 self.load_scene_anim(self.count,0,num)
+                
+            #flasher effect
+            self.game.effects.drive_flasher('flasherSwordsman','fast',time=0.75)
             
             #play sound
             #self.game.sound.play('marrion_'+self.position[num])

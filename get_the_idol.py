@@ -60,10 +60,7 @@ class Get_The_Idol(game.Mode):
             
             #var setup
             self.count = 0
-            
             self.score_value_boost = 5000000
-            self.score_value_start = int(self.game.user_settings['Gameplay (Feature)']['Mode Start Value (Mil)'])*1000000#5000000
-            #self.load_anim(0)
             self.progression_anim_posn = 1
             
             if self.game.user_settings['Gameplay (Feature)']['Get The Idol Difficulty']=='Easy':
@@ -198,7 +195,7 @@ class Get_The_Idol(game.Mode):
 
                 self.load_progression_anim()
                 
-                score_value = (self.score_value_boost*self.count) +self.score_value_start
+                score_value = (self.score_value_boost*self.count) 
                 self.game.set_player_stats('get_the_idol_score',score_value)
                 self.game.set_player_stats('last_mode_score',self.game.get_player_stats('get_the_idol_score' ))
                 #set text layers

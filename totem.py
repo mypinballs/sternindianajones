@@ -42,6 +42,7 @@ class Totem(game.Mode):
             self.game.sound.register_sound('map_target', sound_path+"adv_target2.aiff")
             self.game.sound.register_music('qm_ready', music_path+"quick_multiball_ready.aiff")
             self.game.sound.register_music('qm_running', music_path+"quick_multiball_play.aiff")
+            self.game.sound.register_music('qm_running_ft', music_path+"fish_tales_multiball.aiff")
             self.game.sound.register_sound('qm_jackpot0', speech_path+"the_idol_of_the_incas.aiff")
             self.game.sound.register_sound('qm_jackpot1', speech_path+"the_diamond_of_shanghai.aiff")
             self.game.sound.register_sound('qm_jackpot2', speech_path+"the_remains_of_nurachi.aiff")
@@ -71,12 +72,14 @@ class Totem(game.Mode):
         def reset(self):
             self.timer = int(self.game.user_settings['Gameplay (Feature)']['Captive Multiball Start Timer'])
             self.hits_needed = int(self.game.user_settings['Gameplay (Feature)']['Captive Multiball Start'])
+            self.fish_tales_music = self.game.user_settings['Gameplay (Feature)']['Totem Hidden Music']
             self.count = 0
             self.jackpot_count = self.game.get_player_stats('qm_jackpots_collected')
             self.multiball_started= False
             self.multiball_ready_flag = False
+            self.add_a_ball_active = True #add a ball enabled flag
             #self.game.coils.totemDropUp.pulse()
-            self.game.effects.drive_flasher('flasherSwordsman','off')
+            #self.game.effects.drive_flasher('flasherSwordsman','off')
             self.game.effects.drive_flasher('flasherBackpanel','off')
             
             self.cancel_delayed('timeout_delay') #clear delay in case reset called directly from other modes
@@ -84,6 +87,8 @@ class Totem(game.Mode):
             #map specific
             self.map_banks_completed = self.game.get_player_stats('map_banks_completed')
             self.reset_map()
+            
+            
             
 
         def reset_map(self):
@@ -99,7 +104,8 @@ class Totem(game.Mode):
 
 
         def mode_stopped(self):
-            pass
+            self.reset()
+            
 
         def mode_tick(self):
             if self.multiball_started:
@@ -250,7 +256,7 @@ class Totem(game.Mode):
 
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer1,info_layer2,ball_layer,self.score_layer,timer_layer])
             
-            self.game.effects.drive_flasher('flasherSwordsman','fast',time=0)
+            #self.game.effects.drive_flasher('flasherSwordsman','fast',time=0)
             self.game.effects.drive_flasher('flasherBackpanel','fast',time=0) 
 
             self.game.sound.stop_music()
@@ -266,8 +272,9 @@ class Totem(game.Mode):
             #self.game.sound.stop_music()
             #self.game.sound.play_music('general_play', loops=-1)
             
-            self.game.utility.resume_mode_music()
-            
+            #continue any previously active mode music
+            self.game.utility.resume_mode_music()    
+
 
         def multiball(self):
             #cancel timeout delay
@@ -275,6 +282,17 @@ class Totem(game.Mode):
             #update status & tracking vars
             self.multiball_started = True
             self.game.set_player_stats('quick_multiball_started',self.multiball_started)
+
+            #setup masked transition
+            title_frame = dmd.Animation().load(game_path+"dmd/quick_multiball.dmd")
+            title_layer = dmd.FrameLayer(frame=title_frame.frames[0])
+            title_layer.composite_op="invertedmask"
+            
+            mask_anim = dmd.Animation().load(game_path+"dmd/qm_mask.dmd")
+            mask_layer = dmd.AnimatedLayer(frames=mask_anim.frames,hold=True,frame_time=6)
+            
+            curtain_layer = dmd.GroupedLayer(128,32,[mask_layer,title_layer])
+            curtain_layer.composite_op = "blacksrc"
 
             #setup display
             bgnd = dmd.Animation().load(game_path+"dmd/qm_bgnd_running.dmd")
@@ -334,7 +352,7 @@ class Totem(game.Mode):
 
 
             #update display
-            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,item_layer1,item_layer2,item_layer3,item_layer4,item_layer5,info_layer1,self.score_layer])
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,item_layer1,item_layer2,item_layer3,item_layer4,item_layer5,info_layer1,self.score_layer,curtain_layer])
 
         
             if self.multiball_running==False:
@@ -342,9 +360,16 @@ class Totem(game.Mode):
                 #start the main multiball music
                 self.game.sound.stop_music()
                 self.game.sound.play_music('qm_running', loops=-1)
+                
+                #play sound
+                self.game.sound.play("explosion")
 
                 #launch balls
                 self.launch_ball()
+                
+            if self.jackpot_count==4 and self.fish_tales_music.startswith('Y'):
+                self.game.sound.stop_music()
+                self.game.sound.play_music('qm_running_ft', loops=-1)
             
 
         def launch_ball(self):
@@ -456,9 +481,16 @@ class Totem(game.Mode):
 
             #set target
             self.delay(name='reset_display',delay=3,handler=self.multiball)
+            
+            
+        def add_a_ball(self,value):
+            self.add_a_ball_active = value
+            if not self.add_a_ball_active:
+                self.delay(name='reenable_add_a_ball',delay=2,handler=self.add_a_ball, param=True)
+            
 
         def sw_grailEject_active(self, sw):
-            if self.multiball_running and not self.game.get_player_stats('multiball_running'): #only do this if the main multiball is not running also
+            if self.multiball_running and self.add_a_ball_active and not self.game.get_player_stats('multiball_running'): #only do this if the main multiball is not running also and ball enters front wise (not jet hits)
                 self.game.screens.add_ball(2,self.add_ball_value)
                 self.launch_ball()
 
@@ -495,3 +527,16 @@ class Totem(game.Mode):
             
         def sw_mapEject_active_for_250ms(self,sw): #work out what to do with this rules wise
             self.game.coils.mapEject.pulse()
+            
+        #add a ball monitoring, disabled if jets hit as ball should enter scoop from front only
+        def sw_leftJet_active(self, sw):
+            self.add_a_ball(False)
+
+#        def sw_rightJet_active(self, sw):
+#            self.add_a_ball(False)
+
+        def sw_bottomJet_active(self, sw):
+            self.add_a_ball(False)
+            
+        def sw_topJet_active(self, sw):
+            self.add_a_ball(False)

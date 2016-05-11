@@ -143,7 +143,7 @@ class Loops(game.Mode):
             if self.loop_multiplier==2:#set the loops progress store only on first successful loop
                 self.loops_completed+=1
                 self.game.set_player_stats('loops_completed',self.loops_completed)
-                self.indy_lanes.update_friend_lamps()
+                #self.indy_lanes.update_friend_lamps()
                 
         def jackpot(self):
             pass

@@ -15,7 +15,7 @@ music_path = game_path +"music/"
 class Volume(game.Mode):
 
 	def __init__(self, game):
-            super(Volume, self).__init__(game, 100)
+            super(Volume, self).__init__(game, 99)
             
             self.log = logging.getLogger('ij.volume')
             self.game.sound.register_music('volume_adjust_play', music_path+"shooter_groove.aiff")

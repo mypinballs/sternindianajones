@@ -43,18 +43,25 @@ class Plane_Chase(game.Mode):
 
             self.plane_lamps = ['leftPlaneBottom','rightPlaneBottom','leftPlaneMiddle','rightPlaneMiddle','leftPlaneTop','rightPlaneTop','leftRampArrow','rightRampArrow']
             self.plane_lamps = []
-            self.ramps_made=self.game.get_player_stats('ramps_made')
+            
             self.total_ramps_made = 0
-
+            self.ramps_made = 0
+            
             #flags to enable shot sequence to be progressed
             self.left_ramp_enabled = False
             self.right_ramp_enabled = False
 
 
         def reset(self):
-            #self.reset_lamps()
+            #set the ramps made count
+            if self.game.user_settings['Gameplay (Feature)']['Plane Chase Memory'].startswith('Y'):
+                self.ramps_made=self.game.get_player_stats('ramps_made')
+            else:
+                self.ramps_made = 0
+            
             self.game.coils.flasherSankara.disable()
             self.dog_fight_running = False
+            self.game.set_player_stats('dog_fight_running',self.dog_fight_running)
 
             self.right_ramp_enabled = True
             #self.game.effects.drive_lamp('leftRampArrow','superfast')
@@ -130,6 +137,10 @@ class Plane_Chase(game.Mode):
 
         def dog_fight(self):
             self.dog_fight_running = True
+            self.game.set_player_stats('dog_fight_running',self.dog_fight_running)
+            #reset ramps_made
+            self.ramps_made = 0
+            self.game.set_player_stats('ramps_made',self.ramps_made)
             self.game.temple.open()
             
             bgnd = dmd.Animation().load(game_path+"dmd/blank.dmd") #possibly change the bgnd here
@@ -167,6 +178,9 @@ class Plane_Chase(game.Mode):
              self.game.score(self.dog_fight_value)
              self.queue_clear()
              self.reset()
+             
+             if self.game.get_player_stats('lock_lit'): #lock ball if needed once dog fight completed
+                 self.game.base_game_mode.multiball.lock_ball()
 
         def mode_started(self):
             self.reset()

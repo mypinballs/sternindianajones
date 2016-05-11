@@ -246,7 +246,7 @@ class Hand_Of_Fate(game.Mode):
             option = self.chosen_list[0]
     
             #debug
-            option=self.list[6]
+            #option=self.list[6]
             clear_time=3
             
             if option==self.list[0]:
@@ -283,8 +283,16 @@ class Hand_Of_Fate(game.Mode):
         def extra_ball_lit(self,type):
             self.award_layer = self.game.extra_ball.lit(type)
                 
+            
         def dog_fight_award(self,type):
-            self.name_award(type)
+            if type=='banner':
+                chosen_layer = dmd.TextLayer(128/2, 7, self.game.fonts['9x7_bold'], "center", opaque=True)
+                chosen_layer.set_text('Start Dog Fight'.upper(),color=dmd.ORANGE)
+                #chosen_layer.transition = dmd.ExpandTransition(direction='vertical')
+                self.award_layer=chosen_layer
+            elif type=='anim':
+                self.game.base_game_mode.plane_chase.dog_fight()
+         
             
         def eternal_life_award(self,timer,type):
             anim = dmd.Animation().load(game_path+"dmd/eternal_life.dmd")
@@ -338,7 +346,6 @@ class Hand_Of_Fate(game.Mode):
                 self.award_layer = dmd.FrameLayer(frame=anim.frames[0])
             elif type=='anim':
                 self.game.modes.add(self.frankenstein)
-                self.mode_start_blocking = True
                 
         
         def score_award(self,score):
@@ -360,7 +367,7 @@ class Hand_Of_Fate(game.Mode):
             self.update_lamps()
 
             #add a callback to mode select to continue logic - start any modes enabled, if not blocked
-            if not self.mode_start_blocking:
+            if not self.game.get_player_stats('mode_blocking'):
                 self.mode_select.start_scene()
 
             #remove self
@@ -372,7 +379,7 @@ class Hand_Of_Fate(game.Mode):
 #            self.clear()
             
         def sw_grailEject_active_for_500ms(self,sw):
-            if self.status=='lit':
+            if self.status=='lit' and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_running'):
                 #self.animation()
                 self.choices()
                 #return procgame.game.SwitchStop

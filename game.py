@@ -23,11 +23,13 @@ from scoredisplay import *
 from player import *
 from ark import *
 from temple import *
+from swordsman import *
 #from idol import *
 #from mini_playfield import *
 from moonlight import *
 from trough import *
 from effects import *
+#from rgb_lamps import *
 from volume import *
 from extra_ball import *
 from screens import *
@@ -157,7 +159,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.2.2'
+                self.system_version='0.3.0'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -322,6 +324,8 @@ class Game(game.BasicGame):
                 self.moonlight = Moonlight(self,2)
                 #effects mode
                 self.effects = Effects(self,4)
+                #rgb lamps mode
+                #self.rgb_lamps = RGBLamps(self,4)
                 #utility mode
                 self.utility = Utility(self)
                 #tilt mode
@@ -338,6 +342,8 @@ class Game(game.BasicGame):
                 self.ark = Ark(self,15)
                 #add temple mode for temple logic and control
                 self.temple = Temple(self,15)
+                #add temple mode for temple logic and control
+                self.swordsman = Swordsman(self,15)
                 #add idol mode for idol logic and control
                 #self.idol = Idol(self,15)
                 #setup mini_playfield
@@ -402,9 +408,11 @@ class Game(game.BasicGame):
 		self.modes.add(self.ball_search)
                 self.modes.add(self.utility)
                 self.modes.add(self.effects)
+                #self.modes.add(self.rgb_lamps)
 		self.modes.add(self.ball_save)
                 self.modes.add(self.ark)
                 self.modes.add(self.temple)
+                self.modes.add(self.swordsman)
                 #self.modes.add(self.idol)
                 #self.modes.add(self.mini_playfield)
 		self.modes.add(self.trough)
@@ -465,9 +473,17 @@ class Game(game.BasicGame):
 #        def add_player(self):
 #                super(Game, self).add_player()
 #                audits.record_value(self,'gameStarted')
+        
+        
+        def shoot_again(self):
+            super(Game, self).shoot_again() #calls ball_starting
+           
+            anim = dmd.Animation().load(game_path+"dmd/shoot_again.dmd")
+            self.layer = dmd.AnimatedLayer(frames=anim.frames,hold=False,frame_time=3)
+            self.game.sound.play('shoot_again')
                 
-                
-	def ball_starting(self):
+	
+        def ball_starting(self):
 		super(Game, self).ball_starting()
 		
                 #check for moonlight
@@ -617,6 +633,7 @@ def main():
 
         #set invidivual log levels here
         logging.getLogger('ij.ark').setLevel(logging.DEBUG)
+        logging.getLogger('ij.swordsman').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.temple').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.trough').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.base').setLevel(logging.DEBUG)

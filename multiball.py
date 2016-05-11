@@ -12,6 +12,7 @@ import locale
 import logging
 import audits
 from procgame import *
+from loopin_jackpots import *
 
 base_path = config.value_for_key_path('base_path')
 game_path = base_path+"games/indyjones2/"
@@ -95,6 +96,9 @@ class Multiball(game.Mode):
             self.cheat_value_boost = 1000000
             
             self.hits_needed = int(self.game.user_settings['Gameplay (Feature)']['Temple Hits For Lock'])
+            self.loopin_jackpot_start = int(self.game.user_settings['Gameplay (Feature)']['Loopin Jackpots Start'])
+            
+            self.loopin_jackpots = Loopin_Jackpots(self.game,priority-1)
         
 
 
@@ -117,6 +121,7 @@ class Multiball(game.Mode):
             self.balls_locked = self.game.get_player_stats('balls_locked')
             self.multiball_running = self.game.get_player_stats('multiball_running')
             self.multiball_started = self.game.get_player_stats('multiball_started')
+            self.ark_hits = self.game.get_player_stats('ark_hits')
             
             
             #self.log.info('multiball started flag:%s',self.multiball_started)
@@ -137,6 +142,7 @@ class Multiball(game.Mode):
             self.game.set_player_stats('jackpots_collected',self.jackpot_collected)
             self.game.set_player_stats('cheat_count',self.cheat_count)
             self.game.set_player_stats('lock_progress_hits',self.hits)
+            self.game.set_player_stats('ark_hits',self.ark_hits)
         
         
         def mode_tick(self):
@@ -234,12 +240,19 @@ class Multiball(game.Mode):
             
             
         def ark_hit(self):
+            self.ark_hits+=1
+            self.log.info('Ark Hits Total:%s',self.ark_hits)
             self.game.score(50000)
             self.game.sound.play('electricity')
             self.game.effects.drive_flasher('flasherArkFront','chaos',time=0.5)
             self.game.effects.drive_flasher('flasherArk','fast',time=0.5)
+            self.game.effects.drive_shaker('slow')
             self.cancel_delayed('queue_ark_power')
             self.delay(name='queue_ark_power',delay=0.1,handler=self.ark_power)
+            
+            if self.ark_hits==self.loopin_jackpot_start:
+                self.game.modes.add(self.loopin_jackpots)
+                
             
         def ark_power(self):
              self.game.coils.arkMagnet.patter(original_on_time=25, on_time=10, off_time=60)
@@ -287,6 +300,9 @@ class Multiball(game.Mode):
             #restart the totem mode if quick multiball is not running and stacking therefore isnt happening
             if not self.game.get_player_stats('quick_multiball_running'):
                 self.game.base_game_mode.totem.restart()
+                
+            #pause any active modes
+            self.game.base_game_mode.mode_select.mode_paused(sw=None)
             
             
         def multiball_launch(self):
@@ -310,8 +326,12 @@ class Multiball(game.Mode):
                 #close the temple scoop if open
                 self.game.temple.close()
                 
-                self.game.sound.stop_music()
-                self.game.sound.play_music('general_play', loops=-1)
+                #self.game.sound.stop_music()
+                #self.game.sound.play_music('general_play', loops=-1)
+                
+                #continue any modes previously active
+                self.game.utility.resume_mode_music()
+                self.game.base_game_mode.mode_select.mode_unpaused()
 
                 #light jackpot if not collected during multiball otherwise cancel
                 if self.jackpot_collected==0:
@@ -325,6 +345,7 @@ class Multiball(game.Mode):
                 
                 #restart the totem mode
                 self.game.base_game_mode.totem.restart()
+                
                     
             elif self.balls_in_play==0: #what to do if last 2 or more balls drain together
                 #end tracking
@@ -391,8 +412,8 @@ class Multiball(game.Mode):
             info_layer1 = dmd.TextLayer(128/2, 8, self.game.fonts['07x5'], "center", opaque=False)
             info_layer2 = dmd.TextLayer(128/2, 14, self.game.fonts['07x5'], "center", opaque=False)
 
-            info_layer1.set_text("SHOOT LEFT RAMP OR CENTER",color=dmd.CYAN)
-            info_layer2.set_text("HOLE TO LIGHT JACKPOT",color=dmd.CYAN)
+            info_layer1.set_text("SHOOT ARK OR TEMPLE",color=dmd.CYAN)
+            info_layer2.set_text("SCOOP TO LIGHT JACKPOT",color=dmd.CYAN)
 
             self.layer = dmd.GroupedLayer(128, 32, [self.score_layer,info_layer1,info_layer2,animation_layer1,animation_layer2,animation_layer3,animation_layer4])
 
@@ -477,7 +498,9 @@ class Multiball(game.Mode):
 #                   self.layer = dmd.GroupedLayer(128, 32, [self.animation_layer,self.text_layer])
 
                     #self.jackpot_x = self.game.idol.balls_in_idol+1
-
+                    
+                    self.game.effects.drive_shaker('medium')
+                    
                     self.game.score(self.jackpot_value*self.jackpot_x)
                     self.jackpot_collected+=1
                     self.game.effects.drive_lamp(self.jackpot_lamps[self.jackpot_collected-1],'smarton')
@@ -666,7 +689,7 @@ class Multiball(game.Mode):
                 return procgame.game.SwitchStop
 
         def sw_subway_active(self, sw):
-            if not self.multiball_running and not self.game.get_player_stats('multiball_mode_started'):
+            if not self.multiball_running and not self.game.get_player_stats('multiball_mode_started') and not self.game.get_player_stats('dog_fight_running'):
                 if self.lock_lit:
                     if self.game.switches.subway.time_since_change()>1: #add an extra check for switch bounce here
                         self.lock_ball()
