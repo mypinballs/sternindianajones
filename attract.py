@@ -27,7 +27,27 @@ class Attract(game.Mode):
                 self.display_order = [0,1,2,3,4,5,6,7,8,9]
 		self.display_index = 0
 
-		self.game.sound.register_sound('burp',speech_path+'burp.wav')
+		#setup attract sounds for flipper presses
+                self.game.sound.register_sound('flipperAttract', sound_path+'burp.aiff')
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402CC_bellak.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402CD_bellaks_staff_is_too_long.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402D2_he_was_good.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402CF_dont_look_marrion.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402D4_blow_up_the_ark.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402D5_kill_you_right_now.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402D6_only_say_sorry_so_many_times.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402D7_making_this_up_as_i_go.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402DE_start_the_engines_chuck.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402F2_trust_me.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij402FF_show_alittle_backbone.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij40314_fortune_and_glory_kid.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij4030D_you_know_perfectly_well.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij4030E_you_look_lost.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij4030F_welcome_to_pamcot_palace.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij4033B_ha_ha_very_funny.aiff")
+               
+
+                self.sound_timestamp = time.time()
 
                 #setup coin switches
                 self.coin_switchnames=[]
@@ -38,9 +58,11 @@ class Attract(game.Mode):
                 for switch in self.coin_switchnames:
 			self.add_switch_handler(name=switch, event_type='active', \
 				delay=None, handler=self.coin_switch_handler)
-
+                
+                
 	def mode_topmost(self):
 		pass
+
 
 	def mode_started(self):
 
@@ -294,9 +316,16 @@ class Attract(game.Mode):
 	def mode_stopped(self):
 		self.game.lampctrl.stop_show()
 
+
 	def mode_tick(self):
 		pass
 
+
+        def sound_effects(self):
+             if time.time()-self.sound_timestamp>5:
+                self.game.sound.play_voice('flipperAttract')
+                self.sound_timestamp=time.time()
+                
 
 	# Enter service mode when the enter button is pushed.
 	def sw_enter_active(self, sw):
@@ -357,3 +386,10 @@ class Attract(game.Mode):
             audits.update_counter(self.game,'credits',self.credits+1)
             self.show_pricing()
             self.game.sound.play("coin")
+            
+        
+        def sw_flipperLwL_active(self, sw):
+                self.sound_effects()
+
+        def sw_flipperLwR_active(self, sw):
+                self.sound_effects()

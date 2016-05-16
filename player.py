@@ -39,6 +39,8 @@ class Player(procgame.game.Player):
                 self.player_stats['mode_paused'] = False
                 self.player_stats['multiball_mode_started'] = False
                 self.player_stats['path_mode_started'] = False
+                self.player_stats['temple_mode_started'] = False
+                self.player_stats['ark_mode_started'] = False
                 self.player_stats['lock_lit'] = False
                 self.player_stats['lock_in_progress'] = False
                 self.player_stats['lock_progress_hits'] =0
@@ -85,5 +87,10 @@ class Player(procgame.game.Player):
                 self.player_stats['music_playing'] = False
                 self.player_stats['loopin_jackpots_collected'] = 0
                 self.player_stats['ark_hits'] = 0
+                self.player_stats['jones_banks_completed'] = 0
+                self.player_stats['jones_flags']= [False,False,False,False,False]
+                self.player_stats['8ball_multiball_lit'] = False
+                
+                
                 
                 

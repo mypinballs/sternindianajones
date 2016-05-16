@@ -62,8 +62,8 @@ class Castle_Grunwald(game.Mode):
             self.game.sound.register_sound('cg_speech14', speech_path+"dont_call_me_junior.aiff")
             self.game.sound.register_sound('cg_speech15', sound_path+"motorbike.aiff")
 
-
-
+            #lamps setup
+            self.lamps = ['cairoSwordsman','xMarksTheSpot']
 
             #var setup
             self.count = 0
@@ -128,6 +128,9 @@ class Castle_Grunwald(game.Mode):
 #            if self.game.switches.singleDropTop.is_inactive():
 #                self.game.coils.totemDropDown.pulse(30)
 #                self.log.debug("drop target should be down")
+            
+            #lamps
+            self.update_lamps()
 
         def voice_call(self,count,delay=None):
             if delay==None:
@@ -177,6 +180,9 @@ class Castle_Grunwald(game.Mode):
             #reset drop target
             #self.game.coils.totemDropUp.pulse()
             
+            #lamps
+            self.reset_lamps()
+            
 
         def mode_progression(self):
 
@@ -195,8 +201,13 @@ class Castle_Grunwald(game.Mode):
             
 
 
+        def reset_lamps(self):
+            for i in range(len(self.lamps)):
+                self.game.effects.drive_lamp(self.lamps[i],'off')
+
         def update_lamps(self):
-            pass
+            for i in range(len(self.lamps)):
+                self.game.effects.drive_lamp(self.lamps[i],'fast')
 
         def clear(self):
             self.layer = None

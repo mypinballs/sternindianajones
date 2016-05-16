@@ -374,18 +374,23 @@ class Steal_The_Stones(game.Mode):
 
         def sw_jonesJ_active(self,sw):
             self.jones_progress(0)
+            return procgame.game.SwitchStop
         
         def sw_jonesO_active(self,sw):         
             self.jones_progress(1)
+            return procgame.game.SwitchStop
             
         def sw_jonesN_active(self,sw):
             self.jones_progress(2)
+            return procgame.game.SwitchStop
         
         def sw_jonesE_active(self,sw):         
             self.jones_progress(3)
+            return procgame.game.SwitchStop
             
         def sw_jonesS_active(self,sw):
             self.jones_progress(4)
+            return procgame.game.SwitchStop
             
 #        def sw_miniBottomLeft_active(self, sw):
 #            self.delay(name='load_bgnd_anim', event_type=None, delay=2, handler=self.load_bgnd_anim)

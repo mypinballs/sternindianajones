@@ -244,6 +244,7 @@ class Jones_Vs_Aliens(game.Mode):
             
             #update path mode var
             self.game.set_player_stats("path_mode_started",True) #set as path mode to halt adventure starting if completed
+            self.game.set_player_stats("ark_mode_started",True)
 
             #setup text
             self.info_layer.set_text("SHOOT ARK TO ATTACK", blink_frames=10, color=dmd.PURPLE)
@@ -298,6 +299,11 @@ class Jones_Vs_Aliens(game.Mode):
             #update poa player stats
             self.game.set_player_stats("path_mode_started",False)
             self.game.set_player_stats("poa_queued",False)
+            self.game.set_player_stats("ark_mode_started",False)
+            
+            #safety magnet disable
+            self.cancel_delayed('queue_ark_power')
+            self.game.coils.arkMagnet.disable()
 
             #cancel speech calls
             self.cancel_delayed('mode_speech_delay')
@@ -491,18 +497,23 @@ class Jones_Vs_Aliens(game.Mode):
         
         def sw_jonesJ_active(self,sw):
             self.jones_progress(0)
+            return procgame.game.SwitchStop
         
         def sw_jonesO_active(self,sw):         
             self.jones_progress(1)
+            return procgame.game.SwitchStop
             
         def sw_jonesN_active(self,sw):
             self.jones_progress(2)
+            return procgame.game.SwitchStop
         
         def sw_jonesE_active(self,sw):         
             self.jones_progress(3)
+            return procgame.game.SwitchStop
             
         def sw_jonesS_active(self,sw):
             self.jones_progress(4)
+            return procgame.game.SwitchStop
             
         def sw_leftInlane_active(self,sw):
             self.inlane()

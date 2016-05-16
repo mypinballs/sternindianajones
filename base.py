@@ -11,6 +11,7 @@ from random import *
 from service import *
 from bonus import *
 from pops import *
+from jones import *
 #from narrow_escape import *
 from loops import *
 from poa import *
@@ -67,6 +68,7 @@ class BaseGameMode(game.Mode):
                     self.game.sound.register_sound('outlane_speech', speech_path+"big_problem01.aiff")
                     self.game.sound.register_sound('outlane_speech', speech_path+"lost_your_ball01.aiff")
                     self.game.sound.register_sound('outlane_speech', speech_path+"situation_not_improved01.aiff")
+                    self.game.sound.register_sound('outlane_speech', speech_path+"ij4031F_maybe_but_not_today.aiff")
                     
                 self.game.sound.register_sound('outlane_speech', speech_path+"blank.aiff")
 
@@ -136,6 +138,7 @@ class BaseGameMode(game.Mode):
             #lower priority basic modes
             self.pops = Pops(self.game, 40)
             #self.narrow_escape = Narrow_Escape(self.game, 41)
+            self.jones = Jones(self.game, 41)
 
             #medium priority basic modes
             self.totem = Totem(self.game, 51)
@@ -155,6 +158,7 @@ class BaseGameMode(game.Mode):
             #start modes
             self.game.modes.add(self.pops)
             #self.game.modes.add(self.narrow_escape)
+            self.game.modes.add(self.jones)
             self.game.modes.add(self.indy_lanes)
             self.game.modes.add(self.loops)
             self.game.modes.add(self.totem)
@@ -213,6 +217,7 @@ class BaseGameMode(game.Mode):
             #if self.game.ball==0:
                 self.game.modes.remove(self.pops)
                 #self.game.modes.remove(self.narrow_escape)
+                self.game.modes.remove(self.jones)
                 self.game.modes.remove(self.indy_lanes)
                 self.game.modes.remove(self.loops)
                 self.game.modes.remove(self.totem)
@@ -256,6 +261,12 @@ class BaseGameMode(game.Mode):
 		self.game.end_ball()
 
 
+        def shoot_again(self):
+            anim = dmd.Animation().load(game_path+"dmd/shoot_again.dmd")
+            self.layer = dmd.AnimatedLayer(frames=anim.frames,hold=False,frame_time=3)
+            self.game.sound.play('shoot_again')
+            
+            
 	def sw_startButton_active(self, sw):
 		if self.game.ball == 1 and len(self.game.players)<self.game.max_players:
 			p = self.game.add_player()

@@ -147,6 +147,7 @@ class The_Three_Challenges(game.Mode):
             self.challenges_collected = self.game.get_player_stats('challenges_collected');
             #update path mode var
             self.game.set_player_stats("path_mode_started",True)
+            self.game.set_player_stats("ark_mode_started",True)
             
             self.running_total += int(self.game.user_settings['Gameplay (Feature)']['Mode Start Value (Mil)'])*1000000
             
@@ -195,6 +196,7 @@ class The_Three_Challenges(game.Mode):
             #update poa player stats
             self.game.set_player_stats("path_mode_started",False)
             self.game.set_player_stats("poa_queued",False)
+            self.game.set_player_stats("ark_mode_started",False)
 
 
             #reset music

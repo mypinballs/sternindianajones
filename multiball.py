@@ -61,6 +61,7 @@ class Multiball(game.Mode):
             self.lock_animation_3 = "dmd/xxx.dmd"
 
             self.game.sound.register_sound('electricity', sound_path+"electricity.aiff")
+            self.game.sound.register_sound('electricity', sound_path+"ij40066_ark_magnet.aiff")
             
             self.game.sound.register_sound('lock', sound_path+"lock.aiff")
             self.game.sound.register_sound('jackpot_attempt', sound_path+"jackpot_attempt.aiff")
@@ -143,6 +144,10 @@ class Multiball(game.Mode):
             self.game.set_player_stats('cheat_count',self.cheat_count)
             self.game.set_player_stats('lock_progress_hits',self.hits)
             self.game.set_player_stats('ark_hits',self.ark_hits)
+            
+            #safety magnet disable
+            self.cancel_delayed('queue_ark_power')
+            self.game.coils.arkMagnet.disable()
         
         
         def mode_tick(self):
@@ -689,7 +694,7 @@ class Multiball(game.Mode):
                 return procgame.game.SwitchStop
 
         def sw_subway_active(self, sw):
-            if not self.multiball_running and not self.game.get_player_stats('multiball_mode_started') and not self.game.get_player_stats('dog_fight_running'):
+            if not self.multiball_running and not self.game.get_player_stats('multiball_mode_started') and not self.game.get_player_stats('temple_mode_started') and not self.game.get_player_stats('dog_fight_running'):
                 if self.lock_lit:
                     if self.game.switches.subway.time_since_change()>1: #add an extra check for switch bounce here
                         self.lock_ball()
@@ -763,7 +768,7 @@ class Multiball(game.Mode):
                 self.jackpot('lit')
                 self.game.score(500000)
                 return procgame.game.SwitchStop
-            else:    
+            elif not self.game.get_player_stats('ark_mode_started'):    
                 self.ark_hit()
             
 

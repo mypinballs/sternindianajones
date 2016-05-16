@@ -558,7 +558,7 @@ class Werewolf(game.Mode):
             self.gi(enable=True)
 
             #eject ball
-            self.game.coils.leftEject.pulse()
+            self.game.coils.grailEject.pulse()
 
             #reset lamps
             self.reset_lamps()

@@ -120,6 +120,10 @@ class POA(game.Mode):
                 if self.game.get_player_stats('poa_enabled') and (self.game.get_player_stats("multiball_started") or self.game.get_player_stats("quick_multiball_started") or self.game.get_player_stats('multiball_mode_started') or self.game.get_player_stats("path_mode_started")):
                    self.log.debug("enabled adventure being cancelled and requeued by special mode starting")
                    self.poa_requeued()
+                
+                #monitor scenario to clear continue display from running over the top of started modes
+                if self.adventure_started and self.game.get_player_stats('mode_running') and self.layer!=None:
+                    self.clear()
 
 
         def mode_stopped(self):

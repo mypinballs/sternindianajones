@@ -205,6 +205,9 @@ Gameplay (Feature):
   'Get The Idol Difficulty':
     options: ['Easy','Medium','Hard']
     default: 'Medium'
+  'Get The Idol Awards Locks':
+    options: ['Yes','No']
+    default: 'Yes'  
   'Streets Of Cairo Timer':
     options: [5,120]
     increments: 5
@@ -372,7 +375,10 @@ Gameplay (Feature):
   'Totem Hidden Music':
     options: ['Yes','No']
     default: 'Yes'
-  
+  'Jones Target Banks For 8 Ball':
+    options: [2,8]
+    increments: 1
+    default: 3
 Network:
   'IP Address':
     options: [0,255]

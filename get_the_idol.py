@@ -73,12 +73,11 @@ class Get_The_Idol(game.Mode):
                 self.hits = 5
                 self.progression_amount = 2
 
-                 
-            self.reset()
-
 
         def reset(self):
-           pass
+            self.mode_completed = False
+            self.award_locks = self.game.user_settings['Gameplay (Feature)']['Get The Idol Awards Locks']
+
 
 #        def load_anim(self,count):
 #            self.bgnd_anim = "dmd/get_the_idol_bgnd_"+str(count)+".dmd"
@@ -138,7 +137,12 @@ class Get_The_Idol(game.Mode):
                 #self.cancel_delayed('move_sprites')
                 self.reset_sprites()
                 
-        def mode_started(self):  
+        def mode_started(self): 
+            self.reset()
+            
+            #set mode player stats
+            self.game.set_player_stats('temple_mode_started',True)
+            
             #setup additonal layers
             self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer)
             self.timer_layer.composite_op ="blacksrc"
@@ -164,16 +168,15 @@ class Get_The_Idol(game.Mode):
 
 
         def mode_stopped(self):
-            #update mode select list - get the idol is mode 0 in list
-#            current_list = self.game.get_player_stats('mode_status_tracking');
-#            updated_list =current_list
-#            updated_list[0]=1
-#
-#            self.game.set_player_stats('mode_status_tracking',updated_list)
+            #set mode player stats
+            self.game.set_player_stats('temple_mode_started',False)
 
-            #restore temple if required
+            #restore temple if required and award any locks if setup
             if self.game.get_player_stats('lock_lit'):
-                self.game.temple.open()
+                if self.award_locks and self.mode_completed:
+                    self.game.base_game_mode.multiball.lock_ball()
+                else:
+                    self.game.temple.open()
             else:
                 self.game.temple.close()
 
@@ -228,6 +231,7 @@ class Get_The_Idol(game.Mode):
 
 
         def completed(self):
+            self.mode_completed = True
             self.bgnd_anim = "dmd/get_the_idol_completed.dmd"
             anim = dmd.Animation().load(game_path+self.bgnd_anim)
             self.layer = dmd.AnimatedLayer(frames=anim.frames,opaque=False,hold=True,frame_time=6)

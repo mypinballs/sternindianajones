@@ -159,7 +159,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.3.0'
+                self.system_version='0.3.2'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -477,10 +477,8 @@ class Game(game.BasicGame):
         
         def shoot_again(self):
             super(Game, self).shoot_again() #calls ball_starting
-           
-            anim = dmd.Animation().load(game_path+"dmd/shoot_again.dmd")
-            self.layer = dmd.AnimatedLayer(frames=anim.frames,hold=False,frame_time=3)
-            self.game.sound.play('shoot_again')
+         
+            self.base_game_mode.shoot_again()
                 
 	
         def ball_starting(self):

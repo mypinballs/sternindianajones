@@ -155,7 +155,7 @@ class Match(game.Mode):
 
             for i in range(len(self.game.players)):
                 score = self.game.players[i].score
-                digit = str(score)[-2:-1]
+                digit = str(score)[-2:]
                 player_layers[i].set_text(str(score)[-2:],color=dmd.YELLOW)
                 #set var for comparison
                 self.player_digits.append(int(digit))
@@ -166,7 +166,7 @@ class Match(game.Mode):
 
             for i in range(len(self.player_digits)):
                 self.log.debug("%s:%s",self.player_digits[i],self.value)
-                if self.player_digits[i]==self.value:
+                if int(self.player_digits[i])==int(self.value):
                      #audits.update_counter(self.game,'credits',self.credits+1)
                      self.game.sound.play('success')
                 else:

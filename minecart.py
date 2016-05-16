@@ -99,6 +99,7 @@ class Minecart(game.Mode):
             self.game.sound.register_sound('minecart_fall_speech', sound_path+"falling_scream_shorter.aiff")
             self.game.sound.register_sound('minecart_explosion', sound_path+"mine_cart_explosion.aiff")
             self.game.sound.register_sound('minecart_completed', sound_path+"mine_cart_jingle_completed.aiff")
+            self.game.sound.register_sound('minecart_speech0', speech_path+"ij4032B_watch_it_on_the_curves.aiff")
             
             #lamps setup
             self.lamps = []
@@ -209,7 +210,9 @@ class Minecart(game.Mode):
             if self.frame_time>2: #increase anim speed if not at max
                 self.frame_time-=1
             
-            self.game.sound.play_voice('minecart_roll')
+            self.game.sound.play('minecart_roll')
+            self.voice_call(count=0,delay=1)
+            
             
             
         def completed(self):
@@ -313,7 +316,7 @@ class Minecart(game.Mode):
             
             self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.cart_layer,self.sprite_layer1,self.sprite_layer2,self.tunnel_info_layer,self.award_layer])
 
-            self.game.sound.play_voice("minecart_roll")
+            self.game.sound.play("minecart_roll")
 
 
         def choose_route(self):
@@ -443,6 +446,13 @@ class Minecart(game.Mode):
         def start_music(self):
             self.game.sound.play_music('minecart_mode_music', loops=-1)
             
+
+        def voice_call(self,count,delay=None):
+            if delay==None:
+                self.game.sound.play_voice("minecart_speech"+str(count))
+            else:
+                self.delay(name='mode_speech_delay', event_type=None, delay=delay, handler=self.voice_call, param=count)
+
 
         def mode_started(self):
             #reset

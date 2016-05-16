@@ -58,10 +58,11 @@ class Mode_Select(game.Mode):
             self.mode_bonus_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Bonus Value (Mil)'])*1000000 #2000000
             self.mode_start_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Start Value (Mil)'])*1000000 #5000000
             
-
             #default timer value
             self.timer=30
             self.pause_length = self.game.user_settings['Gameplay (Feature)']['Mode Timers Pause Length']
+            
+            self.total_score = 0
             
             self.timer_layer = None
             
@@ -489,9 +490,9 @@ class Mode_Select(game.Mode):
             self.remove_selected_scene()
 
             #display mode total on screen
-            total_score = self.mode_start_value+self.game.get_player_stats('last_mode_score')
+            self.total_score = self.mode_start_value+self.game.get_player_stats('last_mode_score')
             bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/scene_ended_bgnd.dmd").frames[0])
-            self.info_layer.set_text(locale.format("%d",total_score,True), color=dmd.GREEN)
+            self.info_layer.set_text(locale.format("%d",self.total_score,True), color=dmd.GREEN)
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,self.name_layer,self.info_layer])
 
             #call the common end scene code
@@ -505,7 +506,7 @@ class Mode_Select(game.Mode):
 
             #update the bonus mode tracking
             bonus_mode_tracking = self.game.get_player_stats('bonus_mode_tracking')
-            bonus_mode_tracking.append({'name':self.name_text,'score':self.game.get_player_stats('last_mode_score')})
+            bonus_mode_tracking.append({'name':self.name_text,'score':self.total_score})
             self.game.set_player_stats('bonus_mode_tracking',bonus_mode_tracking)
             #debug
             self.log.info("bonus mode tracking:%s",bonus_mode_tracking)
