@@ -15,6 +15,7 @@ class Tilt(game.Mode):
             self.game.sound.register_sound('tilt warning', speech_path+"carefully.aiff")
             self.game.sound.register_sound('tilt', sound_path+"tilt.aiff")
             self.game.sound.register_sound('tilt_speech', speech_path+"behave_like_civilised_people.aiff")
+            self.game.sound.register_sound('tilt_speech', speech_path+"ij40330_never_happen_again.aiff")
 
             self.tilt_callback = None
 

@@ -655,10 +655,11 @@ class Multiball(game.Mode):
 
 
         def update_lamps(self):
-            if self.lock_lit:
-                self.game.effects.drive_lamp('templeArrow','medium')
-            else:
-                self.game.effects.drive_lamp('templeArrow','off')
+            if not self.game.get_player_stats('temple_mode_started'):
+                if self.lock_lit:
+                    self.game.effects.drive_lamp('templeArrow','medium')
+                else:
+                    self.game.effects.drive_lamp('templeArrow','off')
                 
             for i in range(self.jackpot_collected):
                 self.game.effects.drive_lamp(self.jackpot_lamps[i],'on')
@@ -685,7 +686,8 @@ class Multiball(game.Mode):
 
         def sw_templeStandup_active(self, sw):
             if not self.multiball_started and not self.multiball_running:
-                self.lock_progress()
+                if not self.game.get_player_stats('temple_mode_started'):
+                    self.lock_progress()
             else:
                 value = 4000000
                 self.jackpot_value+=value

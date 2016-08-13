@@ -145,9 +145,10 @@ class The_Three_Challenges(game.Mode):
             
             #load player stats
             self.challenges_collected = self.game.get_player_stats('challenges_collected');
-            #update path mode var
+            #set mode player stats
             self.game.set_player_stats("path_mode_started",True)
             self.game.set_player_stats("ark_mode_started",True)
+            self.game.set_player_stats('temple_mode_started',True)
             
             self.running_total += int(self.game.user_settings['Gameplay (Feature)']['Mode Start Value (Mil)'])*1000000
             
@@ -193,11 +194,11 @@ class The_Three_Challenges(game.Mode):
             self.cancel_delayed('mode_speech_delay')
             self.cancel_delayed('aux_mode_speech_delay')
 
-            #update poa player stats
+            #update mode player stats
             self.game.set_player_stats("path_mode_started",False)
             self.game.set_player_stats("poa_queued",False)
             self.game.set_player_stats("ark_mode_started",False)
-
+            self.game.set_player_stats("temple_mode_started",False)
 
             #reset music
             self.game.sound.stop_music()

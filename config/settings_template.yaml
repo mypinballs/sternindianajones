@@ -78,6 +78,9 @@ Machine (Standard):
     options: [-2500,2500]
     increments: 1
     default: 35
+  'Party Mode':
+    options: ['Double Flip','No Hold','Reversed','Off']
+    default: 'Off'
 Sound:
   'Initial Volume':
     options: [1,38]

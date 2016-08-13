@@ -91,6 +91,9 @@ class Monkey_Brains(game.Mode):
             #load player stats
             self.burps_collected = self.game.get_player_stats('burps_collected');
             
+            #set mode player stats
+            self.game.set_player_stats('temple_mode_started',True)
+            
             #setup additonal layers
             self.timer_layer = dmd.TimerLayer(0, -1, self.game.fonts['07x5'],self.timer,"left")
             self.info_layer = dmd.TextLayer(128/2, 20, self.game.fonts['07x5'], "center", opaque=False)
@@ -127,6 +130,8 @@ class Monkey_Brains(game.Mode):
             self.game.set_player_stats('monkey_brains_score',score_value)
             self.game.set_player_stats('last_mode_score',score_value)
 
+            #set mode player stats
+            self.game.set_player_stats('temple_mode_started',False)
 
             #cancel speech calls
             self.cancel_delayed('mode_speech_delay')

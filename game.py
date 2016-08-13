@@ -159,7 +159,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.3.2'
+                self.system_version='0.3.6'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -550,23 +550,48 @@ class Game(game.BasicGame):
 
 
         def enable_flippers(self, enable):
-		
 		"""Enables or disables the flippers AND bumpers."""
+                self.party_mode = self.user_settings['Machine (Standard)']['Party Mode']
                 #stern flippers
 		for flipper in self.config['PRFlippers']:
 			self.logger.info("Programming flipper %s", flipper)
-			main_coil = self.coils[flipper+'Main']
+			#setup flipper coil naming
+                        main_coil = self.coils[flipper+'Main']
+                        
+                        #setup opposite flipper coil naming for party modes
+                        oppflipper = ''
+                        if flipper.endswith('R'):
+                            oppflipper = flipper[:-1]+'L'
+                        elif flipper.endswith('L'):
+                            oppflipper = flipper[:-1]+'R'
+                        opposite_coil = self.coils[oppflipper+'Main']
 			
 			switch_num = self.switches[flipper].number
 
 			drivers = []
 			if enable:
-                                drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
+                                if self.party_mode=='No Hold':
+                                    drivers += [pinproc.driver_state_pulse(main_coil.state(), main_coil.default_pulse_time)]
+                                elif self.party_mode =='Double Flip':
+                                    drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
+                                    drivers += [pinproc.driver_state_patter(opposite_coil.state(), 2, 18, opposite_coil.default_pulse_time, True)]
+                                elif self.party_mode=='Reversed':
+                                    drivers += [pinproc.driver_state_patter(opposite_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
+                                else:
+                                    drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
+                                
 			self.proc.switch_update_rule(switch_num, 'closed_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
 			
 			drivers = []
 			if enable:
-				drivers += [pinproc.driver_state_disable(main_coil.state())]
+                                if self.party_mode =='Double Flip':
+                                    drivers += [pinproc.driver_state_disable(main_coil.state())]
+                                    drivers += [pinproc.driver_state_disable(opposite_coil.state())]
+                                elif self.party_mode=='Reversed':
+                                    drivers += [pinproc.driver_state_disable(opposite_coil.state())]
+                                else:
+                                    drivers += [pinproc.driver_state_disable(main_coil.state())]
+                                
 			self.proc.switch_update_rule(switch_num, 'open_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
 
 			if not enable:
@@ -638,7 +663,8 @@ def main():
 #        logging.getLogger('ij.poa').setLevel(logging.DEBUG)
         logging.getLogger('ij.mode_select').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.raven_bar').setLevel(logging.DEBUG)
-#        logging.getLogger('ij.match').setLevel(logging.DEBUG)
+#        logging.getLogger('ij.match').setLevel(logging.DEBU
+        logging.getLogger('ij.service').setLevel(logging.DEBUG)
         logging.getLogger('ij.three_challenges').setLevel(logging.DEBUG)
         logging.getLogger('game.vdriver').setLevel(logging.ERROR)
         logging.getLogger('game.driver').setLevel(logging.ERROR)

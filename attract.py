@@ -45,6 +45,10 @@ class Attract(game.Mode):
                 self.game.sound.register_sound('flipperAttract', speech_path+"ij4030E_you_look_lost.aiff")
                 self.game.sound.register_sound('flipperAttract', speech_path+"ij4030F_welcome_to_pamcot_palace.aiff")
                 self.game.sound.register_sound('flipperAttract', speech_path+"ij4033B_ha_ha_very_funny.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij40318_not_leaving_here_without_stones.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij40320_my_name_is_indiana_jones.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij40327_call_it_the_jungle.aiff")
+                self.game.sound.register_sound('flipperAttract', speech_path+"ij40330_never_happen_again.aiff")
                
 
                 self.sound_timestamp = time.time()
@@ -331,6 +335,7 @@ class Attract(game.Mode):
 	def sw_enter_active(self, sw):
                 self.game.modes.remove(self.game.coin_door)
                 self.game.lampctrl.stop_show()
+                self.cancel_delayed('lampshow')
 		for lamp in self.game.lamps:
 			lamp.disable()
 		self.game.modes.add(self.game.service_mode)

@@ -515,9 +515,9 @@ PRCoils:
     flasherKingdom:
         number: C23
         label: 'Kingdom Flasher'
-    coinMeter:
+    topper:
         number: C24
-        label: 'Kingdom Flasher'
+        label: 'Topper'
         
     #low current group 2
     flasherRamp:
@@ -548,13 +548,13 @@ PRCoils:
         label: 'Crusade Flasher'
     flasherArk:
         number: A04
-        label: 'Ark Flasher'
+        label: 'Ark LED Flasher'
     flasherSwordsman:
         number: A05
-        label: 'Swordman Flasher'
+        label: 'Swordman LED Flasher'
     flasherSkull:
         number: A06
-        label: 'Skull Flasher'
+        label: 'Skull LED Flasher'
 #       
 #    divertorMain:
 #        number: FURM

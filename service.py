@@ -1,7 +1,12 @@
 import logging
 import locale
 import audits
+import os
+import sys
+import glob
+import shutil
 from procgame import *
+from distutils import dir_util
 
 base_path = config.value_for_key_path('base_path')
 game_path = base_path+"games/indyjones2/"
@@ -96,9 +101,10 @@ class ServiceModeList(ServiceModeSkeleton):
 		self.game.modes.remove(self)
 		return True
 
+
 class ServiceMode(ServiceModeList):
 	"""Service Mode."""
-	def __init__(self, game, priority, font,big_font, extra_tests=[]):
+        def __init__(self, game, priority, font,big_font, extra_tests=[]):
 		super(ServiceMode, self).__init__(game, priority,font)
 		#self.title_layer.set_text('Service Mode')
                 
@@ -112,7 +118,7 @@ class ServiceMode(ServiceModeList):
 		self.game.sound.register_sound('service_cancel', sound_path+"cancel.wav")
                 self.game.sound.register_sound('service_alert', sound_path+"service_alert.aiff")
                 
-		self.name = 'Service Mode'
+		self.name = 'Service Mode - OS v'+str(self.game.system_version)
 		self.tests = Tests(self.game, self.priority+1, font, big_font, extra_tests)
 		self.items = [self.tests]
 		if len(self.game.settings) > 0: 
@@ -123,8 +129,11 @@ class ServiceMode(ServiceModeList):
 		#if len(self.game.game_data) > 0: 
 		self.statistics = Statistics(self.game, self.priority+1, font, big_font, 'Statistics', self.game.game_data)
 		self.items.append(self.statistics)
+                
+                self.utilities = Utilities(self.game, self.priority+1, font, big_font, 'Utilities')
+		self.items.append(self.utilities)
                         
-
+                        
 class Tests(ServiceModeList):
 	"""Service Mode."""
 	def __init__(self, game, priority, font, big_font, extra_tests=[]):
@@ -138,6 +147,7 @@ class Tests(ServiceModeList):
 		for test in extra_tests:
 			self.items.append(test)
 
+                
 class LampTest(ServiceModeList):
 	"""Lamp Test"""
 	def __init__(self, game, priority, font, big_font):
@@ -146,30 +156,52 @@ class LampTest(ServiceModeList):
 		self.name = "Lamp Test"
 
                 #set layers
-                self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/switch_test_bgnd.dmd').frames[0])
-		self.matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
+                self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_bgnd.dmd').frames[0])
+                self.matrix_grid_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/stern_lamp_test_grid.dmd').frames[0])
+		self.matrix_grid_layer.composite_op = "blacksrc"
+                self.matrix_grid_layer.target_x = 100
+                self.matrix_grid_layer.target_y = 0
+		#self.matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
+                #self.matrix_layer.composite_op = "blacksrc"
+                #self.matrix_layer.target_x = 128
+                #self.matrix_layer.target_y = 32
+                self.matrix_layer_group = []
+                self.matrix_layer = dmd.GroupedLayer(128, 32, self.matrix_layer_group)
                 self.matrix_layer.composite_op = "blacksrc"
-                self.matrix_layer.target_x = 128
-                self.matrix_layer.target_y = 32
                 self.title_layer = dmd.TextLayer(1, 0, font, "left")
                 self.instruction_layer = dmd.TextLayer(45, 0, font, "left")
 		self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
-                self.board_layer = dmd.TextLayer(1, 18, font, "left")
                 self.drive_layer = dmd.TextLayer(1, 24, font, "left")
-                self.row_layer = dmd.TextLayer(1, 18, font, "left")
-                self.column_layer = dmd.TextLayer(1, 24, font, "left")
+                self.wire_layer = dmd.TextLayer(1, 18, self.game.fonts['7x4'], "left")
                 self.number_layer = dmd.TextLayer(99, 24, font, "right")
-		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.instruction_layer,self.item_layer, self.row_layer,self.column_layer,self.number_layer,self.matrix_layer])
+                self.conn_layer = dmd.TextLayer(100, 24, font, "right")
+		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.instruction_layer,self.item_layer,self.conn_layer,self.wire_layer,self.drive_layer,self.number_layer,self.conn_layer,self.matrix_grid_layer,self.matrix_layer])
 
+                self.lamp_index = []
+                self.row_max = 10
+                self.col_max = 8
+                
                 #connector setup
                 self.base_colour =['Red','Yellow']
-                self.connector_key = [3,2]
+                self.connector_key = [7,2]
+                self.connections=['J12','J13']
+                self.lamp_row_transistor = []
+                self.lamp_col_ic = []
+        
+                
+                for r in range(33,43):
+                    self.lamp_row_transistor.append(r)
+                for c in reversed(range(10,18)):
+                    self.lamp_col_ic.append(c)    
+                    
+                self.log.debug("Row Transistors:%s",self.lamp_row_transistor)
+                self.log.debug("Col ICs:%s",self.lamp_col_ic)
 
                 #populate connector colours
                 for j in range (len(self.base_colour)):
-                    self.colours = ['Brown','Red','Orange','Yellow','Green','Blue','Purple','Grey','White']
+                    self.colours = ['Brown','Red','Orange','Yellow','Green','Blue','Purple','Grey','White','No Stripe']
                     colour_set = self.colours
-                    colour_set.pop(self.connector_key[j]-1)
+                    #colour_set.pop(self.connector_key[j]-1)
                     for i in range(len(colour_set)):
                         if colour_set[i]==self.base_colour[j]:
                          colour_set[i] = "Black"
@@ -178,61 +210,225 @@ class LampTest(ServiceModeList):
                     elif j==1:
                         self.col_colour = colour_set
 
-
-		self.items = self.game.lamps
+                #setup the full lamp item list
+		self.items = sorted(self.game.lamps.items_not_tagged('gi'),key=lambda item: item.yaml_number)
+                
+                #setup for row/col tests
+                self.row_test_num = 1 #default
+                self.row_lamps = self.items[(self.row_test_num*8)-8:self.row_test_num*8]
+                for item in self.row_lamps:
+                    self.log.debug("ROW Test lamps: %s,%s",item.yaml_number,item.label)
+              
+                self.col_items = sorted(self.game.lamps.items_not_tagged('gi'),key=lambda item: item.number)
+                self.col_test_num = 1 #default
+                self.col_lamps = self.col_items[(self.col_test_num*10)-10:self.col_test_num*10]
+                for item in self.col_lamps:
+                    self.log.debug("COL Test lamps: %s,%s",item.yaml_number,item.label)
+                
 
         def mode_started(self):
-		super(LampTest, self).mode_started()
-		self.action = 'repeat'
+                self.action = 'repeat'
                 self.instruction_layer.set_text(' - Repeat')
-
-                self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_repeat)
+                
+		super(LampTest, self).mode_started()
+	
+                self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
 
         def mode_stopped(self):
                 self.cancel_delayed('repeat')
 
 	def change_item(self):
 		super(LampTest, self).change_item()
+                #self.log.debug("items total:"+str(len(self.items)))
+		ctr = 0
+                for item in self.items:
+                    if (ctr == self.iterator) and item.yaml_number.count('L')>0:
+                        self.item = item
 
-                 #get the yaml numbering data for coils
-                if self.item.yaml_number.count('L')>0:
+                    ctr += 1
+                    #self.log.debug("Lamp:%s %s",item.label,item.yaml_number)
 
-                    matrix =[]
-                    matrix.append(int(self.item.yaml_number[1])-1)
-                    matrix.append(int(self.item.yaml_number[2])-1)
-                    self.lamp_col = matrix[0]
-                    self.lamp_row = matrix[1]
+                self.set_matrix()
+        
+        #special change method for column test as list is in different order
+        def change_col_item(self):
+		super(LampTest, self).change_item()
+                #self.log.debug("items total:"+str(len(self.items)))
+		ctr = 0
+                for item in self.col_items:
+                    if (ctr == self.iterator) and item.yaml_number.count('L')>0:
+                        self.item = item
 
-               
-                #set text for the layers
-                self.item_layer.set_text(self.item.label)
-                self.row_layer.set_text(self.base_colour[0]+' '+self.row_colour[self.lamp_row])
-                self.column_layer.set_text(self.base_colour[1]+' '+self.col_colour[self.lamp_col])
-                #self.board_layer.set_text("")
-                #self.drive_layer.set_text("Col Drive:"+str(self.lamp_col)+" Row Drive:"+str(self.lamp_row))
-                self.number_layer.set_text(self.item.yaml_number)
+                    ctr += 1
+                    #self.log.debug("Lamp:%s %s",item.label,item.yaml_number)
 
-		self.item.schedule(schedule=0x00ff00ff, cycle_seconds=0, now=True)
-                self.process_repeat()
+                self.set_matrix()
 
         def process_repeat(self):
-		self.set_matrix()
-		self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_repeat)
+            self.change_item()
+            self.item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
+            self.set_matrix()
+            self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_repeat)
+            
+        def process_auto(self):
+		if (self.action == 'repeat'):
+                    self.item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
+                    self.set_matrix()
+                elif (self.action == 'auto'):
+                    self.item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
+                    self.change_item()
+                    if (self.iterator < self.max):
+			self.iterator += 1
+                    else:
+                        self.iterator =0
+                elif (self.action == 'all'):
+                    self.iterator =0
+                    for item in self.items:
+                        item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
+                        self.change_item()
+                        if (self.iterator < self.max):
+                            self.iterator += 1
+                        else:
+                            self.iterator =0
+                elif (self.action=='row'):
+                    self.row_lamps = self.items[(self.row_test_num*8)-8:self.row_test_num*8]
+                    for item in self.row_lamps:
+                        item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
+                        self.change_item()
+                        if (self.iterator < self.max):
+                            self.iterator += 1
+                        else:
+                            self.iterator =0
+                    self.row_test_num+=1
+                    if (self.row_test_num <= 8):
+                        self.row_test_num += 1
+                    else:
+                        self.row_test_num =1
+                elif (self.action=='col'):
+                    self.col_lamps = self.col_items[(self.col_test_num*10)-10:self.col_test_num*10]
+                    for item in self.col_lamps:
+                        item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
+                        self.change_col_item()
+                        if (self.iterator < self.max):
+                            self.iterator += 1
+                        else:
+                            self.iterator =0
+                    self.col_test_num+=1
+                    if (self.col_test_num <= 8):
+                        self.col_test_num += 1
+                    else:
+                        self.col_test_num =1
+                            
+		self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
 
-        def set_matrix(self):
-            #update matrix to show active coil
-            self.matrix_layer.target_x = 102+int(self.lamp_col)*3
-            self.matrix_layer.target_y = 3+int(self.lamp_row)*3
-
+        
+#        def set_all_matrix(self):
+#            self.item_layer.set_text('ALL LAMPS',color=dmd.YELLOW)
+#            self.wire_layer.set_text('')
+#            self.drive_layer.set_text('')
+#            self.conn_layer.set_text('')
+#            self.matrix_layer.target_x = 102
+#            self.matrix_layer.target_y = 2
+            
             #clear matrix display after set time
-            self.delay(name='clear_matrix', event_type=None, delay=1, handler=self.clear_matrix)
+            #self.delay(name='clear_matrix', event_type=None, delay=1, handler=self.clear_matrix)
+            
+        def set_matrix(self):
+            
+            if self.item.yaml_number.count('L')>0:
+                    matrix =[]
+                    lamp_num = int(self.item.yaml_number[1:])-1
+                    matrix.append(lamp_num/8)
+                    matrix.append(lamp_num%8)
+                    self.log.debug("Lamp Matrix for lamp %s :%s",self.item.yaml_number,matrix)
+                    
+                    row_colour = self.base_colour[0]+'/'+self.row_colour[matrix[0]]                
+                    col_colour = self.base_colour[1]+'/'+self.col_colour[matrix[1]]
+                    
+                    pin_row = matrix[0]+1
+                    if pin_row>=self.connector_key[0]:
+                        pin_row-=1
+                    
+                    pin_col = 9-matrix[1]
+                    if pin_row>=self.connector_key[1]:
+                        pin_col+=1
 
-        def clear_matrix(self):
-            self.matrix_layer.target_x = 128
-            self.matrix_layer.target_y = 32
+                    #update matrix to show active coil
+                    #self.matrix_layer.target_x = 102+int(matrix[1])*3
+                    #self.matrix_layer.target_y = 2+int(matrix[0])*3
+                   
+                    matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
+                    matrix_layer.composite_op = "blacksrc"
+                    matrix_layer.target_x = 128
+                    matrix_layer.target_y = 32
+                    matrix_layer.target_x = 102+int(matrix[1])*3
+                    matrix_layer.target_y = 2+int(matrix[0])*3
+                    
+                    self.matrix_layer_group.append(matrix_layer)
+                    self.lamp_index.append(lamp_num)
+                    self.log.debug('Lamp Index:%s',self.lamp_index)
+                        
+                    #set text for the layers
+                    if self.action=='all':
+                        self.item_layer.set_text('ALL LAMPS',color=dmd.YELLOW)
+                        self.wire_layer.set_text('')
+                        self.drive_layer.set_text('')
+                        self.conn_layer.set_text('')
+                    elif self.action=='row':
+                        self.item_layer.set_text('ROW RETURNS',color=dmd.YELLOW)
+                        self.wire_layer.set_text(str(row_colour),color = dmd.BROWN)
+                        self.drive_layer.set_text("Q"+str(self.lamp_row_transistor[matrix[0]]),color=dmd.CYAN)
+                        self.conn_layer.set_text(str(self.connections[0])+"-"+str(pin_row),color=dmd.GREEN)
+                    elif self.action=='col':
+                        self.item_layer.set_text('COL DRIVES',color=dmd.YELLOW)
+                        self.wire_layer.set_text(str(col_colour),color = dmd.BROWN)
+                        self.drive_layer.set_text("IC-U"+str(self.lamp_col_ic[matrix[1]]),color=dmd.CYAN)
+                        self.conn_layer.set_text(str(self.connections[1])+"-"+str(pin_col),color=dmd.GREEN)
+                    else:
+                        self.item_layer.set_text(self.item.label,color=dmd.YELLOW)
+                        self.wire_layer.set_text(str(row_colour)+" "+str(col_colour),color = dmd.BROWN)
+                        self.drive_layer.set_text("Q"+str(self.lamp_row_transistor[matrix[0]])+" IC-U"+str(self.lamp_col_ic[matrix[1]]),color=dmd.CYAN)
+                        self.conn_layer.set_text(str(self.connections[0])+"-"+str(pin_row)+" "+str(self.connections[1])+"-"+str(pin_col),color=dmd.GREEN)
+
+                    #clear matrix display after set time
+                    self.delay(name='clear_matrix', event_type=None, delay=1, handler=lambda:self.clear_matrix(matrix_layer,lamp_num))
+
+
+        def clear_matrix(self,layer,lamp_num):
+            layer.target_x = 128
+            layer.target_y = 32
+            index = self.lamp_index.index(lamp_num)
+            self.matrix_layer_group.pop(index)
+            self.lamp_index.pop(index)
 
 
 	def sw_enter_active(self,sw):
+		if (self.action == 'manual'):
+			self.action = 'repeat'
+			self.instruction_layer.set_text(' - Repeat')
+		elif (self.action == 'repeat'):
+			self.action = 'auto'
+			self.instruction_layer.set_text(' - Auto')
+                elif (self.action == 'auto'):
+			self.action = 'all'
+                        self.instruction_layer.set_text(' - All')
+                elif (self.action == 'all'):
+			self.action = 'row'
+                        self.instruction_layer.set_text(' - Row')
+                        self.iterator = 0
+                elif (self.action == 'row'):
+			self.action = 'col'                  
+                        self.instruction_layer.set_text(' - Column')
+                        self.iterator = 0
+                elif (self.action == 'col'):
+			self.action = 'manual'
+                        self.instruction_layer.set_text(' - Manual')
+		return True
+
+	def sw_startButton_active(self,sw):
+		if (self.action == 'manual'):
+			self.item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
+                        self.set_matrix()
 		return True
 
 
@@ -244,30 +440,49 @@ class CoilTest(ServiceModeList):
                 self.name = "Coil Test"
 
                 #setup layers
-                self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/coil_test_bgnd.dmd').frames[0])
+                self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_bgnd.dmd').frames[0])
+                self.matrix_grid_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/stern_coil_test_grid.dmd').frames[0])
+		self.matrix_grid_layer.composite_op = "blacksrc"
+                self.matrix_grid_layer.target_x = 101
+                self.matrix_grid_layer.target_y = 1
 		self.matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
                 self.matrix_layer.composite_op = "blacksrc"
                 self.matrix_layer.target_x = 128
                 self.matrix_layer.target_y = 32
                 self.title_layer = dmd.TextLayer(1, 0, font, "left")
 		self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
+                self.wire_layer = dmd.TextLayer(1, 18, font, "left")
                 self.instruction_layer = dmd.TextLayer(45, 0, font, "left")
                 self.board_layer = dmd.TextLayer(1, 18, font, "left")
                 self.drive_layer = dmd.TextLayer(1, 24, font, "left")
                 self.conn_layer = dmd.TextLayer(100, 24, font, "right")
-		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.item_layer, self.board_layer,self.drive_layer,self.conn_layer,self.instruction_layer,self.matrix_layer])
+                
+		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.item_layer,self.wire_layer,self.board_layer,self.drive_layer,self.conn_layer,self.instruction_layer,self.matrix_grid_layer,self.matrix_layer])
 
-                #setup mode lists
-                self.colours = ['Brown','Red','Orange','Yellow','Green','Blue','Purple','Grey','White']
-                self.bank_colours = ['Purple','Brown','Black','Blue']
-                self.connector_key =[2,3,4,6]
-                self.connections=['J120-13','J120-11','J120-9','J120-7','J120-6','J120-4','J120-3','J120-1','J116-1','J116-2','J116-4','J116-5','J116-6','J116-7','J117-3','J116-9','J113-1','J113-3']
-                self.transistors=[90,92,87,89,84,86,81,83,72,68,71,67,70,66,69,65]
-
-		self.items = self.game.coils
+                #connector setup
+                self.bank_colours = ['Brown','Blue','Purple','Black','Orange']
+                self.connector_key =[2,3,1,9,4]
+                self.connections=['J8','J9','J7','J6','J2']
+                self.wire_colour = []
+                
+                #populate connector colours
+                for j in range (len(self.bank_colours)):
+                    self.colours = ['Brown','Red','Orange','Yellow','Green','Blue','Purple','Grey','White']
+                    colour_set = self.colours
+                    #colour_set.pop(self.connector_key[j]-1)
+                    for i in range(len(colour_set)):
+                        if colour_set[i]==self.bank_colours[j]:
+                            colour_set[i] = "Black"
                     
+                    self.wire_colour.append(colour_set)
+                             
+                self.log.debug("Coil Wire Colours Created:%s",self.wire_colour)
+
+		self.items = sorted(self.game.coils,key=lambda item: item.number) #self.game.coils   
+                
 		self.max = len(self.items)
-                self.log.info("Max:"+str(self.max))
+                self.log.debug("Max:"+str(self.max))
+
 
 	def mode_started(self):
 		super(CoilTest, self).mode_started()
@@ -279,34 +494,24 @@ class CoilTest(ServiceModeList):
 
                 self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
 
+
         def mode_stopped(self):
                 self.cancel_delayed('repeat')
 
+
         def change_item(self):
-                self.log.info("items total:"+str(len(self.items)))
+                self.log.debug("items total:"+str(len(self.items)))
 		ctr = 0
                 for item in self.items:
                     if (ctr == self.iterator):
                         self.item = item
 
                     ctr += 1
-                    self.log.info("item:"+str(item.label))
-                 #for i in range(len(self.items)):
-#                    if i==self.iterator:
-#                        self.item = self.items[i]
-                #self.item = self.items[self.iterator]
+                    self.log.debug("item:%s %s",item.label,item.yaml_number)
 
-		#self.max = ctr - 1
-		self.item_layer.set_text(self.item.label)
-                #self.log.info("iterator:"+str(self.iterator))
-
-                coil_num =self.item.number-32+1
+                self.set_matrix()
                 
-                if len(self.transistors)>coil_num:
-                    self.drive_layer.set_text("Q"+str(self.transistors[coil_num-1])+" Sol "+str(coil_num))
-                    self.conn_layer.set_text(self.connections[coil_num-1])
                 
-
 	def process_auto(self):
 		if (self.action == 'repeat'):
                     self.item.pulse()
@@ -325,14 +530,36 @@ class CoilTest(ServiceModeList):
         def set_matrix(self):
             #update matrix to show active coil
             num =self.item.number-32
-            self.log.info('coil number is:%s',num)
+            #fix for aux mappings on stern driver
+            if self.item.number>=72:
+                num =self.item.number-39
+                
+            coil_num = num+1
+            self.log.debug('coil number:%s coil name:%s',self.item.number,self.item.name)
+           
             bank= num/8
             drive = num%8
-            self.matrix_layer.target_x = 105+(bank*5)
-            self.matrix_layer.target_y = 7+(drive*3)
-
+            pin_num = drive+1
+            self.log.debug('coil bank:%s coil drive:%s',bank,drive)
+            if pin_num>=self.connector_key[bank]:
+                pin_num+=1
+                
+            self.matrix_layer.target_x = 103+(bank*5)
+            self.matrix_layer.target_y = 8+(drive*3)
+            
+            wire_colour = str(self.bank_colours[bank])+'/'+str(self.wire_colour[bank][drive])
+            
+            if coil_num<=32:
+                self.drive_layer.set_text("Q"+str(coil_num)+" Sol "+str(coil_num),color=dmd.CYAN)
+            else: #auxiliary drivers
+                self.drive_layer.set_text("B"+str(num-32)+ " (Data) Sol "+str(coil_num),color=dmd.CYAN)
+            self.conn_layer.set_text(str(self.connections[bank])+"-"+str(pin_num),color=dmd.GREEN)
+            self.item_layer.set_text(self.item.label,color=dmd.YELLOW)       
+            self.wire_layer.set_text(wire_colour,color=dmd.BROWN)
+            
             #clear matrix display after set time
             self.delay(name='clear_matrix', event_type=None, delay=1, handler=self.clear_matrix)
+
 
         def clear_matrix(self):
             self.matrix_layer.target_x = 128
@@ -796,6 +1023,119 @@ class EditItem:
 
 	def disable(self):
 		pass
+            
+            
+class Utilities(ServiceModeList):
+	"""Service Mode."""
+	def __init__(self, game, priority, font, big_font, name):
+		super(Utilities, self).__init__(game, priority,font)
+		
+		self.name = name
+		self.software_update = SoftwareUpdate(self.game, self.priority+1, font, big_font)
+		self.items = [self.software_update]
+                
+                
+#mode to manually update the game software
+class SoftwareUpdate(ServiceModeSkeleton):
+
+    def __init__(self, game, priority, font, big_font):
+	super(SoftwareUpdate, self).__init__(game, priority,font)
+        self.log = logging.getLogger('ij.software_update')
+        
+        self.usb_location = config.value_for_key_path('usb_path')
+        self.game_update_location = '/indiana-jones-update-files'
+        self.temp_store_path = base_path+"/temp"
+
+        self.name = 'Software Update'
+        self.spin = False
+        
+
+    def mode_started(self):
+	super(SoftwareUpdate,self).mode_started()
+	self.update()
+
+
+    def update(self):
+        self.myLocation = None
+        dirs = []
+        self.okToUpdate = False
+        # list the contents of the USB path
+        try:
+            dirs = os.listdir(self.usb_location)
+        except Exception, err:
+            pass
+            #self.log.info('Directory Read Error:%s',err)
+
+        # check them all for the update files
+        for directory in dirs:
+            checkThis = self.usb_location + self.game_update_location
+            #self.log.info('Directory path found:%s',checkThis)
+            if os.path.isdir(checkThis):
+                self.log.info("Found the update")
+                self.myLocation = checkThis
+                break;
+
+        if self.myLocation != None:
+            self.okToUpdate = True
+            self.item_layer.set_text("Files Found For Update",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Press Enter to Update",color=dmd.GREEN)
+        else:
+            self.okToUpdate = False
+            self.log.info("Didn't find the update")
+            self.item_layer.set_text("Files Not Found",color=dmd.RED)
+            self.instruction_layer.set_text("Check USB Drive",color=dmd.GREEN)
+
+       
+    
+    def sw_enter_active(self,sw):
+        if self.okToUpdate:
+            self.busy = True
+            # if enter is pressed, copy the files
+            # update the layer to say copying files
+            self.item_layer.set_text("Copying Files",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Do Not Power Off",color=dmd.RED)
+            self.spin = True
+            self.delay(delay=1,handler=self.copy_files)
+
+        else:
+            self.game.sound.play(self.game.assets.sfx_menuReject)
+        return game.SwitchStop
+
+
+
+    def copy_files(self):
+
+        #remove the tmp directory if exists
+        try:
+            shutil.rmtree(self.temp_store_path)
+        except:
+            pass
+
+        #then copy the allowed files to a temp store
+        try:
+            shutil.copytree(src=self.myLocation, dst=self.temp_store_path, ignore=shutil.ignore_patterns('*.pyc','*.psd','*.jpg','*.bmp','.png','*.exe','*.zip','*.sh'))
+        except OSError as err:
+            self.log.info('Temp store not created. Error: %s' % err)
+
+        #then copy temp store to the game folder
+        try:
+            dir_util.copy_tree(src=self.temp_store_path,dst=game_path,update=True)
+        except OSError as err:
+            self.log.info('Files not Updated. Error: %s' % err)
+            
+        #cleanup - remove the tmp directory if exists
+        try:
+            shutil.rmtree(self.temp_store_path)
+        except:
+            pass
+
+
+        self.item_layer.set_text("Copy Finished",color=dmd.YELLOW)
+        self.instruction_layer.set_text("Press Exit Button",color=dmd.GREEN)
+        self.spin = False
+
+        self.busy = False
+        
 
 #mode for coin door opening & showing game health
 class CoinDoor(game.Mode):
