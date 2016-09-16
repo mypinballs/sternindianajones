@@ -156,7 +156,7 @@ class Well_Of_Souls(game.Mode):
             #self.game.trough.debug()
 
             #start ball save
-            self.game.ball_save.start(time=5)
+            self.game.ball_save.start(time=self.ball_save_time)
 
 
             #update_lamps

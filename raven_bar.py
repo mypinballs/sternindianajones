@@ -785,8 +785,10 @@ class Raven_Bar(game.Mode):
         def gi(self,enable=True):
             if enable:
                 self.game.lamps.playfieldGI.disable()
+                
             else:
                 self.game.lamps.playfieldGI.enable()
+            self.game.base_game_mode.pops.lighting(enable)
  
            
         def clear(self):

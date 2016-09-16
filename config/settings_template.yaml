@@ -282,6 +282,18 @@ Gameplay (Feature):
     options: [5,30]
     increments: 5
     default: 20
+  'Warehouse Raid BIP Start':
+    options: [2,4]
+    increments: 1
+    default: 2
+  'Warehouse Raid Ball Save Timer':
+    options: [5,20]
+    increments: 1
+    default: 10
+  'Warehouse Hold Timer':
+    options: [5,40]
+    increments: 1
+    default: 20
   'Jones Vs Aliens Timer':
     options: [20,90]
     increments: 5
@@ -399,4 +411,10 @@ Network:
     options: [0,255]
     increments: 1
     default: 0
+  'Store High Scores on Server':
+    options: ['Yes','No']
+    default: 'No'
+  'Display Server Scores in Attract':
+    options: ['Yes','No']
+    default: 'No'
 

@@ -17,7 +17,7 @@ music_path = game_path +"music/"
 class Screens(game.Mode):
 
 	def __init__(self, game):
-            super(Screens, self).__init__(game, 100)
+            super(Screens, self).__init__(game, 94 )
 
             self.game.sound.register_sound('collect', sound_path+"mode_bonus_jingle.aiff")
             
@@ -100,6 +100,19 @@ class Screens(game.Mode):
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,name_layer,info_layer])
 
 
+            self.delay(name='clear_display_delay', event_type=None, delay=timer, handler=self.clear)
+        
+        
+        def flasher(self,text,timer,color):
+
+            bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/scene_ended_bgnd.dmd").frames[0])
+            info_layer = dmd.TextLayer(128/2, 7, self.game.fonts['8x6'], "center")
+            #info_layer = dmd.AnimatedTextLayer(128/2, 7, self.game.fonts['10x7_bold'], "center",4)
+            info_layer.set_text(text.upper(),color=dmd.GREEN,blink_frames=2)
+
+            #update display layer
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer])
+            
             self.delay(name='clear_display_delay', event_type=None, delay=timer, handler=self.clear)
 
 

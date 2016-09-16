@@ -6,8 +6,9 @@ __date__ ="$Jan 18, 2011 1:36:37 PM$"
 
 import procgame
 import locale
-from procgame import *
+import logging
 import random
+from procgame import *
 
 base_path = config.value_for_key_path('base_path')
 game_path = base_path+"games/indyjones2/"
@@ -20,6 +21,9 @@ class Pops(game.Mode):
 
 	def __init__(self, game, priority):
             super(Pops, self).__init__(game, priority)
+            
+            self.log = logging.getLogger('ij.pops')
+            
             self.text_layer = dmd.TextLayer(104, 0, self.game.fonts['10x7_bold'], "center", opaque=False)
 
             self.game.sound.register_sound('punch1', sound_path+"punch_1.aiff")
@@ -33,6 +37,7 @@ class Pops(game.Mode):
             self.game.sound.register_sound('super4', sound_path+"super_jets_4.aiff")
             self.game.sound.register_sound('super5', sound_path+"super_jets_5.aiff")
 
+            self.lamps = ['leftJet','rightJet','topJet','bottomJet']
             self.super_pops_count = 0
             self.super_pops_default = 50
             self.super_pops_raise = 25
@@ -47,8 +52,16 @@ class Pops(game.Mode):
             self.super_pops_count =  self.super_pops_default + (self.super_pops_raise*self.level)
 
         def mode_started(self):
-            print("Pops Mode Started")
-            pass
+           self.update_lamps()
+           
+        def mode_stopped(self):
+            self.reset_lamps()
+            
+        def lighting(self,enable=True):
+            if enable:
+                self.update_lamps()
+            else:
+                self.reset_lamps()
 
         def play_sound(self):
 
@@ -93,11 +106,24 @@ class Pops(game.Mode):
                 self.game.score(self.super_score)
             else:
                 self.game.score(self.score)
+                
+        def reset_lamps(self):
+            for i in range(len(self.lamps)):
+                self.game.effects.drive_lamp(self.lamps[i],'off')
+
+        def update_lamps(self):
+            for i in range(len(self.lamps)):
+                self.game.effects.drive_lamp(self.lamps[i],'on')
+                
+        def set_lamps(self,id):
+            self.game.effects.drive_lamp(self.lamps[id],'smarton')
+                
         
         def sw_leftJet_active(self, sw):
             self.update_count()
-
+            
             self.pops_score()
+            self.set_lamps(0)
             self.play_sound()
             self.play_animation()
 
@@ -105,13 +131,7 @@ class Pops(game.Mode):
             self.update_count()
 
             self.pops_score()
-            self.play_sound()
-            self.play_animation()
-
-        def sw_bottomJet_active(self, sw):
-            self.update_count()
-
-            self.pops_score()
+            self.set_lamps(1)
             self.play_sound()
             self.play_animation()
             
@@ -119,6 +139,15 @@ class Pops(game.Mode):
             self.update_count()
 
             self.pops_score()
+            self.set_lamps(2)
+            self.play_sound()
+            self.play_animation()
+            
+        def sw_bottomJet_active(self, sw):
+            self.update_count()
+
+            self.pops_score()
+            self.set_lamps(3)
             self.play_sound()
             self.play_animation()
 

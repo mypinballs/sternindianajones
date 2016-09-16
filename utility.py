@@ -13,6 +13,7 @@ base_path = config.value_for_key_path('base_path')
 game_path = base_path+"games/indyjones2/"
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/"
+music_path = game_path +"music/"
 
 class Utility(game.Mode):
 
@@ -21,6 +22,14 @@ class Utility(game.Mode):
 
             self.log = logging.getLogger('ij.utility')
             self.game.sound.register_sound('elephant_alert', sound_path+"elephant.aiff")
+            
+            #hs entry stuff
+            self.game.sound.register_music('hs_entry_music', music_path+"raiders_march.aiff")
+            self.game.sound.register_sound('initial_letter_move', sound_path+"swipe_1.aiff")
+            self.game.sound.register_sound('initial_letter_enter', sound_path+"match_success.aiff")
+            self.game.sound.register_sound('entry_complete_jingle', sound_path+"ij400A8_jones_jingle.aiff")
+            self.game.sound.register_sound('well_done', speech_path+"well_done_my_friend.aiff")
+            
 
         def ball_missing(self):
             text_layer = dmd.TextLayer(128/2, 7, self.game.fonts['num_09Bx7'], "center", opaque=False)

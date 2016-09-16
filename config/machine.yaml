@@ -890,9 +890,9 @@ PRLamps:
     kingdom3:
         number: L68
         label: 'Kingdom Scene 3'
-    kingdom2:
+    jonesVsAliens:
         number: L69
-        label: 'Kingdom Scene 2'
+        label: 'Jones Vs Aliens'
     leftSpecial:
         number: L70
         label: 'Left Special'
@@ -900,9 +900,9 @@ PRLamps:
         number: L71
         tags: arrow
         label: 'Raiders Arrow'
-    jonesVsAliens:
+    warehouseRaid:
         number: L72
-        label: 'Jones vs Aliens'
+        label: 'Warehouse Raid'
     #col10
     handOfFate: 
     #mystery

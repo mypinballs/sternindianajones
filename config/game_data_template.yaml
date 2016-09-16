@@ -20,6 +20,6 @@ ClassicHighScoreData:
 POAChampionData:
 - {date: 'Sun Oct  3 17:38:46 2010', inits: JIM, score: 2}
 TreasureChampionData:
-- {date: 'Sun Oct  3 17:38:46 2010', inits: C B, score: 5}
-LoopsChampionData:
-- {date: 'Sun Oct  3 17:38:46 2010', inits: C H, score: 2}
+- {date: 'Sun Oct  3 17:38:46 2010', inits: C B, score: 3}
+LoopChampionData:
+- {date: 'Sun Oct  3 17:38:46 2010', inits: RAC, score: 4}

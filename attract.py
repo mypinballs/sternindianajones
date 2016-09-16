@@ -278,6 +278,17 @@ class Attract(game.Mode):
                         combined.transition = dmd.PushTransition(direction='west')
                         # add it to the stack
                         script.append({'seconds':5.0, 'layer':combined})
+                    
+                    # generate screens for Loop Champion
+                    if category.game_data_key == 'LoopChampionData':
+                        bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/mode_bonus_bgnd.dmd").frames[0])
+                        title = dmd.TextLayer(128/2, 0, self.game.fonts['5px_az'], "center", opaque=False).set_text(category.titles[0].upper(),color=dmd.DARK_BROWN)
+                        initsLine = dmd.TextLayer(64, 7, self.game.fonts['9px_az'], "center", opaque=False).set_text(score.inits,color=dmd.YELLOW)
+                        scoreLine = dmd.TextLayer(64, 18, self.game.fonts['10px_az'], "center", opaque=False).set_text(score_str+" "+category.score_suffix_plural.upper(),color=dmd.GREY)
+                        combined = dmd.GroupedLayer(128,32,[bgnd_layer,initsLine,scoreLine,title])
+                        combined.transition = dmd.PushTransition(direction='west')
+                        # add it to the stack
+                        script.append({'seconds':5.0, 'layer':combined})
 
 
         def attract_display(self):

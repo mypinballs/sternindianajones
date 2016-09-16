@@ -558,6 +558,8 @@ class Minecart(game.Mode):
                 self.game.lamps.playfieldGI.disable()
             else:
                 self.game.lamps.playfieldGI.enable()
+            
+            self.game.base_game_mode.pops.lighting(enable)
 
         def clear(self):
             self.layer = None

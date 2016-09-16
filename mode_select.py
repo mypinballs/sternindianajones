@@ -24,6 +24,7 @@ from the_three_challenges import *
 from choose_wisely import *
 from werewolf import *
 from raven_bar import *
+from warehouse_raid import *
 from jones_vs_aliens import *
 
 
@@ -51,7 +52,7 @@ class Mode_Select(game.Mode):
             self.info_text =''
             self.info2_text =''
 
-            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','jonesVsAliens']
+            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','jonesVsAliens']
             self.choice_id =0
 
             #default mode bonus value
@@ -90,7 +91,8 @@ class Mode_Select(game.Mode):
             self.tank_chase = Tank_Chase(self.game, 89,self)
             self.the_three_challenges = The_Three_Challenges(self.game, 90,self)
             self.choose_wisely = Choose_Wisely(self.game, 91,self)
-            self.jones_vs_aliens = Jones_Vs_Aliens(self.game, 92,self)
+            self.warehouse_raid = Warehouse_Raid(self.game, 92,self)
+            self.jones_vs_aliens = Jones_Vs_Aliens(self.game, 93,self)
             
              #setup the switches which pause an active mode
             self.mode_pausing_switchnames = []
@@ -170,7 +172,7 @@ class Mode_Select(game.Mode):
                     self.timer_layer = self.tank_chase.timer_layer
                 elif self.current_mode_num==10:
                     self.timer_layer = self.the_three_challenges.timer_layer
-                elif self.current_mode_num==12:
+                elif self.current_mode_num==13:
                     self.timer_layer = self.jones_vs_aliens.timer_layer
                 
                 if self.timer_layer:
@@ -346,6 +348,11 @@ class Mode_Select(game.Mode):
                     self.info_text = 'VIDEO MODE'
                 
                 elif self.current_mode_num==12:
+                    self.name_text = 'WAREHOUSE RAID'
+                    self.info_text = 'LOCK BALLS ON RAMP'
+                    self.info2_text = 'TO FIND ITEMS'
+                
+                elif self.current_mode_num==13:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Jones Vs Aliens Timer']
                     self.name_text = 'JONES VS ALIENS'
                     self.info_text = 'DESTROY SHIPS'
@@ -427,6 +434,8 @@ class Mode_Select(game.Mode):
             elif self.current_mode_num==11:
                 self.game.modes.add(self.choose_wisely)
             elif self.current_mode_num==12:
+                self.game.modes.add(self.warehouse_raid)
+            elif self.current_mode_num==13:
                 self.game.modes.add(self.jones_vs_aliens)
 
         def remove_selected_scene(self):
@@ -459,6 +468,8 @@ class Mode_Select(game.Mode):
             elif self.current_mode_num==11:
                 self.game.modes.remove(self.choose_wisely)
             elif self.current_mode_num==12:
+                self.game.modes.remove(self.warehouse_raid)
+            elif self.current_mode_num==13:
                 self.game.modes.remove(self.jones_vs_aliens)
 
                     
@@ -471,7 +482,7 @@ class Mode_Select(game.Mode):
             time = 2
 
             if self.ssd_count==0: #make sure the following delays only get called once
-                if self.current_mode_num !=2 and self.current_mode_num!=3 and self.current_mode_num!=6:#don't set timeout for these non time based modes
+                if self.current_mode_num !=2 and self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=12:#don't set timeout for these non time based modes
                     self.delay(name='scene_timeout', event_type=None, delay=self.timer+time, handler=self.end_scene)
                 self.delay(name='scene_delay', event_type=None, delay=time, handler=self.add_selected_scene)
                 if self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=11:#don't eject ball for video modes, scene will eject it itself at end

@@ -34,7 +34,7 @@ class Player(procgame.game.Player):
                 self.player_stats['mode_enabled']=False
                 self.player_stats['mode_running'] = False
                 self.player_stats['mode_running_id'] = 99
-                self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0]
+                self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
                 self.player_stats['mode_blocking'] = False
                 self.player_stats['mode_paused'] = False
                 self.player_stats['multiball_mode_started'] = False
@@ -82,6 +82,8 @@ class Player(procgame.game.Player):
                 self.player_stats['jva_ships_destroyed'] = 0
                 self.player_stats['jva_smart_bombs'] = 0
 		self.player_stats['jones_vs_aliens_score'] = 0
+                self.player_stats['warehouse_items_collected']=0
+                self.player_stats['warehouse_raid_score']=0
                 self.player_stats['frankenstein_sets_completed'] = 0
                 self.player_stats['frankenstein_millions_score'] = 0
                 self.player_stats['music_playing'] = False

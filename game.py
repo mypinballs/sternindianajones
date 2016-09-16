@@ -37,6 +37,7 @@ from mpcballsearch import *
 from service import *
 from utility import *
 from tilt import *
+from highscore import EntrySequenceManager
 
 from attract import *
 from base import *
@@ -159,7 +160,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.3.6'
+                self.system_version='0.4.0'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -201,6 +202,10 @@ class Game(game.BasicGame):
                 self.fonts['23x12'] = dmd.font_named("font_23x12_bold.dmd")
                 self.fonts['23x12'].tracking = -1
                 self.fonts['23x12'].composite_op ="blacksrc"
+                
+                self.fonts['30x13'] = dmd.font_named("font_30x13_bold.dmd")
+                self.fonts['30x13'].tracking = -1
+                self.fonts['30x13'].composite_op ="blacksrc"
                 
                 self.fonts['4px_az'] = dmd.font_named("font_7x4.dmd")
                 self.fonts['5px_az'] = dmd.font_named("font_7x5.dmd")
@@ -301,9 +306,9 @@ class Game(game.BasicGame):
 
                 # Setup High Scores
 		self.setup_highscores()
+                #allow access of hs initials from other modes
+                self.last_entered_inits = None
                         
-                
-
 
                 #Setup Date & Time Display
                 self.show_date_time = self.user_settings['Machine (Standard)']['Show Date and Time']
@@ -388,9 +393,59 @@ class Game(game.BasicGame):
 		cat.score_suffix_plural = ' Artifacts'
                 cat.score_for_player = lambda player: player.player_stats['treasures_collected']
 		self.highscore_categories.append(cat)
+                
+                #Loopin' Ramp Champion
+		cat = highscore.HighScoreCategory()
+		cat.game_data_key = 'LoopChampionData'
+		cat.titles = ['Loopin\' Ramp Champ']
+		cat.score_suffix_singular = ' Ramp'
+		cat.score_suffix_plural = ' Ramps'
+                cat.score_for_player = lambda player: player.player_stats['loops_completed']
+		self.highscore_categories.append(cat)
 
 		for category in self.highscore_categories:
 			category.load_from_game(self)
+                        
+        
+        def start_highscore_sequence(self):
+		seq_manager = EntrySequenceManager(game=self, priority=150)
+		seq_manager.ready_handler = self.highscore_entry_ready_to_prompt
+		seq_manager.finished_handler = self.highscore_entry_finished
+		
+		seq_manager.logic = procgame.highscore.CategoryLogic(game=self, categories=self.highscore_categories)
+		self.modes.add(seq_manager)
+	
+	def highscore_entry_ready_to_prompt(self, mode, prompt):
+		#banner_mode = Billboard(game=self, priority=8)
+		#banner_mode.show_text(text=('Great Score'.upper(), prompt.left.upper()), seconds=None)
+		#self.modes.add(banner_mode)
+                self.sound.stop_music()
+                self.sound.play_music('hs_entry_music', loops=-1)
+                self.sound.play_voice('well_done')
+                
+                bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/hs_entry_bgnd.dmd").frames[0])
+                title_layer = dmd.TextLayer(128/2, 10, self.fonts['8x6'], "center", opaque=False).set_text("Great Score".upper(),color=dmd.CYAN)
+                player_layer = dmd.TextLayer(128/2, 18, self.fonts['8x6'], "center", opaque=False).set_text(prompt.left.upper(),color=dmd.CYAN)
+                # combine the parts together
+                self.utility.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,title_layer,player_layer])
+                
+		self.utility.delay(delay=3, handler=lambda: self.highscore_banner_complete(mode=mode))
+
+
+	def highscore_banner_complete(self, mode):
+                self.utility.layer=None
+		mode.prompt()
+          
+                
+        def highscore_entry_finished(self, mode):
+		self.modes.remove(mode)
+                self.modes.add(self.match)
+
+                #store high score on hs server
+#                if self.user_settings['Network']['Store High Scores on Server']=='Yes':
+#                    p = self.current_player()
+#                    self.hs_server.store_score(self.last_entered_inits,p.score)          
+                    
 
         def set_player_stats(self,id,value):
             p = self.current_player()
@@ -500,8 +555,10 @@ class Game(game.BasicGame):
 
                 self.modes.remove(self.base_game_mode)
 
-                self.modes.add(self.match)
-
+                #self.modes.add(self.match)
+                #run the high score sequencer. Will run match automatically if no high scores to enter
+                self.start_highscore_sequence() 
+                
                 #record audits
                 #-------------
                 self.game_time = time.time()-self.start_time

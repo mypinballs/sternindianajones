@@ -4,12 +4,18 @@ import audits
 import os
 import sys
 import glob
+import pwd
+import grp
+       
 import shutil
 from procgame import *
 from distutils import dir_util
 
 base_path = config.value_for_key_path('base_path')
 game_path = base_path+"games/indyjones2/"
+#proc_path = base_path+"pyprocgame/procgame/"
+import procgame
+proc_path = procgame.__file__[:-13]
 speech_path = game_path +"speech/"
 sound_path = game_path +"sound/service/"
 music_path = game_path +"music/"
@@ -1032,7 +1038,9 @@ class Utilities(ServiceModeList):
 		
 		self.name = name
 		self.software_update = SoftwareUpdate(self.game, self.priority+1, font, big_font)
-		self.items = [self.software_update]
+                self.log_download = LogsDownload(self.game, self.priority+1, font, big_font)
+                self.reboot_game = Reboot(self.game, self.priority+1, font, big_font)
+		self.items = [self.software_update,self.log_download,self.reboot_game]
                 
                 
 #mode to manually update the game software
@@ -1043,13 +1051,22 @@ class SoftwareUpdate(ServiceModeSkeleton):
         self.log = logging.getLogger('ij.software_update')
         
         self.usb_location = config.value_for_key_path('usb_path')
-        self.game_update_location = '/indiana-jones-update-files'
+        self.main_update_location = '/indiana-jones-update-files'
+        self.game_update_location = '/game-update'
+        self.proc_update_location = '/procgame-update'
         self.temp_store_path = base_path+"/temp"
 
         self.name = 'Software Update'
         self.spin = False
-        
+        self.proc_update = False
 
+        try:
+            self.proc_uid = pwd.getpwnam("proc").pw_uid
+            self.proc_gid = grp.getgrnam("proc").gr_gid
+        except:
+            self.proc_uid = None
+        
+        
     def mode_started(self):
 	super(SoftwareUpdate,self).mode_started()
 	self.update()
@@ -1059,6 +1076,7 @@ class SoftwareUpdate(ServiceModeSkeleton):
         self.myLocation = None
         dirs = []
         self.okToUpdate = False
+        
         # list the contents of the USB path
         try:
             dirs = os.listdir(self.usb_location)
@@ -1068,12 +1086,27 @@ class SoftwareUpdate(ServiceModeSkeleton):
 
         # check them all for the update files
         for directory in dirs:
-            checkThis = self.usb_location + self.game_update_location
+            checkThis = self.usb_location + self.main_update_location
             #self.log.info('Directory path found:%s',checkThis)
             if os.path.isdir(checkThis):
                 self.log.info("Found the update")
                 self.myLocation = checkThis
+                
+                #check for procfiles to update
+                mylocation_dirs = []
+                try:
+                    mylocation_dirs = os.listdir(self.myLocation)
+                except Exception, err:
+                    pass
+                
+                for directory in mylocation_dirs:
+                    checkThis = self.usb_location + self.main_update_location + self.proc_update_location
+                    if os.path.isdir(checkThis):
+                        self.proc_update = True;
+                        self.log.info("procgame files to be updated")
+                        
                 break;
+            
 
         if self.myLocation != None:
             self.okToUpdate = True
@@ -1114,20 +1147,34 @@ class SoftwareUpdate(ServiceModeSkeleton):
         #then copy the allowed files to a temp store
         try:
             shutil.copytree(src=self.myLocation, dst=self.temp_store_path, ignore=shutil.ignore_patterns('*.pyc','*.psd','*.jpg','*.bmp','.png','*.exe','*.zip','*.sh'))
+            
+            #fix permissions for game installs
+            recursive= True
+            if self.proc_uid !=None:                
+                os.chown(self.temp_store_path, self.proc_uid, self.proc_gid)
+                if recursive:
+                    for root, dirs, files in os.walk(self.temp_store_path):
+                        for d in dirs:
+                            os.chown(os.path.join(root, d), self.proc_uid, self.proc_gid)
+                        for f in files:
+                            os.chown(os.path.join(root, f), self.proc_uid, self.proc_gid)
+                            
         except OSError as err:
             self.log.info('Temp store not created. Error: %s' % err)
 
         #then copy temp store to the game folder
         try:
-            dir_util.copy_tree(src=self.temp_store_path,dst=game_path,update=True)
+            dir_util.copy_tree(src=self.temp_store_path+self.game_update_location,dst=game_path,update=True)
+            if self.proc_update:
+                dir_util.copy_tree(src=self.temp_store_path+self.proc_update_location,dst=proc_path,update=True)
         except OSError as err:
             self.log.info('Files not Updated. Error: %s' % err)
             
         #cleanup - remove the tmp directory if exists
-        try:
-            shutil.rmtree(self.temp_store_path)
-        except:
-            pass
+#        try:
+#            shutil.rmtree(self.temp_store_path)
+#        except:
+#            pass
 
 
         self.item_layer.set_text("Copy Finished",color=dmd.YELLOW)
@@ -1135,6 +1182,155 @@ class SoftwareUpdate(ServiceModeSkeleton):
         self.spin = False
 
         self.busy = False
+        
+        
+#mode to download logs to usb stick for analysis
+class LogsDownload(ServiceModeSkeleton):
+
+    def __init__(self, game, priority, font, big_font):
+	super(LogsDownload, self).__init__(game, priority,font)
+        self.log = logging.getLogger('ij.logs_download')
+        
+        self.usb_location = config.value_for_key_path('usb_path')
+        self.logs_location = game_path+'/var/logs'
+        self.temp_store_path = base_path+"/temp"
+        self.log_store_path = self.usb_location+"/indiana-jones-logs"
+
+        self.name = 'Logs Download'
+        self.spin = False
+        self.proc_update = False
+
+
+    def mode_started(self):
+	super(LogsDownload,self).mode_started()
+	self.update()
+
+
+    def update(self):
+        self.myLocation = None
+        dirs = []
+        self.okToUpdate = False
+        
+        # check for usb stick inserted and named correctly
+        try:
+            dirs = os.listdir(self.usb_location)
+            self.okToUpdate = True
+            self.item_layer.set_text("Store Disk Found",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Press Enter to Download",color=dmd.GREEN)
+            
+        except Exception, err:
+            self.okToUpdate = False
+            self.log.info("Didn't find the storage usb drive")
+            self.item_layer.set_text("Store Not Found",color=dmd.RED)
+            self.instruction_layer.set_text("Check USB Drive",color=dmd.GREEN)
+           
+
+       
+    
+    def sw_enter_active(self,sw):
+        if self.okToUpdate:
+            self.busy = True
+            # if enter is pressed, copy the files
+            # update the layer to say copying files
+            self.item_layer.set_text("Copying Log Files",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Do Not Power Off",color=dmd.RED)
+            self.spin = True
+            self.delay(delay=1,handler=self.copy_files)
+
+        else:
+            self.game.sound.play(self.game.assets.sfx_menuReject)
+        return game.SwitchStop
+
+
+    def copy_files(self):
+
+        #remove the tmp directory if exists and remove the usb drive log folder if exists
+        try:
+            shutil.rmtree(self.temp_store_path)
+        except:
+            pass
+
+        #then copy the allowed files to a temp store
+        try:
+            shutil.copytree(src=self.logs_location, dst=self.temp_store_path, ignore=shutil.ignore_patterns('*.pyc','*.psd','*.jpg','*.bmp','.png','*.exe','*.zip','*.sh'))
+        except OSError as err:
+            self.log.info('Temp store not created. Error: %s' % err)
+
+        #then copy temp store to the usb drive
+        try:
+            dir_util.copy_tree(src=self.temp_store_path,dst=self.log_store_path,update=True)
+            if self.proc_update:
+                dir_util.copy_tree(src=self.temp_proc_store_path,dst=proc_path,update=True)
+        except OSError as err:
+            self.log.info('Files not Updated. Error: %s' % err)
+            
+        #cleanup - remove the tmp directory if exists
+#        try:
+#            shutil.rmtree(self.temp_store_path)
+#        except:
+#            pass
+
+        self.item_layer.set_text("Log Download Finished",color=dmd.YELLOW)
+        self.instruction_layer.set_text("Press Exit Button",color=dmd.GREEN)
+        self.spin = False
+        self.busy = False
+      
+      
+class Reboot(ServiceModeSkeleton):
+
+    def __init__(self, game, priority, font, big_font):
+	super(Reboot, self).__init__(game, priority,font)
+        self.log = logging.getLogger('ij.restart')
+        self.name = 'Reboot Game'
+        
+        
+    def mode_started(self):
+	super(Reboot,self).mode_started()
+        self.okToUpdate = True
+        self.item_layer.set_text("Game will be restarted",color=dmd.YELLOW)
+	self.instruction_layer.set_text("Press Enter to Confirm",color=dmd.GREEN)
+
+
+    def reboot(self):
+	self.stop_proc()
+
+	# Import and run the startup script, further execution of this script is halted until the run_loop is stopped.
+	import game
+	game.main()
+
+	# Reset mode & restart P-ROC / pyprocgame
+	self.restart_proc()
+
+
+    def stop_proc(self):
+
+        self.game.sound.stop_music()
+	self.game.end_run_loop()
+	while len(self.game.dmd.frame_handlers) > 0:
+		del self.game.dmd.frame_handlers[0]
+	del self.game.proc
+
+
+    def restart_proc(self):
+	self.game.proc = self.game.create_pinproc()
+	self.game.proc.reset(1)
+	self.game.load_config(self.game.yamlpath)
+	self.game.dmd.frame_handlers.append(self.game.proc.dmd_draw)
+	self.game.dmd.frame_handlers.append(self.game.set_last_frame)
+	self.game.run_loop()
+    
+    
+    def sw_enter_active(self,sw):
+        if self.okToUpdate:
+            self.busy = True
+            # if enter is pressed, reboot the game
+            self.item_layer.set_text("Rebooting...",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Do Not Power Off",color=dmd.RED)
+            self.spin = True
+            self.delay(delay=1,handler=self.reboot)
+        else:
+            self.game.sound.play(self.game.assets.sfx_menuReject)
+        return game.SwitchStop
         
 
 #mode for coin door opening & showing game health
