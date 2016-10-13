@@ -180,9 +180,9 @@ class Get_The_Idol(game.Mode):
             else:
                 self.game.temple.close()
 
-            #stop music
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+            #reset music
+            #self.game.sound.stop_music()
+            #self.game.sound.play_music('general_play', loops=-1)
             
             #clear display
             self.clear()

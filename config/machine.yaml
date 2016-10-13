@@ -158,7 +158,7 @@ PRSwitches:
         tags: trough,trough_eject
     troughTop:
         number: S22
-        type: 'NC'
+        #type: 'NC'
         tags: trough_jam
         label: 'Trough Top (Eject)'
     shooterLane:
@@ -1070,6 +1070,8 @@ PRBallSave:
         leftInlane: open
         rightOutlane: open
         rightInlane: open
+        leftLoopBottom: open
+        rightLoopBottom: open
         #grailEject: open
     stopSwitches:
         shooterLane: closed

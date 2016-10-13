@@ -242,13 +242,18 @@ class Trough(procgame.game.Mode):
             self.eject_sw_count = 0
              
              
-	# Count the number of balls in the trough by counting active trough switches.
+	# Count the number of balls in the trough by counting active trough switches. 
 	def num_balls(self):
 		"""Returns the number of balls in the trough."""
 		ball_count = 0
 		for switch in self.position_switchnames:
 			if self.game.switches[switch].is_active():
 				ball_count += 1
+                                
+                #add count of jam switch in case balls get stacked somehow during play
+		if self.game.switches[self.jam_switchname].is_active():
+                    ball_count += 1
+                                
 		return ball_count
 
 	def is_full(self):

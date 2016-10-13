@@ -1131,7 +1131,7 @@ class SoftwareUpdate(ServiceModeSkeleton):
             self.delay(delay=1,handler=self.copy_files)
 
         else:
-            self.game.sound.play(self.game.assets.sfx_menuReject)
+            self.game.sound.play('service_cancel')
         return game.SwitchStop
 
 
@@ -1238,7 +1238,7 @@ class LogsDownload(ServiceModeSkeleton):
             self.delay(delay=1,handler=self.copy_files)
 
         else:
-            self.game.sound.play(self.game.assets.sfx_menuReject)
+            self.game.sound.play('service_cancel')
         return game.SwitchStop
 
 
@@ -1329,7 +1329,7 @@ class Reboot(ServiceModeSkeleton):
             self.spin = True
             self.delay(delay=1,handler=self.reboot)
         else:
-            self.game.sound.play(self.game.assets.sfx_menuReject)
+            self.game.sound.play('service_cancel')
         return game.SwitchStop
         
 

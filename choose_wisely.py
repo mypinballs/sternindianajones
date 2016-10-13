@@ -306,6 +306,12 @@ class Choose_Wisely(game.Mode):
             
             #turn off GI
             self.gi(enable=False)
+            
+            #disable ball search
+            self.game.ball_search.disable()
+            
+            #pause totem (if qm multiball ready)
+            self.game.base_game_mode.totem.mode_paused()
 
 
         def mode_stopped(self):
@@ -319,8 +325,8 @@ class Choose_Wisely(game.Mode):
             self.cancel_delayed('aux_mode_speech_delay')
 
             #reset music
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+            #self.game.sound.stop_music()
+            #self.game.sound.play_music('general_play', loops=-1)
 
             #clear display
             self.clear()
@@ -330,12 +336,18 @@ class Choose_Wisely(game.Mode):
             
             #turn off GI
             self.gi(enable=True)
-
+            
             #eject ball
             self.game.coils.grailEject.pulse()
+            
+            #enable ball search
+            self.game.ball_search.enable()
 
             #reset lamps
             self.reset_lamps()
+            
+            #unpause totem (if qm multiball ready)
+            self.game.base_game_mode.totem.mode_unpaused()
 
         def mode_tick(self):
             pass

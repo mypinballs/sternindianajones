@@ -201,8 +201,8 @@ class The_Three_Challenges(game.Mode):
             self.game.set_player_stats("temple_mode_started",False)
 
             #reset music
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+            #self.game.sound.stop_music()
+            #self.game.sound.play_music('general_play', loops=-1)
 
             #clear display
             self.clear()

@@ -70,14 +70,24 @@ class Totem(game.Mode):
 
 
         def reset(self):
+            #load settings
             self.timer = int(self.game.user_settings['Gameplay (Feature)']['Captive Multiball Start Timer'])
             self.hits_needed = int(self.game.user_settings['Gameplay (Feature)']['Captive Multiball Start'])
             self.fish_tales_music = self.game.user_settings['Gameplay (Feature)']['Totem Hidden Music']
+            self.add_a_ball_active = True #add a ball enabled flag
+            
+            #var setup
             self.count = 0
             self.jackpot_count = self.game.get_player_stats('qm_jackpots_collected')
-            self.multiball_started= False
+            
+            #reset status flags
+            self.multiball_running=False
+            self.multiball_started = False
             self.multiball_ready_flag = False
-            self.add_a_ball_active = True #add a ball enabled flag
+            self.game.set_player_stats('quick_multiball_running',self.multiball_running) 
+            self.game.set_player_stats('quick_multiball_started',self.multiball_started)
+            self.game.set_player_stats('quick_multiball_ready',self.multiball_ready_flag)
+            
             #self.game.coils.totemDropUp.pulse()
             #self.game.effects.drive_flasher('flasherSwordsman','off')
             self.game.effects.drive_flasher('flasherBackpanel','off')
@@ -118,6 +128,23 @@ class Totem(game.Mode):
 
                 if self.multiball_running:
                     self.multiball_tracking()
+          
+                    
+        #for use with modes where multiball ready event needs pausing (ie video modes)
+        def mode_paused(self):
+            if self.multiball_ready_flag:
+                self.timer_layer.pause(True)
+                self.game.effects.drive_flasher('flasherBackpanel','off')
+                self.cancel_delayed('timeout_delay')
+         
+                   
+        #for use with modes where multiball ready event needs pausing (ie video modes)
+        def mode_unpaused(self):
+            if self.multiball_ready_flag:
+                self.timer_layer.pause(False) 
+                self.game.effects.drive_flasher('flasherBackpanel','fast',time=0) 
+                self.delay(name='timeout_delay', delay=self.timer_layer.get_time_remaining(), handler=self.timeout)
+               
 
         def hit(self):
 
@@ -147,6 +174,7 @@ class Totem(game.Mode):
         def update_score(self):
             score = self.game.current_player().score
             self.score_layer.set_text(locale.format("%d", score, True),color=dmd.YELLOW)
+
 
         def update_lamps(self):
             self.update_map_lamps()
@@ -251,10 +279,10 @@ class Totem(game.Mode):
 
             info_layer1.set_text("HIT BALL",color=dmd.CYAN)
             info_layer2.set_text("FOR MULTIBALL",color=dmd.CYAN)
-
-            timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
-
-            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer1,info_layer2,ball_layer,self.score_layer,timer_layer])
+            
+            self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
+            
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer1,info_layer2,ball_layer,self.score_layer,self.timer_layer])
             
             #self.game.effects.drive_flasher('flasherSwordsman','fast',time=0)
             self.game.effects.drive_flasher('flasherBackpanel','fast',time=0) 
@@ -436,7 +464,7 @@ class Totem(game.Mode):
             info_layer1.set_text(info_line1[self.jackpot_count],color=dmd.PURPLE)
             info_layer2.set_text(info_line2[self.jackpot_count],color=dmd.PURPLE)
 
-            award_layer = dmd.TextLayer(43,16, self.game.fonts['num_14x10'], "center", opaque=False)
+            award_layer = dmd.TextLayer(43,17, self.game.fonts['num_14x10'], "center", opaque=False)
             #calc award
             award = self.jackpot_base_value+self.jackpot_boost_value*self.jackpot_count
             award_layer.set_text(locale.format("%d",award,True),blink_frames=2,color=dmd.GREEN)

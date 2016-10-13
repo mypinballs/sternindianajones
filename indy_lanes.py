@@ -28,7 +28,7 @@ class Indy_Lanes(game.Mode):
             self.log = logging.getLogger('ij.indy_lanes')
 
             self.mode_select = mode_select
-            self.hof = Hand_Of_Fate(self.game,priority-1,mode_select)#95 priority+1
+            self.hof = Hand_Of_Fate(self.game,95,mode_select)#95 priority+1
            
 
             self.bonus_layer = dmd.TextLayer(90, -1, self.game.fonts['num_09Bx7'], "center", opaque=False)

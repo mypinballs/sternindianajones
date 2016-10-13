@@ -46,6 +46,12 @@ class Match(game.Mode):
             self.value = 0
             self.player_digits = []
             self.play=False
+            #clear any stored score values
+            self.p1_layer.set_text("")
+            self.p2_layer.set_text("")
+            self.p3_layer.set_text("")
+            self.p4_layer.set_text("")
+            
 
 
         def mode_started(self):

@@ -138,6 +138,7 @@ class Multiball(game.Mode):
             
             self.reset()
 
+
         def mode_stopped(self):
             self.jackpot('cancelled')
             self.game.set_player_stats('jackpots_collected',self.jackpot_collected)
@@ -148,7 +149,11 @@ class Multiball(game.Mode):
             #safety magnet disable
             self.cancel_delayed('queue_ark_power')
             self.game.coils.arkMagnet.disable()
-        
+            
+            #remove looping jackpots mode if started
+            if self.ark_hits>=self.loopin_jackpot_start:
+                self.game.modes.remove(self.loopin_jackpots)
+                
         
         def mode_tick(self):
             if self.multiball_started:
@@ -508,14 +513,14 @@ class Multiball(game.Mode):
                     
                     self.game.score(self.jackpot_value*self.jackpot_x)
                     self.jackpot_collected+=1
-                    self.game.effects.drive_lamp(self.jackpot_lamps[self.jackpot_collected-1],'smarton')
+                        
                     if self.jackpot_collected>4:
                         self.super_jackpot_collected()
                     else:
-                        #self.delay(name='reset_jackpot', event_type=None, delay=1, handler=self.jackpot, param='unlit')
                         #update display
                         self.jackpot_collected_display(self.jackpot_collected)
-
+                        #update lamps
+                        self.game.effects.drive_lamp(self.jackpot_lamps[self.jackpot_collected-1],'smarton')
                         #speech
                         self.game.sound.play('jackpot'+str(self.jackpot_x))
 
@@ -730,7 +735,7 @@ class Multiball(game.Mode):
                 return procgame.game.SwitchStop
 
         def sw_rightRampMade_active(self, sw):
-            if self.multiball_running and self.game.switches.rightRampMade.time_since_change()>1:
+            if self.multiball_running and self.jackpot_status=='lit' and self.game.switches.rightRampMade.time_since_change()>1:
                 self.jackpot('made')
                 return procgame.game.SwitchStop
 

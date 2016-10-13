@@ -388,8 +388,8 @@ class Rope_Bridge(game.Mode):
             self.cancel_delayed('aux_mode_speech_delay')
 
             #reset music
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+            #self.game.sound.stop_music()
+            #self.game.sound.play_music('general_play', loops=-1)
 
             #clear display
             self.clear()

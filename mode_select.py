@@ -280,13 +280,13 @@ class Mode_Select(game.Mode):
                 if self.current_mode_num==0:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Get The Idol Timer']
                     self.name_text = 'GET THE IDOL'
-                    self.info_text = 'HIT CENTER'
-                    self.info2_text = 'DROP TARGETS'
+                    self.info_text = 'HIT TEMPLE'
+                    self.info2_text = 'CAPTIVE BALL'
 
                 elif self.current_mode_num==1:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Streets Of Cairo Timer']
                     self.name_text = 'STREETS OF CAIRO'
-                    self.info_text = 'SHOOT RAMPS'
+                    self.info_text = 'SHOOT LIT SHOTS'
                     self.info2_text = 'TO FIND MARION'
 
                 elif self.current_mode_num==2:
@@ -311,8 +311,9 @@ class Mode_Select(game.Mode):
                 elif self.current_mode_num==5:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Steal The Stones Timer']
                     self.name_text = 'STEAL THE STONES'
-                    self.info_text = 'GET ALL LIT TARGETS'
-
+                    self.info_text = 'SHOOT RAMP THEN'
+                    self.info2_text = 'JONES TARGETS'
+                    
                 elif self.current_mode_num==6:
                     #timer = self.game.user_settings['Gameplay (Feature)']['Mine Cart Timer']
                     self.name_text = 'MINE CART'
@@ -327,7 +328,7 @@ class Mode_Select(game.Mode):
                 elif self.current_mode_num==8:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Castle Brunwald Timer']
                     self.name_text = 'CASTLE BRUNWALD'
-                    self.info_text = 'HIT CAPTIVE BALL'
+                    self.info_text = 'HIT UPPER CAPTIVE BALL'
                     self.info2_text = 'TO ESCAPE CASTLE'
 
                 elif self.current_mode_num==9:
@@ -385,7 +386,7 @@ class Mode_Select(game.Mode):
                 #score
                 self.game.score(self.mode_start_value)
                 
-            elif self.mode_running:
+            elif self.mode_running and self.game.get_player_stats('multiball_running')==False and self.game.get_player_stats('quick_multiball_running')==False and self.game.get_player_stats('lock_in_progress')==False and self.game.get_player_stats('dog_fight_running')==False:
                 self.mode_bonus()
             else:
                 timer = 0
@@ -495,6 +496,7 @@ class Mode_Select(game.Mode):
 
         def end_scene(self):
             #play sound
+            self.game.sound.stop_music()
             self.game.sound.play("scene_ended")
 
             #remove the active scene
@@ -530,6 +532,9 @@ class Mode_Select(game.Mode):
             self.mode_running = False
             self.game.set_player_stats('mode_running',self.mode_running)
             self.game.set_player_stats('mode_running_id',99)
+            
+            #continue any previously active mode music
+            self.game.utility.resume_mode_music()  
             
             
         def mode_bonus(self):

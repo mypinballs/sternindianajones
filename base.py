@@ -5,6 +5,7 @@ import locale
 import logging
 import audits
 import time
+import gc
 
 from procgame import *
 from random import *
@@ -225,12 +226,14 @@ class BaseGameMode(game.Mode):
                 self.game.modes.remove(self.mode_select)
                 self.game.modes.remove(self.multiball)
                 self.game.modes.remove(self.poa)
-
+                
+                
 	def ball_drained_callback(self):
                 # temp addition of ball_served flag checking to try and resolve trough ball launch bounce in
 		if self.game.trough.num_balls_in_play == 0 and self.ball_served:
                     # End the ball
                     self.finish_ball()
+
 
 	def finish_ball(self):
 
@@ -259,12 +262,28 @@ class BaseGameMode(game.Mode):
 		# Tell the game object it can process the end of ball
 		# (to end player's turn or shoot again)
 		self.game.end_ball()
+                
+                #garbage collection - experiemental
+                collect = gc.collect()
+                remaining_garbage = gc.garbage
+                self.log.debug("garbage collection:%s",collect)
+                self.log.debug("remaining garbage :%s",remaining_garbage)
 
 
         def shoot_again(self):
             anim = dmd.Animation().load(game_path+"dmd/shoot_again.dmd")
-            self.layer = dmd.AnimatedLayer(frames=anim.frames,hold=False,frame_time=3)
+            self.sa_layer = dmd.AnimatedLayer(frames=anim.frames,hold=True,frame_time=6)
+            self.sa_layer.add_frame_listener(-1, self.shoot_again_cleanup)
+            self.layer=self.sa_layer
             self.game.sound.play('shoot_again')
+            
+            
+        def shoot_again_cleanup(self,wait=2):
+            self.delay(name='sa_cleanup',delay=wait,handler=self.clear)
+            
+            
+        def clear(self):
+            self.layer = None
             
             
 	def sw_startButton_active(self, sw):

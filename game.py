@@ -33,7 +33,7 @@ from effects import *
 from volume import *
 from extra_ball import *
 from screens import *
-from mpcballsearch import *
+from ball_search import *
 from service import *
 from utility import *
 from tilt import *
@@ -160,7 +160,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.4.0'
+                self.system_version='0.4.1'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -598,8 +598,8 @@ class Game(game.BasicGame):
 	def setup_ball_search(self):
 		# No special handlers in starter game.
 		special_handler_modes = []
-		self.ball_search = mpcBallSearch(self, priority=100, \
-                                     countdown_time=10, coils=self.ballsearch_coils, \
+		self.ball_search = Ball_Search(self, priority=100, \
+                                     countdown_time=12, coils=self.ballsearch_coils, \
                                      reset_switches=self.ballsearch_resetSwitches, \
                                      stop_switches=self.ballsearch_stopSwitches, \
                                      special_handler_modes=special_handler_modes) #procgame.modes.BallSearch

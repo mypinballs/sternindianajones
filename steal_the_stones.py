@@ -175,8 +175,8 @@ class Steal_The_Stones(game.Mode):
             self.game.set_player_stats("poa_queued",False)
 
             #reset music
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+            #self.game.sound.stop_music()
+            #self.game.sound.play_music('general_play', loops=-1)
 
             #clear display
             self.clear()

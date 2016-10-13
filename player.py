@@ -20,6 +20,7 @@ class Player(procgame.game.Player):
                 self.player_stats['loop_value']=1000000 #1M default
                 self.player_stats['ramps_made']=0
                 self.player_stats['dog_fight_running']=False
+                self.player_stats['dog_fights_completed']=0
                 self.player_stats['adventure_letters_collected']=0
                 self.player_stats['adventures_started']=0
                 self.player_stats['burps_collected']=0

@@ -185,8 +185,8 @@ class Warehouse_Raid(game.Mode):
             self.release_ball()
             
             #reset music
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+            #self.game.sound.stop_music()
+            #self.game.sound.play_music('general_play', loops=-1)
 
             #update idol state
             #self.game.idol.home()

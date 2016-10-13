@@ -28,7 +28,9 @@ class Extra_Ball(game.Mode):
             print("Extra Ball Collected")
             if play_anim:
                 anim = dmd.Animation().load(game_path+"dmd/extra_ball.dmd")
-                self.layer = dmd.AnimatedLayer(frames=anim.frames,hold=False)
+                self.collect_layer = dmd.AnimatedLayer(frames=anim.frames,hold=True,frame_time=6)
+                self.collect_layer.add_frame_listener(-1, self.collect_cleanup)
+                self.layer=self.collect_layer
                 
             self.game.sound.play('extra_ball_collected')
             #self.game.sound.play_voice('extra_ball_speech')
@@ -37,6 +39,15 @@ class Extra_Ball(game.Mode):
             
             self.game.set_player_stats('extra_ball_lit',False)
             self.game.extra_ball_count()
+            
+            
+            
+        def collect_cleanup(self,wait=1):
+            self.delay(name='eb_collect_cleanup',delay=wait,handler=self.clear)
+            
+        
+        def clear(self):
+            self.layer = None
 
 
         def lit(self,type='anim'):
