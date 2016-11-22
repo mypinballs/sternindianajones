@@ -38,9 +38,6 @@ class Choose_Wisely(game.Mode):
 
             #lamps setup
             self.lamps = ['tournamentStartButton']
-            
-            
-            self.reset()
 
 
         def reset(self):
@@ -283,8 +280,13 @@ class Choose_Wisely(game.Mode):
 
 
         def mode_started(self):
+            self.reset()
+            
             #load player stats
-            self.level = self.game.get_player_stats('choose_wisely_level');
+            self.level = self.game.get_player_stats('choose_wisely_level')
+            
+            #update mode player stats
+            self.game.set_player_stats('video_mode_started',True)
 
             #setup additonal layers
             self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
@@ -319,6 +321,9 @@ class Choose_Wisely(game.Mode):
 
             self.game.set_player_stats('choose_wisely_score',self.score_value)
             self.game.set_player_stats('last_mode_score',self.score_value)
+            
+            #update mode player stats
+            self.game.set_player_stats('video_mode_started',False)
 
             #cancel speech calls
             self.cancel_delayed('mode_speech_delay')

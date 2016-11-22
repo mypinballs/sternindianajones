@@ -30,14 +30,11 @@ class ModeScoreLayer(dmd.TextLayer):
 
 class Frankenstein(game.Mode):
 
-	def __init__(self, game, priority,mode_select):
+	def __init__(self, game, priority):
             super(Frankenstein, self).__init__(game, priority)
 
             #logging
             self.log = logging.getLogger('ij.frankenstein')
-            
-            #setup link back to mode_select mode
-            self.mode_select = mode_select
 
             #screen setup
             self.timer = int(self.game.user_settings['Gameplay (Feature)']['Frankenstein Timer'])
@@ -86,13 +83,10 @@ class Frankenstein(game.Mode):
             self.set3 = False
             
 
-        def mode_started(self):
-            
+        def mode_started(self): 
             self.reset()
+            
             self.running_total = 0
-#            self.mode_select.mode_enabled = False
-#            self.mode_select.mode_running = True
-#            self.mode_select.current_mode_num = 13 #set the special hidden mode id
             self.game.set_player_stats('mode_blocking',True)
             
             #load player stats
@@ -121,9 +115,6 @@ class Frankenstein(game.Mode):
 
 
         def mode_stopped(self):
-#            self.mode_select.mode_enabled = True
-#            self.mode_select.mode_running = False
-#            self.mode_select.move_left() #set the next regular mode
             self.game.set_player_stats('mode_blocking',False)
             
             #save player stats
@@ -316,7 +307,7 @@ class Frankenstein(game.Mode):
             self.delay(name='eject_delay', event_type=None, delay=timer-1, handler=self.eject)
             
         def eject(self):
-            self.mode_select.eject_ball()
+            self.game.base_game_mode.mode_select.eject_ball()
 
 
         #switch handlers

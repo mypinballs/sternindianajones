@@ -78,21 +78,13 @@ class Multiball(game.Mode):
             
             self.jackpot_lamps = ['arkJackpot','stonesJackpot','grailJackpot','skullJackpot']
 
+            self.balls_in_play = 0
             self.balls_needed = 3 #change to setting
-            self.balls_in_play = 1
-
             self.lock_ball_score = 500000
             self.lock_enabled_score = 100000
             self.jackpot_base = 25000000
             self.jackpot_boost = 20000000
             self.super_jackpot_value = 100000000
-
-            self.lock_lit = False
-            self.mode_running = False
-            self.balls_locked = 0
-            self.multiball_started = False
-            self.multiball_running = False
-
             self.cheat_value_start = 5000000
             self.cheat_value_boost = 1000000
             
@@ -102,18 +94,19 @@ class Multiball(game.Mode):
             self.loopin_jackpots = Loopin_Jackpots(self.game,priority-1)
         
 
-
-        def reset(self):
-            self.update_lamps()
+        def reset(self):     
+            pass
 
 
         def mode_started(self):
-            #set player stats for mode
+            self.reset()
+            
+            #update player stats for mode
             self.jackpot_value = self.jackpot_base
             self.jackpot_x = 1
             self.jackpot_status = 'notlit'
             self.jackpot_collected = self.game.get_player_stats('jackpots_collected')
-            self.super_jackpot_enabled = False
+            self.super_jackpot_lit = False
             self.next_ball_ready = False
             self.cheat_count = self.game.get_player_stats('cheat_count')
             self.hits = self.game.get_player_stats('lock_progress_hits')
@@ -134,9 +127,10 @@ class Multiball(game.Mode):
             if self.lock_lit:
                 self.game.temple.open()
             else:
-                self.game.temple.close()
+                self.game.temple.close() 
             
-            self.reset()
+            #update lamps
+            self.update_lamps()
 
 
         def mode_stopped(self):
@@ -196,6 +190,8 @@ class Multiball(game.Mode):
             #update idol state
             #self.game.idol.lock()
             
+            #pause any active modes
+            self.game.base_game_mode.mode_select.mode_paused(sw=None)
 
             #animations
             anim = dmd.Animation().load(game_path+"dmd/lock_"+str(self.balls_locked)+".dmd")
@@ -246,6 +242,8 @@ class Multiball(game.Mode):
             self.hits_needed = int(self.game.user_settings['Gameplay (Feature)']['Temple Hits For Lock'])
             self.hits = 0
             
+            #Note: active mode timers are restarted ewhen ball is ejected via mode_select
+
             self.update_lamps()
             
             
@@ -496,7 +494,7 @@ class Multiball(game.Mode):
                     if self.jackpot_collected<4:
                         self.multiball_display(self.jackpot_collected)
                     else:
-                        self.super_jackpot_lit()
+                        self.super_jackpot_ready()
 
                 elif status=='made':
                     self.game.coils.flasherSkull.disable()
@@ -536,11 +534,10 @@ class Multiball(game.Mode):
                     
                     self.clear()
 
-        def super_jackpot_lit(self):
+        def super_jackpot_ready(self):
             self.super_jackpot_lit = True
             self.game.coils.flasherSankara.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
             self.game.coils.flasherTemple.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
-            self.super_jackpot_enabled = True
             self.game.temple.open()
 
 

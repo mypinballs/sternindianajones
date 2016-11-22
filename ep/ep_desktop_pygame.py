@@ -371,7 +371,7 @@ class EP_Desktop():
 
             for dot in frame_string:
                 dot_value = ord(dot)
-                image = None
+                #image = None
                 # if we got something other than 0
                 if dot_value != 0:
                     # set the brightness and color
@@ -415,11 +415,15 @@ class EP_Desktop():
                     y += 1
                 #del image
 
+            pygame.display.flip()
+            #pygame.display.update()
+            
             del x
             del y
             del frame_string
 
-            pygame.display.update()
+           
+            
 
     def clear_hd(self):
         self.HD = False

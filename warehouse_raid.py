@@ -68,8 +68,6 @@ class Warehouse_Raid(game.Mode):
 
             #lamps setup
             self.lamps = ['rightRampArrow']
-            
-            self.reset()
 
 
         def reset(self):
@@ -82,6 +80,7 @@ class Warehouse_Raid(game.Mode):
             self.running_total = 0
             self.mode_running=False
             self.reset_drop_count = 6
+
 
         def load_scene_anim(self,count):
 
@@ -100,7 +99,6 @@ class Warehouse_Raid(game.Mode):
             self.delay(name='reload_bgnd_anim',delay=2,handler=self.load_bgnd_anim)
             
             self.layer = dmd.GroupedLayer(128, 32, [self.box_layer,self.scene_layer,self.score_layer,self.info_layer,self.award_layer])
-            
 
 
         def load_bgnd_anim(self):   
@@ -120,11 +118,14 @@ class Warehouse_Raid(game.Mode):
             
             self.delay(name='reload_bgnd_anim',delay=5,handler=self.load_bgnd_anim)
 
+
         def electricity_sound(self):
             self.game.sound.play('warehouse_electricity')
-          
+            
 
         def mode_started(self):
+            self.reset()
+            
             #load player stats
             self.items_collected = self.game.get_player_stats('warehouse_items_collected');
 

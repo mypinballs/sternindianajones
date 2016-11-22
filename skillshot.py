@@ -32,8 +32,6 @@ class Skillshot(game.Mode):
             self.skill_value_start = 5000000
             self.skill_value_boost = 5000000
             self.count = 0
-            
-            self.reset()
 
 
         def reset(self):
@@ -41,6 +39,8 @@ class Skillshot(game.Mode):
 
 
         def mode_started(self):
+            self.reset()
+            
             self.activate_lamps()
             self.game.coils.leftControlGate.pulse(0)
             self.game.status = 'skillshot'

@@ -67,17 +67,6 @@ Machine (Standard):
   'Shaker Installed':
     options: ['Yes','No']
     default: 'No'
-  'Color Display Pixel Size':
-    options: [14,10,8]
-    default: 10
-  'Color Display X Offset':
-    options: [-2500,2500]
-    increments: 1
-    default: 0
-  'Color Display Y Offset':
-    options: [-2500,2500]
-    increments: 1
-    default: 35
   'Party Mode':
     options: ['Double Flip','No Hold','Reversed','Off']
     default: 'Off'
@@ -94,6 +83,17 @@ Sound:
 #    increments: 0.1
 #    default: 0.0
 Display:
+  'Color Display Pixel Size':
+    options: [14,10,8]
+    default: 10
+  'Color Display X Offset':
+    options: [-2500,2500]
+    increments: 1
+    default: 0
+  'Color Display Y Offset':
+    options: [-2500,2500]
+    increments: 1
+    default: 35
   'Left side score justify':
     # This example has no default.  The first option (right) will be used as the default.
     options: [right, left]
@@ -333,9 +333,13 @@ Gameplay (Feature):
     options: ['On','Off']
     default: 'On'
   'Super Jets Start':
-    options: [10,255]
+    options: [10,200]
     increments: 10
-    default: 100
+    default: 50
+  'Super Jets Boost':
+    options: [10,50]
+    increments: 5
+    default: 25
   'Hand Of Fate Lit Difficulty':
     options: ['Easy','Hard']
     default: 'Easy'

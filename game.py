@@ -160,7 +160,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.4.1'
+                self.system_version='0.5.0'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -199,6 +199,10 @@ class Game(game.BasicGame):
                 self.fonts['10x7_bold'].tracking = -1
                 self.fonts['10x7_bold'].composite_op ="blacksrc"
                 
+                self.fonts['14x9_bold'] = dmd.font_named("font_14x9.dmd")
+                self.fonts['14x9_bold'].tracking = -1
+                self.fonts['14x9_bold'].composite_op ="blacksrc"
+                
                 self.fonts['23x12'] = dmd.font_named("font_23x12_bold.dmd")
                 self.fonts['23x12'].tracking = -1
                 self.fonts['23x12'].composite_op ="blacksrc"
@@ -211,6 +215,7 @@ class Game(game.BasicGame):
                 self.fonts['5px_az'] = dmd.font_named("font_7x5.dmd")
                 self.fonts['5px_inv_az'] = dmd.font_named("font_7x5_inverted.dmd")
                 self.fonts['6px_az'] = dmd.font_named("Font_19_CactusCanyon.dmd")
+                self.fonts['7px_narrow_az'] = dmd.font_named("Font_1_CactusCanyon.dmd")
                 self.fonts['7px_az'] = dmd.font_named("Font_2_CactusCanyon.dmd")
                 self.fonts['7px_bold_az'] = dmd.font_named("Font_14_CactusCanyon.dmd")
                 self.fonts['9px_az'] = dmd.font_named("Font_15_CactusCanyon.dmd")
@@ -323,12 +328,12 @@ class Game(game.BasicGame):
                 #------------------
                 #attract mode
 		self.attract_mode = Attract(self)
-                #basic game control mode
-		self.base_game_mode = BaseGameMode(self)
                 #moonlight mode - special
                 self.moonlight = Moonlight(self,2)
                 #effects mode
                 self.effects = Effects(self,4)
+                #basic game control mode
+		self.base_game_mode = BaseGameMode(self)
                 #rgb lamps mode
                 #self.rgb_lamps = RGBLamps(self,4)
                 #utility mode
@@ -358,7 +363,7 @@ class Game(game.BasicGame):
 
                 # set up the color desktop if we're using that
                 if self.color_desktop:
-                    self.desktop.draw_window(self.user_settings['Machine (Standard)']['Color Display Pixel Size'],self.user_settings['Machine (Standard)']['Color Display X Offset'],self.user_settings['Machine (Standard)']['Color Display Y Offset'])
+                    self.desktop.draw_window(self.user_settings['Display']['Color Display Pixel Size'],self.user_settings['Display']['Color Display X Offset'],self.user_settings['Display']['Color Display Y Offset'])
                     # load the images for the colorized display
                     self.desktop.load_images(dots_path)
 

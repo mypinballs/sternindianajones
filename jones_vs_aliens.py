@@ -88,16 +88,13 @@ class Jones_Vs_Aliens(game.Mode):
 
             #var setup
             self.mode_started_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Start Value (Mil)'])*1000000
-            self.count = 0
             self.forcefield_hits = 3
             self.ship_hits = 3
-            self.ships_destroyed = 0
             self.score_value_boost = 5000000
             self.score_value_start = 5000000
             self.score_value_extra = 2000000
             self.forcefield_hit_value = 100000
             self.ship_hit_value = 250000
-            self.running_total = 0
             
             #lamps setup
             self.lamps = ['raidersArrow']
@@ -108,16 +105,17 @@ class Jones_Vs_Aliens(game.Mode):
             
             self.smart_bomb_lamp_button = 'tournamentStartButton'
             
-            self.reset()
-
 
         def reset(self):
+            self.count = 0
+            self.ships_destroyed = 0
+            self.running_total = 0
             self.reset_jones()
+            
             
         def reset_jones(self):
             self.jones_flags = [False,False,False,False,False]
             self.update_jones_lamps()
-            
             
 
         def set_jones_lamps(self,id):
@@ -233,6 +231,8 @@ class Jones_Vs_Aliens(game.Mode):
 
 
         def mode_started(self):
+            self.reset()
+            
             #setup additonal layers
             self.timer_layer = dmd.TimerLayer(128, 25, self.game.fonts['07x5'],self.timer,"right")
             self.destroyed_layer = dmd.TextLayer(128/2, 12, self.game.fonts['8x6'], "center", opaque=False)

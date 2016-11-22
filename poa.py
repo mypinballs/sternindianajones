@@ -37,11 +37,6 @@ class POA(game.Mode):
                 #setup global mode variables
                 #self.lamps=['adventureA','adventureD','adventureV','adventureE1','adventureN','adventureT','adventureU','adventureR','adventureE2']
                 self.lamps = ['jonesJ','jonesJ','jonesO','jonesO','jonesN','jonesN','jonesE','jonesE','jonesS'] 
-                
-                self.full_sets_completed = 0
-
-                self.pit_value_base = 20000000
-                self.pit_value = self.game.get_player_stats('pit_value')
 
                 #register music files
                 self.game.sound.register_music('poa_play', music_path+"poa.aiff")
@@ -65,8 +60,6 @@ class POA(game.Mode):
 			self.add_switch_handler(name=switch, event_type='active', \
 				delay=None, handler=self.adventure_paused)  
                                 
-                #reset variables
-                self.reset()
 
         def reset(self):
                 self.adventure_started  = False
@@ -86,6 +79,8 @@ class POA(game.Mode):
                 self.adventureR_lit = False
                 self.adventureE2_lit = False
                 self.flag = [False,False,False,False,False,False,False,False,False]
+                self.full_sets_completed = 0
+                self.pit_value_base = 20000000
                 
                 self.reset_lamps()
                 self.reset_pit_value()
@@ -93,6 +88,8 @@ class POA(game.Mode):
 	
 	def mode_started(self):
                 self.log.info("POA Mode Started")
+                #reset variables
+                self.reset()
 
                 #setup mode general stuff
                 self.adventure_continue_timer = self.game.user_settings['Gameplay (Feature)']['Adventure Continue Timer']
@@ -105,6 +102,7 @@ class POA(game.Mode):
                 self.load_aux_flags()
                 self.letters_spotted = self.game.get_player_stats('adventure_letters_spotted')
                 self.letters_collected = self.game.get_player_stats('adventure_letters_collected')
+                self.pit_value = self.game.get_player_stats('pit_value')
 
                 #update lamp states
                 self.update_lamps()
@@ -117,9 +115,9 @@ class POA(game.Mode):
         def mode_tick(self):
                 #monitor game flags for modes where adventure needs to end if running
                 #important game setup logic - possibly add settings to change this list?
-                if self.game.get_player_stats('poa_enabled') and (self.game.get_player_stats("multiball_started") or self.game.get_player_stats("quick_multiball_started") or self.game.get_player_stats('multiball_mode_started') or self.game.get_player_stats("path_mode_started")):
+                if self.game.get_player_stats('poa_enabled') and (self.game.get_player_stats("multiball_started") or self.game.get_player_stats("quick_multiball_started") or self.game.get_player_stats('multiball_mode_started') or self.game.get_player_stats("path_mode_started") or self.game.get_player_stats("video_mode_started")):
                    self.log.debug("enabled adventure being cancelled and requeued by special mode starting")
-                   self.poa_requeued()
+                   self.poa_requeue()
                 
                 #monitor scenario to clear continue display from running over the top of started modes
                 if self.adventure_started and self.game.get_player_stats('mode_running') and self.layer!=None:
@@ -301,18 +299,19 @@ class POA(game.Mode):
                 self.delay(name='poa_enabled_check', event_type=None, delay=1, handler=self.poa_enabled)
                 
         
-        def poa_requeued(self):
-            #cancel the activated items
-            self.cancel_delayed('adventure_timeout')
-            #self.game.coils.divertorHold.disable()
-            self.game.coils.flasherKingdom.disable()
+        def poa_requeue(self):
+            if self.game.get_player_stats('poa_enabled'):
+                #cancel the activated items
+                self.cancel_delayed('adventure_timeout')
+                #self.game.coils.divertorHold.disable()
+                self.game.coils.flasherKingdom.disable()
             
-            #update the player stats
-            self.game.set_player_stats('poa_enabled',False)
-            self.game.set_player_stats("poa_queued",True)
+                #update the player stats
+                self.game.set_player_stats('poa_enabled',False)
+                self.game.set_player_stats("poa_queued",True)
             
-            #setup the queue
-            self.poa_enabled()
+                #setup the queue
+                self.poa_enabled()
 
 
         def adventure_start(self):
@@ -393,17 +392,20 @@ class POA(game.Mode):
         
 
         def adventure_expired(self):
-            # Manually cancel the delay in case this function was called externally.
+            # Manually cancel  delays in case this function was called externally.
             self.cancel_delayed('adventure_continue_timer')
-            #self.game.coils.divertorHold.disable()
+            self.cancel_delayed('poa_enabled_check')
+
             self.game.coils.flasherKingdom.disable()
             self.reset_lamps()
             #self.game.mini_playfield.path_ended()
             self.adventure_started  = False
             self.adventure_continuing  = False
             
-            self.game.sound.stop_music()
-            self.game.sound.play_music('general_play', loops=-1)
+#            self.game.sound.stop_music()
+#            self.game.sound.play_music('general_play', loops=-1)
+            #continue any previously active mode music
+            self.game.utility.resume_mode_music()    
 
             self.clear()
 

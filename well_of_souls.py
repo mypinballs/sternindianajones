@@ -76,8 +76,6 @@ class Well_Of_Souls(game.Mode):
 
             #lamps setup
             self.lamps = ['templeArrow']
-            
-            self.reset()
 
 
         def reset(self):
@@ -126,6 +124,8 @@ class Well_Of_Souls(game.Mode):
             #self.torch_sounds(6)
 
         def mode_started(self):
+            self.reset()
+            
             #load player stats
             self.snakes_torched = self.game.get_player_stats('snakes_torched');
 

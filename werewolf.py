@@ -508,6 +508,9 @@ class Werewolf(game.Mode):
             #self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
             #self.info_layer = dmd.TextLayer(128/2, 20, self.game.fonts['07x5'], "center", opaque=False)
             #self.info_layer.set_text("SHOOT LIT SHOTS",blink_frames=1000)
+            
+            #update mode player stats
+            self.game.set_player_stats('video_mode_started',True)
 
             #show instructions
             self.instructions()
@@ -544,7 +547,9 @@ class Werewolf(game.Mode):
                 
             self.game.set_player_stats('werewolf_score',self.score_total)
             self.game.set_player_stats('last_mode_score',self.score_total)
-
+            
+            #update mode player stats
+            self.game.set_player_stats('video_mode_started',False)
 
             #cancel speech calls
             self.cancel_delayed('mode_speech_delay')

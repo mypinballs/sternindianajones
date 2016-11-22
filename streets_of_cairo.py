@@ -123,8 +123,6 @@ class Streets_Of_Cairo(game.Mode):
             #lamps setup
             self.lamps = ['leftLoopArrow','cairoSwordsman','rightRampArrow','rightLoopArrow']
             self.shoot_button_lamp = 'tournamentStartButton'
-            
-            self.reset()
 
 
         def reset(self):
@@ -328,10 +326,9 @@ class Streets_Of_Cairo(game.Mode):
             self.create_monkey_sprite([posn+(32*0),5],delay)
 
             
-
-            
-
         def mode_started(self):
+            self.reset()
+            
             #load player stats
             self.baskets_searched = self.game.get_player_stats('soc_baskets_searched')
 

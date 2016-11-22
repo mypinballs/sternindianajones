@@ -111,8 +111,6 @@ class Rope_Bridge(game.Mode):
 
             #lamps setup
             self.lamps = ['rightRampArrow','rightLoopArrow']
-            
-            self.reset()
 
 
         def reset(self):
@@ -339,6 +337,8 @@ class Rope_Bridge(game.Mode):
         
 
         def mode_started(self):
+            self.reset()
+            
             #load player stats
             self.rope_bridge_distance = self.game.get_player_stats('rope_bridge_distance');
             

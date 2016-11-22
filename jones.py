@@ -44,12 +44,10 @@ class Jones(game.Mode):
             self.game.sound.register_sound('jones_speech1', speech_path+"ij402C1_open_aswell_as_i.aiff")
 
             #var setup
-            
             self.eight_ball_bank_count = int(self.game.user_settings['Gameplay (Feature)']['Jones Target Banks For 8 Ball'])
             self.score_value_boost = 5000000
             self.score_value_start = 5000000
             self.score_value_extra = 2000000
-            self.running_total = 0
             
             #lamps setup
             self.jones_lamps = ['jonesJ','jonesO','jonesN','jonesE','jonesS']
@@ -61,8 +59,8 @@ class Jones(game.Mode):
             
         def reset(self):
             self.jones_flags = [False,False,False,False,False]
+            self.running_total = 0
             self.update_lamps()
-            
             
 
         def set_lamps(self,id):
@@ -70,6 +68,7 @@ class Jones(game.Mode):
             for i in range(len(self.jones_lamps)):
                 if not self.jones_flags[i]:
                     self.game.effects.drive_lamp(self.jones_lamps[i],'medium')
+        
         
         def update_lamps(self):
             for i in range(len(self.jones_lamps)):

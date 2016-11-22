@@ -158,9 +158,8 @@ PRSwitches:
         tags: trough,trough_eject
     troughTop:
         number: S22
-        #type: 'NC'
         tags: trough_jam
-        label: 'Trough Top (Eject)'
+        label: 'Trough Top'
     shooterLane:
         number: S23
         label: 'Shooter Lane'
@@ -312,17 +311,17 @@ PRSwitches:
         label: 'Right Ramp Made'
     captiveBallRear:
         number: S61
-        label: 'Captive Ball Front'
+        label: 'Cap Ball Front'
     captiveBallFront:
         #leftRampMade - temp surrogate
         number: S62
-        label: 'Captive Ball Front'
+        label: 'Cap Ball Front'
     swordsmanBack:
         number: S63
-        label: 'Swordsman Back'
+        label: 'Sman Back'
     swordsmanForward:
         number: S64
-        label: 'Swordsman Forward'
+        label: 'Sman Forward'
 
      #Old Switch defs
 #    singleDropTop:
@@ -472,7 +471,7 @@ PRCoils:
         label: 'Left Jet'
     topJet:
         number: C10
-        label: 'Left Jet'
+        label: 'Top Jet'
     bottomJet:
         number: C11
         label: 'Bottom Jet'

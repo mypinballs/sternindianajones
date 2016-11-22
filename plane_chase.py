@@ -34,23 +34,9 @@ class Plane_Chase(game.Mode):
             self.dog_fight_boost = 10000000
             self.dog_fight_min_value = 3000000
 
-            self.bottom_left_wings = False
-            self.middle_left_wings = False
-            self.top_left_wings = False
-            self.bottom_right_wings = False
-            self.middle_right_wings = False
-            self.top_right_wings = False
-
             self.plane_lamps = ['leftPlaneBottom','rightPlaneBottom','leftPlaneMiddle','rightPlaneMiddle','leftPlaneTop','rightPlaneTop','leftRampArrow','rightRampArrow']
             self.plane_lamps = []
             
-            self.total_ramps_made = 0
-            self.ramps_made = 0
-            
-            #flags to enable shot sequence to be progressed
-            self.left_ramp_enabled = False
-            self.right_ramp_enabled = False
-
 
         def reset(self):
             #set the ramps made count
@@ -66,7 +52,16 @@ class Plane_Chase(game.Mode):
             self.dog_fight_value = self.dog_fight_base_value+(self.dog_fight_boost*self.dog_fights_completed)
             self.dog_fight_running = False
             self.game.set_player_stats('dog_fight_running',self.dog_fight_running)
+            #flags to enable shot sequence to be progressed
+            self.left_ramp_enabled = False
             self.right_ramp_enabled = True
+            
+            self.bottom_left_wings = False
+            self.middle_left_wings = False
+            self.top_left_wings = False
+            self.bottom_right_wings = False
+            self.middle_right_wings = False
+            self.top_right_wings = False
             
             self.game.coils.flasherSankara.disable()
             

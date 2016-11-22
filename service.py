@@ -115,14 +115,16 @@ class ServiceMode(ServiceModeList):
 		#self.title_layer.set_text('Service Mode')
                 
                 #setup sounds
-                self.game.sound.register_sound('service_enter', sound_path+"menu_in.wav")
-		self.game.sound.register_sound('service_exit', sound_path+"menu_out.wav")
-		self.game.sound.register_sound('service_next', sound_path+"next_item.wav")
-		self.game.sound.register_sound('service_previous', sound_path+"previous_item.wav")
-		self.game.sound.register_sound('service_switch_edge', sound_path+"switch_edge.wav")
-		self.game.sound.register_sound('service_save', sound_path+"save.wav")
-		self.game.sound.register_sound('service_cancel', sound_path+"cancel.wav")
+                self.game.sound.register_sound('service_enter', sound_path+"menu_enter.wav")
+		self.game.sound.register_sound('service_exit', sound_path+"menu_exit.wav")
+		self.game.sound.register_sound('service_next', sound_path+"menu_up.wav")
+		self.game.sound.register_sound('service_previous', sound_path+"menu_down.wav")
+		self.game.sound.register_sound('service_switch_edge', sound_path+"menu_switch_edge.wav")
+		self.game.sound.register_sound('service_save', sound_path+"menu_save.wav")
+		self.game.sound.register_sound('service_cancel', sound_path+"menu_cancel.wav")
+                self.game.sound.register_sound('service_reject', sound_path+"menu_reject.wav")
                 self.game.sound.register_sound('service_alert', sound_path+"service_alert.aiff")
+                self.game.sound.register_sound('service_start', sound_path+"service_startup.aiff")
                 
 		self.name = 'Service Mode - OS v'+str(self.game.system_version)
 		self.tests = Tests(self.game, self.priority+1, font, big_font, extra_tests)
@@ -640,7 +642,7 @@ class SwitchTest(ServiceModeSkeleton):
                     
                     self.wire_colour.append(colour_set)
                              
-                self.log.info("Wire Colours Created:%s",self.wire_colour)
+                self.log.debug("Wire Colours Created:%s",self.wire_colour)
                
                 #self.direct_colours = ['Green','Brown','Red','Orange','Yellow','Black','Blue','Purple','Grey','Green','','']
                 
@@ -652,10 +654,19 @@ class SwitchTest(ServiceModeSkeleton):
 			else:
 				add_handler = 0
 			if add_handler:
-				self.add_switch_handler(name=switch.name, event_type='inactive', delay=None, handler=self.switch_handler)
-				self.add_switch_handler(name=switch.name, event_type='active', delay=None, handler=self.switch_handler)
-
-
+                            self.add_switch_handler(name=switch.name, event_type='inactive', delay=None, handler=self.switch_handler)
+                            self.add_switch_handler(name=switch.name, event_type='active', delay=None, handler=self.switch_handler)
+                            self.log.debug("Added Switch:%s",switch.name)
+                       
+                            
+        def mode_started(self):
+            super(SwitchTest, self).mode_started()
+            for switch in self.game.switches:
+                if switch.is_active():
+                    self.switch_handler(switch)
+                    self.log.debug("Active Switch:%s",switch.name)
+                    
+                    
 	def switch_handler(self, sw):
 		if (sw.state):
                     self.game.sound.play('service_switch_edge')
@@ -748,6 +759,10 @@ class SwitchTest(ServiceModeSkeleton):
 
 	#def sw_enter_active(self,sw):
 	#	return True
+        
+       
+	
+              
             
             
 class Statistics(ServiceModeList):
@@ -1039,8 +1054,9 @@ class Utilities(ServiceModeList):
 		self.name = name
 		self.software_update = SoftwareUpdate(self.game, self.priority+1, font, big_font)
                 self.log_download = LogsDownload(self.game, self.priority+1, font, big_font)
+                self.set_date_time = SetDateTime(self.game, self.priority+1, font, big_font)
                 self.reboot_game = Reboot(self.game, self.priority+1, font, big_font)
-		self.items = [self.software_update,self.log_download,self.reboot_game]
+		self.items = [self.software_update,self.log_download,self.reboot_game,self.set_date_time]
                 
                 
 #mode to manually update the game software
@@ -1330,6 +1346,80 @@ class Reboot(ServiceModeSkeleton):
             self.delay(delay=1,handler=self.reboot)
         else:
             self.game.sound.play('service_cancel')
+        return game.SwitchStop
+    
+    
+class SetDateTime(ServiceModeSkeleton):
+
+    def __init__(self, game, priority, font, big_font):
+	super(SetDateTime, self).__init__(game, priority,font)
+        self.log = logging.getLogger('ij.set_date_time')
+        self.name = 'Set Date & Time'
+        
+        self.date_layer = dmd.DateLayer(1, 10,  self.game.fonts['7px_narrow_az'],"all", "left", opaque=False, colour=dmd.YELLOW)
+        self.adjust_layer = dmd.TextLayer(1, 18,  self.game.fonts['5px_az'], "left", opaque=False)
+        self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.instruction_layer,self.adjust_layer,self.date_layer])
+        
+        self.adjust_id=99
+        self.adjust_types=['Month','Day','Year','Hours','Minutes']
+        self.adjust_max=len(self.adjust_types)
+        
+        
+    def mode_started(self):
+	super(SetDateTime,self).mode_started()
+	self.instruction_layer.set_text("+- To Change,Enter to Confirm",color=dmd.GREEN)
+        self.adjust_layer.set_text("PRESS ENTER TO BEGIN",blink_frames=8,color=dmd.CYAN)
+
+
+    def sw_up_active(self, sw):
+        if self.adjust_id<self.adjust_max:
+            self.process_up()
+        #return game.SwitchStop
+        
+    def sw_down_active(self, sw):
+        if self.adjust_id<self.adjust_max:
+            self.process_down()
+        #return game.SwitchStop
+        
+    def process_up(self):
+        if self.adjust_id==0:
+            self.date_layer.adjust_month(1)
+        elif self.adjust_id==1:
+            self.date_layer.adjust_day(1)
+        elif self.adjust_id==2:
+            self.date_layer.adjust_year(1)
+        elif self.adjust_id==3:
+            self.date_layer.adjust_hours(1)
+        elif self.adjust_id==4:
+            self.date_layer.adjust_minutes(1)
+             
+                 
+    def process_down(self):
+        if self.adjust_id==0:
+            self.date_layer.adjust_month(-1)
+        elif self.adjust_id==1:
+            self.date_layer.adjust_day(-1)
+        elif self.adjust_id==2:
+            self.date_layer.adjust_year(-1)
+        elif self.adjust_id==3:
+            self.date_layer.adjust_hours(-1)
+        elif self.adjust_id==4:
+            self.date_layer.adjust_minutes(-1)
+            
+    
+    def sw_enter_active(self,sw):
+        
+        self.adjust_id+=1
+        
+        if self.adjust_id==self.adjust_max:
+            self.date_layer.adjust_completed()
+            self.adjust_layer.set_text("ADJUST COMPLETED",color=dmd.CYAN)
+        else:
+            if self.adjust_id>self.adjust_max:
+                self.adjust_id=0
+                self.date_layer.adjust_month(0) #added to force correct text on a second adjustment run start
+            self.adjust_layer.set_text("ADJUSTING "+self.adjust_types[self.adjust_id].upper(),blink_frames=8,color=dmd.RED)
+
         return game.SwitchStop
         
 

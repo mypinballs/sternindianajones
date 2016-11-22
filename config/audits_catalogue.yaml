@@ -141,6 +141,8 @@ featureAudits:
     label: 'Moonlight Multiball Started'
   mapBankCompleted:
     label: 'Map Bank Completed'
+  finalAdventureStarted:
+    label: 'Final Adventure Started' 
 #this section is for items that o a value against them i.e read and write not just read
 counters:
   credits:

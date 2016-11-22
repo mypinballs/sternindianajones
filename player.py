@@ -19,6 +19,8 @@ class Player(procgame.game.Player):
                 self.player_stats['loops_made']=0
                 self.player_stats['loop_value']=1000000 #1M default
                 self.player_stats['ramps_made']=0
+                self.player_stats['super_pops_required']=100
+                self.player_stats['super_pops_level']=1
                 self.player_stats['dog_fight_running']=False
                 self.player_stats['dog_fights_completed']=0
                 self.player_stats['adventure_letters_collected']=0
@@ -36,12 +38,14 @@ class Player(procgame.game.Player):
                 self.player_stats['mode_running'] = False
                 self.player_stats['mode_running_id'] = 99
                 self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                #self.player_stats['mode_status_tracking']= [0,1,1,1,1,1,1,1,1,1,1,1,1,1] #for testing final adventure more easily
                 self.player_stats['mode_blocking'] = False
                 self.player_stats['mode_paused'] = False
                 self.player_stats['multiball_mode_started'] = False
                 self.player_stats['path_mode_started'] = False
                 self.player_stats['temple_mode_started'] = False
                 self.player_stats['ark_mode_started'] = False
+                self.player_stats['video_mode_started'] = False
                 self.player_stats['lock_lit'] = False
                 self.player_stats['lock_in_progress'] = False
                 self.player_stats['lock_progress_hits'] =0
@@ -93,7 +97,8 @@ class Player(procgame.game.Player):
                 self.player_stats['jones_banks_completed'] = 0
                 self.player_stats['jones_flags']= [False,False,False,False,False]
                 self.player_stats['8ball_multiball_lit'] = False
-                
-                
+                self.player_stats['final_adventure_total']=0
+                self.player_stats['final_adventure_status']=False
+                self.player_stats['final_adventure_started']=False
                 
                 

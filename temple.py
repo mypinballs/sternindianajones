@@ -89,7 +89,7 @@ class Temple(game.Mode):
 
                 
         #switch handlers
-        def sw_templeMotorDown_inactive(self,sw):
+        def sw_templeMotorDown_inactive_for_50ms(self,sw):
             
             if self.temple_state=="closing":
                 self.motor(False)
@@ -103,7 +103,7 @@ class Temple(game.Mode):
             self.log.info('Temple Motor Down Switch is inactive, State is:%s',self.temple_state)
             
         
-        def sw_templeMotorUp_inactive(self,sw):
+        def sw_templeMotorUp_inactive_for_50ms(self,sw):
             
             if self.temple_state=="opening":
                 self.motor(False)

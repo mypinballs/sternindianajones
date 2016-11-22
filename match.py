@@ -38,8 +38,6 @@ class Match(game.Mode):
             self.game.sound.register_sound('success', sound_path+"match_success.aiff")
             self.game.sound.register_sound('fail', sound_path+"match_fail.aiff")
             self.game.sound.register_music('raiders_march', music_path+"raiders_march.aiff")
-            
-            self.reset()
 
 
         def reset(self):

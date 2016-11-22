@@ -66,18 +66,15 @@ class Castle_Grunwald(game.Mode):
             self.lamps = ['cairoSwordsman','xMarksTheSpot']
 
             #var setup
-            self.count = 0
             self.hits = 3
             self.score_value_boost = 5000000
             self.score_value_start = 5000000
             self.score_value_extra = 2000000
-            
-            
-            self.reset()
 
 
         def reset(self):
-           pass
+           self.count = 0
+           
 
         def load_scene_anim(self,count):
             self.bgnd_anim = "dmd/castle_grunwald_scene_"+str(count)+".dmd"
@@ -111,6 +108,8 @@ class Castle_Grunwald(game.Mode):
 
 
         def mode_started(self):
+            self.reset()
+            
             #setup additonal layers
             self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer)
             self.info_layer = dmd.TextLayer(128/2, 26, self.game.fonts['07x5'], "center", opaque=False)

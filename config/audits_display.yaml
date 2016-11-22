@@ -251,3 +251,7 @@ featureAudits:
     type: sum
     cid1: jackpotCollected
     label: 'Total Jackpots Collected'
+  totalFinalAdventuresStarted:
+    type: sum
+    cid1: finalAdventureStarted
+    label: 'Total Final Adventures Started'

@@ -59,9 +59,12 @@ class Get_The_Idol(game.Mode):
             self.lamps = ['templeArrow']
             
             #var setup
-            self.count = 0
             self.score_value_boost = 5000000
-            self.progression_anim_posn = 1
+            
+
+        def reset(self):
+            self.mode_completed = False
+            self.award_locks = self.game.user_settings['Gameplay (Feature)']['Get The Idol Awards Locks']
             
             if self.game.user_settings['Gameplay (Feature)']['Get The Idol Difficulty']=='Easy':
                 self.hits = 2 #number of hits required to keep drops down
@@ -72,11 +75,9 @@ class Get_The_Idol(game.Mode):
             elif self.game.user_settings['Gameplay (Feature)']['Get The Idol Difficulty']=='Hard':
                 self.hits = 5
                 self.progression_amount = 2
-
-
-        def reset(self):
-            self.mode_completed = False
-            self.award_locks = self.game.user_settings['Gameplay (Feature)']['Get The Idol Awards Locks']
+                
+            self.count = 0
+            self.progression_anim_posn = 1
 
 
 #        def load_anim(self,count):

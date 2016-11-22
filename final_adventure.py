@@ -26,12 +26,12 @@ class ModeScoreLayer(dmd.TextLayer):
 
 		return super(ModeScoreLayer, self).next_frame()
 
-class Moonlight(game.Mode):
+class Final_Adventure(game.Mode):
 
 	def __init__(self, game, priority):
-            super(Moonlight, self).__init__(game, priority)
+            super(Final_Adventure, self).__init__(game, priority)
 
-            self.log = logging.getLogger('ij.moonlight_madness')
+            self.log = logging.getLogger('ij.final_adventure')
 
             self.game.sound.register_music('multiball_play', music_path+"multiball.aiff")
             self.game.sound.register_music('multiball_end', music_path+"bonus.aiff")
@@ -96,21 +96,20 @@ class Moonlight(game.Mode):
             # Install switch handlers.
             for switch in self.moonlight_switchnames:
 		self.add_switch_handler(name=switch, event_type='active',delay=None, handler=self.progress)
-
-
+                
         
         def reset(self):
             self.count = 0
             self.million_count = 0
             self.total = 0
             self.played_flag = False
-            self.start_finish = False
             self.ball_ejected = False
+            self.start_finish = False
+            self.start_cleanup = False
             self.jackpot_value = self.jackpot_base
             self.jackpot_x = 1
             self.jackpot_collected = 0
             self.jackpot_status = 'notlit'
-             
              
             self.reset_display_flag()
             self.reset_combos()
@@ -147,17 +146,29 @@ class Moonlight(game.Mode):
             self.log.info("GI FLUTTER")
             self.game.lamps.playfieldGI.schedule(0x000C0F0F,cycle_seconds=1)
             
+        def gi(self,enable=True):
+            if enable:
+                self.game.lamps.playfieldGI.disable()
+            else:
+                self.game.lamps.playfieldGI.enable()
+            
+            self.game.base_game_mode.pops.lighting(enable)
+            
+            
             
         def mode_started(self):
+            self.reset()
+            
+            #setup player stats
             self.multiball_ready = self.game.get_player_stats('multiball_ready')
             self.multiball_started = self.game.get_player_stats('multiball_started')
-            self.multiball_running = self.game.get_player_stats('multiball_running')
+            self.multiball_running = self.game.get_player_stats('multiball_running')         
 
-            #setup
-            self.game.enable_flippers(True)
-            self.game.tilt.reset()
-            self.game.ball_search.enable()
-
+            #cleanup lamps & flashers
+            self.game.effects.drive_lamp('grail','off')
+            self.game.effects.drive_flasher('flasherCrusade','off')
+            
+                
             #set gi
             self.gi_flutter()
 
@@ -166,14 +177,7 @@ class Moonlight(game.Mode):
 
             #reset tracking
             self.reset()
-
-            #add other modes to utilise mechanisms and other logic
-            self.mode_select = Mode_Select(self.game, 60)
            
-            self.game.modes.add(self.mode_select)
-            self.mode_select.mode_enabled = False
-           
-
             
         def mode_stopped(self):
             #tidy up
@@ -182,15 +186,19 @@ class Moonlight(game.Mode):
 
             #set the played flag to true so only happens once per player if enabled
             self.played_flag = True
-            self.game.set_player_stats('moonlight_status',self.played_flag)
+            self.game.set_player_stats('final_adventure_status',self.played_flag)
             #store the total value for the round
-            self.game.set_player_stats('moonlight_total',self.total)
-
-            #remove other modes
-            self.game.modes.remove(self.mode_select)
-
+            self.game.set_player_stats('final_adventure_total',self.total)
+            
+            #reset mode select scenes
+            self.game.base_game_mode.mode_select.reset_scenes()
+            
             #continue game
-            self.game.ball_starting()
+            self.game.trough.launch_balls(1)
+            self.game.enable_flippers(enable=True)
+            self.game.utility.resume_mode_music()
+            
+            self.game.set_player_stats('final_adventure_started',False)
 
 
         def mode_tick(self):
@@ -215,14 +223,15 @@ class Moonlight(game.Mode):
                 if self.multiball_running:
                     self.multiball_tracking()
 
-
                 
         def display_start(self,time=0):             
             bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/scene_ended_bgnd.dmd").frames[0])
-            info_top_layer = dmd.TextLayer(128/2, 6, self.game.fonts['9x7_bold'], "center")
-            info_bottom_layer = dmd.TextLayer(128/2, 18, self.game.fonts['9x7_bold'], "center")
-            info_top_layer.set_text("Moonlight".upper(), color=dmd.PURPLE)
-            info_bottom_layer.set_text("Madness".upper(), color=dmd.PURPLE)
+            info_top_layer = dmd.TextLayer(128/2, 1, self.game.fonts['14x9_bold'], "center")
+            info_bottom_layer = dmd.TextLayer(128/2, 15, self.game.fonts['14x9_bold'], "center")
+            info_top_layer.composite_op='blacksrc'
+            info_bottom_layer.composite_op='blacksrc'
+            info_top_layer.set_text("Final".upper(), color=dmd.PURPLE)
+            info_bottom_layer.set_text("Adventure".upper(), color=dmd.PURPLE)
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_top_layer,info_bottom_layer])
             
             self.delay(name='display_mode_info_delay',delay=time,handler=self.display_info)
@@ -230,7 +239,7 @@ class Moonlight(game.Mode):
         
         def display_info(self):
             bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/scene_ended_bgnd.dmd").frames[0])
-            self.title_layer.set_text("Moonlight Madness".upper(), color=dmd.PURPLE)
+            self.title_layer.set_text("Final Adventure".upper(), color=dmd.PURPLE)
             self.info_layer.set_text("All Switches = ".upper()+str(locale.format("%d", self.base_value, True)), color=dmd.CYAN)
             #self.title_layer.composite_op='blacksrc'
             #self.info_layer.composite_op='blacksrc'
@@ -246,13 +255,16 @@ class Moonlight(game.Mode):
             self.delay(name='animation_end_delay', event_type=None, delay=time, handler=self.display_info)
 
 
-        def display_total(self,time=0):            
+        def display_total(self,time=0):   
+            self.cancel_delayed('animation_end_delay')
             bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/scene_ended_bgnd.dmd").frames[0])
             title_layer = dmd.TextLayer(128/2, 4, self.game.fonts['8x6'], "center")
             value_layer = ModeScoreLayer(128/2, 15, self.game.fonts['num_14x10'], self)
-            title_layer.set_text("Moonlight Total".upper(), color=dmd.PURPLE)
+            title_layer.set_text("Adventure Total".upper(), color=dmd.PURPLE)
             value_layer.set_text(locale.format("%d", self.total, True), color=dmd.GREEN)
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,value_layer,title_layer])
+            
+            self.delay(name='minimum_total_score_display_timer',delay=time,handler=self.start_cleanup_allowed)
 
 
         def display_finish(self,time=0):             
@@ -311,6 +323,8 @@ class Moonlight(game.Mode):
             #update the flag
             self.multiball_started = True
             self.game.set_player_stats('multiball_started',self.multiball_started)
+            
+            self.game.set_player_stats('final_adventure_started',True)
 
             #display mode info
             self.display_start(3)
@@ -320,11 +334,12 @@ class Moonlight(game.Mode):
 
             #change music
             self.game.sound.stop_music()
-            self.game.sound.play_music('multiball_play',-1)
+            self.game.sound.play_music('multiball_play',loops=-1)
+            self.log.info('multiball music started')
 
             self.delay(name='multiball_eject_delay',delay=start_speech_length+1, handler=self.multiball_eject)
 
-            audits.record_value(self.game,'moonlightMultiballStarted')
+            audits.record_value(self.game,'finalAdventureStarted')
 
 
         def multiball_eject(self):
@@ -354,13 +369,17 @@ class Moonlight(game.Mode):
 
         def multiball_tracking(self):
             #end check
-            if self.balls_in_play==1 and not self.start_finish:
-
+            if self.balls_in_play<=1 and not self.start_finish:
+                
                 #update flag
                 self.start_finish = True
-
+            
                 #cancel award
                 self.jackpot('cancelled')
+                
+                #update base mode so game can continue uninterupted by drain when ready
+                self.game.base_game_mode.ball_served = False
+                self.game.base_game_mode.ball_starting = True
 
                 #disable all lamps
                 for lamp in self.game.lamps:
@@ -372,18 +391,20 @@ class Moonlight(game.Mode):
 
                 #multiball ended callback
                 if self.end_callback:
-                    self.log.debug('Moonlight Multiball End Callback Called')
+                    self.log.debug('Final Adventure End Callback Called')
                     self.end_callback()
 
                 #disable flippers
                 self.game.enable_flippers(enable=False)
+                #reset GI
+                self.gi(enable=True)
 
                 #calc total & display
                 self.total = (self.count*self.base_value)+(self.jackpot_collected*self.jackpot_value)
-                self.display_total()
+                self.display_total(time=4) #sets start_cleanup flag after delay
+                
 
-
-            elif self.balls_in_play==0: #all balls now drained
+            elif self.balls_in_play==0 and self.start_cleanup: #all balls now drained and cleanup flag set
 
                 #end tracking & update player stats
                 self.multiball_running=False
@@ -397,11 +418,8 @@ class Moonlight(game.Mode):
                 #play end jingle
                 self.game.sound.fadeout_music()
                 self.game.sound.play('multiball_finish')
-                
-                #zero score
-                self.game.current_player().score = 0
 
-                wait =3
+                wait =2
                 self.display_finish(wait)
                 self.delay(delay=wait,handler=self.finish)    
                 
@@ -410,6 +428,10 @@ class Moonlight(game.Mode):
             if self.game.trough.num_balls_to_launch==0:
                 self.game.ball_save.start(num_balls_to_save=self.balls_needed, time=self.ball_save_time, now=True, allow_multiple_saves=True)
     
+    
+        def start_cleanup_allowed(self):
+            #update flag
+            self.start_cleanup = True
 
         def finish(self):
             self.game.modes.remove(self)

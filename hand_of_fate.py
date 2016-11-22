@@ -19,7 +19,7 @@ music_path = game_path +"music/"
 
 class Hand_Of_Fate(game.Mode):
 
-	def __init__(self, game, priority, mode_select):
+	def __init__(self, game, priority):
             super(Hand_Of_Fate, self).__init__(game, priority)
 
             self.log = logging.getLogger('ij.HandOfFate')
@@ -39,14 +39,12 @@ class Hand_Of_Fate(game.Mode):
 
             self.list =['Lite Extra Ball','Dog Fight Hurry Up','Eternal Life','Bonus X','10 Million','20 Million','Frankenstein Millions','Super Jets','Lock Ball','Lite POA','Lite Loops','Spot Friend','Quick Multi-Ball']
 
-            self.mode_select = mode_select
-            self.reset()
             
             #mode links
             self.advance_bonusx = None
             
             #special modes
-            self.frankenstein = Frankenstein(self.game, 96,self.mode_select)
+            self.frankenstein = Frankenstein(self.game, 96)
 
 
         def reset(self):
@@ -56,11 +54,14 @@ class Hand_Of_Fate(game.Mode):
 
 
         def mode_started(self):
+            self.reset()
             self.ready()
 
         
         def mode_stopped(self):
             self.set_status('off')
+            #re-enable ball search
+            self.game.ball_search.enable()
             
         
         def get_status(self):
@@ -155,6 +156,9 @@ class Hand_Of_Fate(game.Mode):
             self.layer = display_layer
             
             self.game.sound.play('hof_lit')
+            
+            #disable ball search
+            self.game.ball_search.disable()
 
 
 #        def choices(self):
@@ -368,25 +372,28 @@ class Hand_Of_Fate(game.Mode):
 
             #add a callback to mode select to continue logic - start any modes enabled, if not blocked
             if not self.game.get_player_stats('mode_blocking'):
-                self.mode_select.start_scene()
+                  self.game.base_game_mode.mode_select.start_scene()
 
             #remove self
             self.game.modes.remove(self)
 
-
-#        def eject(self):
-#            self.game.coils.leftEject.pulse()
-#            self.clear()
             
-        def sw_grailEject_active_for_500ms(self,sw):
-            if self.status=='lit' and not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_running'):
-                #self.animation()
-                self.choices()
+        def sw_grailEject_active_for_500ms(self,sw): #this works in conjunction with the mode_select grailEject swtich handler
+            if self.status=='lit':
+                #catch all events that should stop hof starting and cause a skip to the start scene eject logic
+                if not self.game.get_player_stats('multiball_started') and not self.game.get_player_stats('quick_multiball_running') and not self.game.get_player_stats('lock_in_progress') and not self.game.get_player_stats('dog_fight_running') and not self.game.get_player_stats('multiball_mode_started'):
+                     self.choices()
+                else: 
+                     self.game.base_game_mode.mode_select.start_scene()
+    
+           
                 #return procgame.game.SwitchStop
+
 
 #        def sw_leftInlane_active(self,sw):
 #            if self.status=='ready':
 #                self.set_status('lit')
+
 
         def sw_rightInlane_active(self,sw):
             if self.status=='ready':

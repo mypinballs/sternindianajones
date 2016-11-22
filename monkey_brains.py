@@ -52,8 +52,6 @@ class Monkey_Brains(game.Mode):
 
             #lamps setup
             self.lamps = ['leftLoopArrow','rightLoopArrow','templeArrow','rightRampArrow']
-            
-            self.reset()
 
 
         def reset(self):
@@ -88,6 +86,8 @@ class Monkey_Brains(game.Mode):
 
 
         def mode_started(self):
+            self.reset()
+            
             #load player stats
             self.burps_collected = self.game.get_player_stats('burps_collected');
             

@@ -26,6 +26,7 @@ from werewolf import *
 from raven_bar import *
 from warehouse_raid import *
 from jones_vs_aliens import *
+from final_adventure import *
 
 
 base_path = config.value_for_key_path('base_path')
@@ -48,13 +49,8 @@ class Mode_Select(game.Mode):
             self.game.sound.register_sound('scene_started', sound_path+'mode_started.aiff')
             self.game.sound.register_sound('scene_ended', sound_path+'mode_ended.aiff')
 
-            self.name_text =''
-            self.info_text =''
-            self.info2_text =''
-
             self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','jonesVsAliens']
-            self.choice_id =0
-
+           
             #default mode bonus value
             self.mode_bonus_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Bonus Value (Mil)'])*1000000 #2000000
             self.mode_start_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Start Value (Mil)'])*1000000 #5000000
@@ -62,20 +58,6 @@ class Mode_Select(game.Mode):
             #default timer value
             self.timer=30
             self.pause_length = self.game.user_settings['Gameplay (Feature)']['Mode Timers Pause Length']
-            
-            self.total_score = 0
-            
-            self.timer_layer = None
-            
-            #setup mode enabled flag from game settings
-            if self.game.user_settings['Gameplay (Feature)']['Mode Start Lit']!='Off':
-                self.mode_enabled = True
-            else:
-                self.mode_enabled = False
-            self.game.set_player_stats('mode_enabled',self.mode_enabled)
-
-            #setup mode running flag
-            self.mode_running = False
             
             #setup game modes
             self.get_the_idol = Get_The_Idol(self.game, 80,self)
@@ -93,6 +75,7 @@ class Mode_Select(game.Mode):
             self.choose_wisely = Choose_Wisely(self.game, 91,self)
             self.warehouse_raid = Warehouse_Raid(self.game, 92,self)
             self.jones_vs_aliens = Jones_Vs_Aliens(self.game, 93,self)
+            self.final_adventure = Final_Adventure(self.game,150)
             
              #setup the switches which pause an active mode
             self.mode_pausing_switchnames = []
@@ -100,11 +83,30 @@ class Mode_Select(game.Mode):
                     self.mode_pausing_switchnames.append(switch.name)
                     self.log.info("Mode Pausing Switch is:"+switch.name)
 
-            self.reset()
 
         def reset(self):
+            self.choice_id =0
+            #setup flags
+            self.mode_running = False
             self.secret_mode = False
+            self.all_scenes_complete = False
+            
+            #setup mode enabled flag from game settings
+            if self.game.user_settings['Gameplay (Feature)']['Mode Start Lit']!='Off':
+                self.mode_enabled = True
+            else:
+                self.mode_enabled = False
+                
+            self.total_score = 0
+            self.timer_layer = None
+            
+            self.name_text =''
+            self.info_text =''
+            self.info2_text =''
+            
+            #reset lamps
             self.reset_lamps()
+            
 
         def reset_lamps(self):
             #loop round and turn off all lamps
@@ -112,6 +114,18 @@ class Mode_Select(game.Mode):
                 self.game.effects.drive_lamp(self.lamp_list[i],'off')
 
             self.mode_start_lamp(self.mode_enabled)
+            
+            
+        def reset_scenes(self):
+            #celar completed scenes
+            self.select_list= [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            self.game.set_player_stats('mode_status_tracking',self.select_list)
+            self.all_scenes_complete = False
+            
+            #setup new scene
+            self.unplayed_scenes()
+            self.mode_enabled=True
+
 
         def mode_start_lamp(self,flag):
             lamp_name ='grail'
@@ -119,10 +133,17 @@ class Mode_Select(game.Mode):
                 self.game.effects.drive_lamp(lamp_name,'medium')
             else:
                 self.game.effects.drive_lamp(lamp_name,'off')
+                
+            if self.all_scenes_complete:
+                self.game.effects.drive_lamp(lamp_name,'fast')
 
 
         def mode_started(self):
             self.log.info("Main Mode Select Started")
+            
+            self.reset()
+            
+            self.game.set_player_stats('mode_enabled',self.mode_enabled)
             
             #setup pause switch handlers
             for switch in self.mode_pausing_switchnames:
@@ -142,9 +163,8 @@ class Mode_Select(game.Mode):
             pass
 
         def mode_stopped(self):
-            #update player stats
-            self.game.set_player_stats('current_mode_num',self.current_mode_num)
-            self.game.set_player_stats('mode_status_tracking',self.select_list)
+            #cancel timers
+            self.cancel_delayed('scene_timeout')
 
             #clean up any running modes
             if self.mode_running:
@@ -152,9 +172,13 @@ class Mode_Select(game.Mode):
                 self.remove_selected_scene()
                 #call the common end scene code
                 self.end_scene_common(0.1)
+                
+            #update player stats
+            self.game.set_player_stats('current_mode_num',self.current_mode_num)
+            self.game.set_player_stats('mode_status_tracking',self.select_list)
 
 
-        def mode_paused(self,sw):
+        def mode_paused(self,sw=None):
             if self.mode_running:
                 if self.current_mode_num==0:
                     self.timer_layer = self.get_the_idol.timer_layer
@@ -181,12 +205,15 @@ class Mode_Select(game.Mode):
                     self.cancel_delayed('scene_unpause')
                     if sw !=None:
                         self.delay(name='scene_unpause', delay=self.pause_length,handler=self.mode_unpaused)
+                    
+                    self.game.set_player_stats('mode_paused',True)
             
             
         def mode_unpaused(self):
             if self.mode_running and self.timer_layer:
                 self.timer_layer.pause(False) 
                 self.delay(name='scene_timeout', event_type=None, delay=self.timer_layer.get_time_remaining(), handler=self.end_scene)
+                self.game.set_player_stats('mode_paused',False)
         
         
         def update_lamps(self):
@@ -215,30 +242,33 @@ class Mode_Select(game.Mode):
                 if self.select_list[i]==0:
                     choice_list.append(i)
            
-            #adjust choice number
-            if dirn=='left':
-                self.choice_id -=1
-            elif dirn=='right':
-                self.choice_id +=1
+            if len(choice_list)>0:
+               
+                #adjust choice number
+                if dirn=='left':
+                    self.choice_id -=1
+                elif dirn=='right':
+                    self.choice_id +=1
+                else:
+                    self.choice_id = random.randint(0, len(choice_list)-1)
+
+                #create wrap around
+                if self.choice_id>len(choice_list)-1:
+                    self.choice_id=0
+                elif self.choice_id<0:
+                    self.choice_id=len(choice_list)-1
+
+                #set new mode number
+                self.current_mode_num = choice_list[self.choice_id]
+
+                self.log.debug("mode now active:"+str(self.lamp_list[self.current_mode_num]))
             else:
-                self.choice_id = random.randint(0, len(choice_list)-1)
-
-            #create wrap around
-            if self.choice_id>len(choice_list)-1:
-                self.choice_id=0
-            elif self.choice_id<0:
-                self.choice_id=len(choice_list)-1
-
-            #set new mode number
-            self.current_mode_num = choice_list[self.choice_id]
-
+                self.all_scenes_complete = True
+                self.mode_enabled = False
+                self.game.effects.drive_flasher('flasherCrusade',style='super',time=0)
+            
             #update lamps
             self.update_lamps()
-
-            self.log.debug("mode now active:"+str(self.lamp_list[self.current_mode_num]))
-
-           
-
 
 
         def move_left(self):
@@ -269,11 +299,18 @@ class Mode_Select(game.Mode):
             self.game.coils.grailEject.pulse()
             #reset the temple ball count
             self.game.temple.balls=0
+            
+            #continue any active mode timers paused by this or other entries to the scoops (ball lock etc)
+            self.mode_unpaused()
      
 
         def start_scene(self):
-            if self.mode_enabled and self.game.get_player_stats('multiball_running')==False and self.game.get_player_stats('quick_multiball_running')==False and self.game.get_player_stats('lock_in_progress')==False and self.game.get_player_stats('dog_fight_running')==False:
-
+            if self.mode_enabled and self.game.get_player_stats('multiball_started')==False and self.game.get_player_stats('quick_multiball_running')==False and self.game.get_player_stats('lock_in_progress')==False and self.game.get_player_stats('dog_fight_running')==False:
+                
+                self.name_text =''
+                self.info_text =''
+                self.info2_text =''
+            
                 #play sound
                 self.game.sound.play("scene_started")
 
@@ -386,7 +423,7 @@ class Mode_Select(game.Mode):
                 #score
                 self.game.score(self.mode_start_value)
                 
-            elif self.mode_running and self.game.get_player_stats('multiball_running')==False and self.game.get_player_stats('quick_multiball_running')==False and self.game.get_player_stats('lock_in_progress')==False and self.game.get_player_stats('dog_fight_running')==False:
+            elif self.mode_running and self.game.get_player_stats('multiball_started')==False and self.game.get_player_stats('quick_multiball_running')==False and self.game.get_player_stats('lock_in_progress')==False and self.game.get_player_stats('dog_fight_running')==False  and self.game.get_player_stats('multiball_mode_started')== False:
                 self.mode_bonus()
             else:
                 timer = 0
@@ -394,11 +431,18 @@ class Mode_Select(game.Mode):
                 if self.game.get_player_stats('multiball_started')  or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress') or self.game.get_player_stats('dog_fight_running'):
                     timer =2
                     
+                if self.game.get_player_stats('multiball_mode_started'):
+                    timer =1
+                    
                 #hold a ball for while multiball running for multiple jackpots use
                 if self.game.get_player_stats('multiball_running'): 
                     timer = 10
                     if self.game.temple.balls==self.game.trough.num_balls_in_play: #dont hold if all balls are in temple subway
                         timer=0
+                        
+                #check for scene completetion and therefore start final adventure
+                if self.all_scenes_complete and not self.game.get_player_stats('final_adventure_started'):
+                    self.start_final_adventure()
                     
                 self.delay(name='eject_delay', event_type=None, delay=timer, handler=self.eject_ball)
                 
@@ -479,6 +523,7 @@ class Mode_Select(game.Mode):
             self.info_layer.set_text(self.info_text, color=dmd.CYAN)
             self.info2_layer.set_text(self.info2_text, color=dmd.CYAN)
 
+
         def scene_start_delay(self):
             time = 2
 
@@ -491,8 +536,10 @@ class Mode_Select(game.Mode):
                 self.delay(name='clear_delay', event_type=None, delay=time, handler=self.clear)
                 self.ssd_count+=1
 
+
         def cancel_timeout(self):
-            self.cancel_delayed("scene_timeout")
+            self.cancel_delayed('scene_timeout')
+
 
         def end_scene(self):
             #play sound
@@ -510,8 +557,12 @@ class Mode_Select(game.Mode):
 
             #call the common end scene code
             self.end_scene_common(3)
+          
             
         def end_scene_common(self,timer):
+            #cancel any running timers in case mode was completed
+            self.cancel_delayed('scene_timeout')
+            
             #update mode completed status tracking
             self.select_list[self.current_mode_num] =1
             #set next mode to be played
@@ -537,10 +588,18 @@ class Mode_Select(game.Mode):
             self.game.utility.resume_mode_music()  
             
             
+        def start_final_adventure(self):
+            self.game.modes.add(self.final_adventure)
+            self.mode_enabled = False
+            
+            
         def mode_bonus(self):
             timer=2
             self.game.screens.mode_bonus(timer,self.mode_bonus_value)
             self.delay(name='eject_delay', event_type=None, delay=timer-1, handler=self.eject_ball)
+            
+            #pause any active modes for bonus
+            self.mode_paused()
 
             audits.record_value(self,'modeBonus')
 
@@ -580,14 +639,14 @@ class Mode_Select(game.Mode):
                 self.move_right()
 
         def sw_leftLoopTop_active(self, sw):
-            if not self.mode_enabled and not self.mode_running:
+            if not self.mode_enabled and not self.mode_running and not self.all_scenes_complete:
                 self.mode_enabled=True
                 self.game.set_player_stats('mode_enabled',self.mode_enabled)
 
                 self.mode_start_lamp(self.mode_enabled)
 
         def sw_rightLoopTop_active(self, sw):
-            if not self.mode_enabled and not self.mode_running:
+            if not self.mode_enabled and not self.mode_running and not self.all_scenes_complete:
                 self.mode_enabled=True
                 self.game.set_player_stats('mode_enabled',self.mode_enabled)
                 

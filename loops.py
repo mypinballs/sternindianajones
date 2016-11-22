@@ -19,13 +19,10 @@ sound_path = game_path +"sound/"
 
 class Loops(game.Mode):
 
-	def __init__(self, game, priority, mode1):
+	def __init__(self, game, priority):
             super(Loops, self).__init__(game, priority)
 
             self.log = logging.getLogger('ij.loops')
-
-            #setup mode links
-            self.indy_lanes = mode1
 
             self.text_layer = dmd.TextLayer(128/2, 1, self.game.fonts['23x12'], "center", opaque=False)
             self.text_layer.composite_op ="blacksrc"
@@ -39,30 +36,18 @@ class Loops(game.Mode):
             self.game.sound.register_sound('dingy', sound_path+"dingy.aiff")
             self.game.sound.register_sound('truck', sound_path+"truck.aiff")
             self.game.sound.register_sound('motorbike', sound_path+"motorbike.aiff")
-
-
-            self.loop_unlit_value = 100000
-            self.loop_value = 0
-
-            self.loops_completed=self.game.get_player_stats('loops_completed')
-            self.loops_made=self.game.get_player_stats('loops_made')
-            self.ramps_made=self.game.get_player_stats('ramps_made')
-            self.friends_collected=self.game.get_player_stats('friends_collected')
-
+            self.game.sound.register_sound('combo_speech', speech_path+"great_shot.aiff")
+            
             self.loop_lamps = ['leftLoopArrow','rightLoopArrow']
-            self.loop_flag = [False,False]
-
-
-
-
-            #setup loop collection order
+            
             self.vehicles = ['horse','car','dingy','truck','motorbike']
-            shuffle(self.vehicles)
+            self.loop_unlit_value = 100000
+            self.loop_value = 1000000
+            self.combo_value = 2000000
             
 
-            self.reset()
-
         def reset(self):
+            self.loop_flag = [False,False]
             self.loop_active = False
             self.loop_multiplier=1
             self.side=None
@@ -74,6 +59,8 @@ class Loops(game.Mode):
             
 
         def mode_started(self):
+            self.reset()
+            
             self.loops_completed=self.game.get_player_stats('loops_completed')
             self.loops_made=self.game.get_player_stats('loops_made')
             self.ramps_made=self.game.get_player_stats('ramps_made')
@@ -143,7 +130,7 @@ class Loops(game.Mode):
             if self.loop_multiplier==2:#set the loops progress store only on first successful loop
                 self.loops_completed+=1
                 self.game.set_player_stats('loops_completed',self.loops_completed)
-                #self.indy_lanes.update_friend_lamps()
+                #self.game.base_game_mode.indy_lanes.update_friend_lamps()
                 
         def jackpot(self):
             pass
@@ -158,6 +145,33 @@ class Loops(game.Mode):
             self.game.score(self.loop_unlit_value)
             self.game.sound.play('unlit')
             self.loop_multiplier=1
+            
+            
+        def combo(self,side):
+            run_length= self.game.sound.play_voice('combo_speech')
+        
+            #self.active_prompt.right[self.fanfareIndex].upper() 
+            #info_layer = dmd.AnimatedTextLayer(128/2, 7, self.game.fonts['9x7_bold'], "center",4)
+            info_layer1 = dmd.TextLayer(128/2, 2, self.game.fonts['14x9_bold'], "center", opaque=False)
+            info_layer1.composite_op ="blacksrc"
+            info_layer1.set_text('2 WAY',color=dmd.ORANGE, blink_frames=3)
+            info_layer2 = dmd.TextLayer(128/2, 18, self.game.fonts['9x7_bold'], "center", opaque=False)
+            info_layer2.composite_op ="blacksrc"
+            info_layer2.set_text('COMBO',color=dmd.YELLOW)
+        
+            bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/tile_bgnd.dmd").frames[0])
+            #combine the parts together
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer, info_layer2, info_layer1]) 
+            
+            #update score
+            self.game.score(self.combo_value)
+         
+            self.delay(name='clear_combo', event_type=None, delay=run_length+1, handler=lambda:self.combo_clear(side))
+                
+        def combo_clear(self,side):
+            self.clear()
+            self.sequence(side)
+            
 
         def enable_loop(self,num):
             self.friends_collected = self.game.get_player_stats('friends_collected')
@@ -199,7 +213,10 @@ class Loops(game.Mode):
                 if self.game.switches.leftLoopTop.time_since_change()<=1.5 and self.game.switches.leftLoopBottom.time_since_change()<=1.5:
                     self.multiplier()
 
-                self.sequence(self.side)
+                if self.game.switches.rightRampMade.time_since_change()<=2:
+                    self.combo(self.side)
+                else:
+                    self.sequence(self.side)
 
 
         def sw_leftInlane_active(self,sw):

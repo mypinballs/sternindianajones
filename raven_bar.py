@@ -122,7 +122,6 @@ class Raven_Bar(game.Mode):
             self.lamps = []
             
 
-
         def reset(self):
             #load stored vars from settings
             #self.timer = int(self.game.user_settings['Gameplay (Feature)']['Tank Chase Timer'])
@@ -670,6 +669,9 @@ class Raven_Bar(game.Mode):
             #self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
             #self.info_layer = dmd.TextLayer(128/2, 20, self.game.fonts['07x5'], "center", opaque=False)
             #self.info_layer.set_text("SHOOT LIT SHOTS",blink_frames=1000)
+            
+            #update mode player stats
+            self.game.set_player_stats('video_mode_started',True)
 
             #show instructions
             self.instructions()
@@ -706,6 +708,9 @@ class Raven_Bar(game.Mode):
                 
             self.game.set_player_stats('raven_bar_score',score_value)
             self.game.set_player_stats('last_mode_score',score_value)
+            
+            #update mode player stats
+            self.game.set_player_stats('video_mode_started',False)
 
 
             #cancel speech calls

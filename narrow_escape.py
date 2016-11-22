@@ -29,16 +29,13 @@ class Narrow_Escape(game.Mode):
 
             self.game.sound.register_sound('escape', sound_path+"narrow_escape.aiff")
 
-            
-            self.reset()
-
 
         def reset(self):
            pass
 
 
         def mode_started(self):
-            pass
+            self.reset()
 
         def mode_tick(self):
             pass

@@ -73,10 +73,25 @@ class BaseGameMode(game.Mode):
                     
                 self.game.sound.register_sound('outlane_speech', speech_path+"blank.aiff")
 
-                #setup flags
-                self.ball_starting = True
-                self.ball_served= False
-                self.ball_saved = False
+                
+                #setup modes
+                #lower priority basic modes
+                self.pops = Pops(self.game, 40)
+                #self.narrow_escape = Narrow_Escape(self.game, 41)
+                self.jones = Jones(self.game, 41)
+                self.indy_lanes = Indy_Lanes(self.game, 42)
+                
+                #medium priority basic modes
+                self.totem = Totem(self.game, 51)
+                self.plane_chase = Plane_Chase(self.game, 52)
+                self.loops = Loops(self.game, 53)
+
+                #self.skillshot = Skillshot(self.game, 54)
+                self.mode_select = Mode_Select(self.game, 60)
+
+                #higher priority basic modes
+                self.multiball = Multiball(self.game, 95)#61
+                self.poa = POA(self.game, 96)
 
 
 	def mode_started(self):
@@ -103,7 +118,10 @@ class BaseGameMode(game.Mode):
 		# Enable the flippers
                 #print "Game Config: "+str(self.game.config)
 		self.game.enable_flippers(True)
-
+                
+                #setup flags
+                self.ball_served= False
+                self.ball_saved = False
                 # Each time this mode is added to game Q, set this flag true.
 		self.ball_starting = True
 
@@ -123,8 +141,6 @@ class BaseGameMode(game.Mode):
 		# handler.
 		self.game.trough.drain_callback = self.ball_drained_callback
 
-
-
                 #ball save callback - exp
                 self.game.ball_save.callback = self.ball_save_callback
 
@@ -134,29 +150,7 @@ class BaseGameMode(game.Mode):
 
         def add_basic_modes(self,ball_in_play):
 
-
-        #if self.game.ball==1:
-            #lower priority basic modes
-            self.pops = Pops(self.game, 40)
-            #self.narrow_escape = Narrow_Escape(self.game, 41)
-            self.jones = Jones(self.game, 41)
-
-            #medium priority basic modes
-            self.totem = Totem(self.game, 51)
-            self.plane_chase = Plane_Chase(self.game, 52)
-            #self.skillshot = Skillshot(self.game, 54)
-            self.mode_select = Mode_Select(self.game, 60)
-
-            #higher priority basic modes
-            self.multiball = Multiball(self.game, 95)#61
-            self.poa = POA(self.game, 96)
-            
-            
-            #modes with links to other modes
-            self.indy_lanes = Indy_Lanes(self.game, 42, self.mode_select)
-            self.loops = Loops(self.game, 43, self.indy_lanes)
-
-            #start modes
+            #add modes
             self.game.modes.add(self.pops)
             #self.game.modes.add(self.narrow_escape)
             self.game.modes.add(self.jones)
@@ -215,7 +209,7 @@ class BaseGameMode(game.Mode):
 		# switches being hit.
 		self.game.ball_search.disable()
 
-            #if self.game.ball==0:
+
                 self.game.modes.remove(self.pops)
                 #self.game.modes.remove(self.narrow_escape)
                 self.game.modes.remove(self.jones)
@@ -230,7 +224,7 @@ class BaseGameMode(game.Mode):
                 
 	def ball_drained_callback(self):
                 # temp addition of ball_served flag checking to try and resolve trough ball launch bounce in
-		if self.game.trough.num_balls_in_play == 0 and self.ball_served:
+		if self.game.trough.num_balls_in_play == 0 and self.ball_served and not self.game.get_player_stats('final_adventure_started'):
                     # End the ball
                     self.finish_ball()
 

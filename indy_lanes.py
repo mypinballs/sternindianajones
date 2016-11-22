@@ -22,15 +22,13 @@ music_path = game_path +"music/"
 
 class Indy_Lanes(game.Mode):
 
-	def __init__(self, game, priority, mode_select):
+	def __init__(self, game, priority):
             super(Indy_Lanes, self).__init__(game, priority)
 
             self.log = logging.getLogger('ij.indy_lanes')
 
-            self.mode_select = mode_select
-            self.hof = Hand_Of_Fate(self.game,95,mode_select)#95 priority+1
+            self.hof = Hand_Of_Fate(self.game,95)#95 priority+1
            
-
             self.bonus_layer = dmd.TextLayer(90, -1, self.game.fonts['num_09Bx7'], "center", opaque=False)
             self.bonus_layer.composite_op="blacksrc"
             self.loop_layer = dmd.TextLayer(90, 24, self.game.fonts['6x6_bold'], "center", opaque=False)
@@ -55,6 +53,13 @@ class Indy_Lanes(game.Mode):
 
             #self.bonus_lamps = ['bonus2X','bonus4X','bonus6X','bonus8X']
 
+            
+            self.loop_base_value = 1000000
+            self.lane_unlit_value = 50000
+            self.lane_lit_value = 10000
+
+
+        def reset(self):
             self.friends_collected = 0
             self.friend_dmd_image =""
             self.friend_sound_call = ""
@@ -66,17 +71,10 @@ class Indy_Lanes(game.Mode):
 
             self.bonusx = 0
             self.loop_value =0
-            self.loop_base_value = 1000000
-
-            self.lane_unlit_value = 50000
-            self.lane_lit_value = 10000
-            self.reset()
-
-
-        def reset(self):
             self.letters_spotted = 0
             self.lane_flag = [False,False,False,False]
             self.reset_lamps()
+
 
         def reset_lamps(self):
             for i in range(len(self.lamps)):
@@ -88,6 +86,8 @@ class Indy_Lanes(game.Mode):
 
 
         def mode_started(self):
+            self.reset()
+            
             #load player specific data
             #-------------------------
             self.lane_flag = self.game.get_player_stats('indy_lanes_flag')

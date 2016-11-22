@@ -52,14 +52,9 @@ class Totem(game.Mode):
 
             self.totem_value_start = 2000000
             self.totem_value_boost = 1000000
-
             self.jackpot_base_value = 10000000
             self.jackpot_boost_value = 500000
-
             self.add_ball_value = 1000000
-
-            self.multiball_started = False
-            self.multiball_running = False
             self.balls_needed = 2
             
             self.map_lamps = ['mapM','mapA','mapP']
@@ -114,7 +109,9 @@ class Totem(game.Mode):
 
 
         def mode_stopped(self):
-            self.reset()
+            self.clear()
+            self.game.effects.drive_flasher('flasherBackpanel','off')
+            self.cancel_delayed('timeout_delay')
             
 
         def mode_tick(self):
@@ -518,7 +515,7 @@ class Totem(game.Mode):
             
 
         def sw_grailEject_active(self, sw):
-            if self.multiball_running and self.add_a_ball_active and not self.game.get_player_stats('multiball_running'): #only do this if the main multiball is not running also and ball enters front wise (not jet hits)
+            if self.multiball_running and self.add_a_ball_active and not self.game.get_player_stats('multiball_running') and not self.game.get_player_stats('lock_in_progress') and not self.game.get_player_stats('multiball_mode_started'): #only do this if the main multiball is not running or lock in progress or other multiball modes running also and ball enters front wise (not jet hits)
                 self.game.screens.add_ball(2,self.add_ball_value)
                 self.launch_ball()
 
