@@ -231,22 +231,18 @@ PRSwitches:
         number: S41
         tags: moonlight
         label: 'Adventure (E2)'
-    adventureR:
+    adventureUR:
         number: S42
         tags: moonlight
-        label: 'Adventure (R)'
-    adventureU:
-        number: S42
-        tags: moonlight
-        label: 'Adventure (U)'
+        label: 'Adventure (U & R)'
     adventureT:
         number: S43
         tags: moonlight
         label: 'Adventure (T)'
-    adventureN:
+    adventureE1N:
         number: S44
         tags: moonlight
-        label: 'Adventure (N)'
+        label: 'Adventure (E1 & N)'
     mapEject:
         number: S45
         label: 'Map Eject'
@@ -294,10 +290,6 @@ PRSwitches:
         number: S57
         tags: moonlight
         label: 'Adventure (V)'
-    adventureE1:
-        number: S57
-        tags: moonlight
-        label: 'Adventure (E1)'
     leftLoopTop:
         number: S58
         tags: moonlight,poa_pause,mode_pause

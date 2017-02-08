@@ -298,6 +298,13 @@ Gameplay (Feature):
     options: [20,90]
     increments: 5
     default: 60
+  'Ringmaster Timer':
+    options: [20,90]
+    increments: 5
+    default: 30
+  'Ringmaster Extras':
+    options: ['Yes','No']
+    default: 'Yes'
   'Frankenstein Timer':
     options: [20,90]
     increments: 5

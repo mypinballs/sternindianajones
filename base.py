@@ -11,6 +11,7 @@ from procgame import *
 from random import *
 from service import *
 from bonus import *
+from spinner import *
 from pops import *
 from jones import *
 #from narrow_escape import *
@@ -76,10 +77,11 @@ class BaseGameMode(game.Mode):
                 
                 #setup modes
                 #lower priority basic modes
-                self.pops = Pops(self.game, 40)
+                self.spinner = Spinner(self.game, 40)
+                self.pops = Pops(self.game, 41)
                 #self.narrow_escape = Narrow_Escape(self.game, 41)
-                self.jones = Jones(self.game, 41)
-                self.indy_lanes = Indy_Lanes(self.game, 42)
+                self.jones = Jones(self.game, 42)
+                self.indy_lanes = Indy_Lanes(self.game, 43)
                 
                 #medium priority basic modes
                 self.totem = Totem(self.game, 51)
@@ -151,6 +153,7 @@ class BaseGameMode(game.Mode):
         def add_basic_modes(self,ball_in_play):
 
             #add modes
+            self.game.modes.add(self.spinner)
             self.game.modes.add(self.pops)
             #self.game.modes.add(self.narrow_escape)
             self.game.modes.add(self.jones)
@@ -209,7 +212,7 @@ class BaseGameMode(game.Mode):
 		# switches being hit.
 		self.game.ball_search.disable()
 
-
+                self.game.modes.remove(self.spinner)
                 self.game.modes.remove(self.pops)
                 #self.game.modes.remove(self.narrow_escape)
                 self.game.modes.remove(self.jones)

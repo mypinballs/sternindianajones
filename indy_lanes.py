@@ -69,8 +69,8 @@ class Indy_Lanes(game.Mode):
             self.shorty = False
             self.dr_jones = False
 
-            self.bonusx = 0
-            self.loop_value =0
+            self.bonusx = 1
+            self.loop_value =self.loop_base_value
             self.letters_spotted = 0
             self.lane_flag = [False,False,False,False]
             self.reset_lamps()
@@ -359,6 +359,6 @@ class Indy_Lanes(game.Mode):
             self.lane_change('left')
 
 
-        def sw_flipperLwR_active(self, sw):
-            self.lane_change('right')
+#        def sw_flipperLwR_active(self, sw):
+#            self.lane_change('right')
 

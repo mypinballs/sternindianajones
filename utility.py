@@ -97,7 +97,7 @@ class Utility(game.Mode):
         
         def resume_mode_music(self):
             self.log.info('Utility Mode Music Resumer Called')
-            self.mode_music_list = ['gti_play','soc_background_play','wos_background_play','rvb_bgnd_play','monkey_brains_play','sts_background_play','minecart_mode_music','rope_bridge_play','castle_grunwald_play','ttc_background_play','tc_background_play','cw_background_play','warehouse_background_play','jones_vs_aliens_play','frankenstein_play']
+            self.mode_music_list = ['gti_play','soc_background_play','wos_background_play','rvb_bgnd_play','monkey_brains_play','sts_background_play','minecart_mode_music','rope_bridge_play','castle_grunwald_play','ttc_background_play','tc_background_play','cw_background_play','warehouse_background_play','jones_vs_aliens_play','ringmaster_play','frankenstein_play']
             mode_running_id = self.game.get_player_stats('mode_running_id')
             mode_running = self.game.get_player_stats('mode_running')
             qm_ready = self.game.get_player_stats('quick_multiball_ready')

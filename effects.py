@@ -79,7 +79,8 @@ class Effects(game.Mode):
                 style = data[1]
                 time = data[2]
                 
-
+            self.cancel_delayed(flasher_name+'_off')
+            
             if style == 'slow':
        		self.game.coils[flasher_name].schedule(schedule=0x00003000, cycle_seconds=cycle, now=True)
             elif style == 'medium':

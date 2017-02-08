@@ -221,6 +221,8 @@ class Trough(procgame.game.Mode):
         def check_trough_eject(self,sw):
             #cancel any queued reset of the tracking count
             self.cancel_delayed('reset_eject_count_delay')
+            #cancel any queued coil retrys - power is working as we are here
+            self.cancel_delayed('nopower_retrycoil')
             # tick up the count with each switch hit
             self.eject_sw_count += 1
             self.log.debug("Trough Eject switch count:%s",self.eject_sw_count)
@@ -294,11 +296,14 @@ class Trough(procgame.game.Mode):
 		# shooter lane.	
 		if self.game.switches[self.shooter_lane_switchname].is_inactive():
 			self.num_balls_to_launch -= 1
-                        #pulse coil
-			self.game.coils[self.eject_coilname].pulse()
-                        self.delay(name='reset_eject_count_delay',delay=1,handler=self.reset_eject_count) #setup a time delay to reset the eject count
                         
-			# Only increment num_balls_in_play if there are no more 
+                        #pulse coil
+			#self.game.coils[self.eject_coilname].pulse()
+                        self.eject_coil()
+                        #setup a time delay to reset the eject count
+                        self.delay(name='reset_eject_count_delay',delay=1,handler=self.reset_eject_count) 
+			
+                        # Only increment num_balls_in_play if there are no more 
 			# stealth launches to complete.
 			if self.num_balls_to_stealth_launch > 0:
 				self.num_balls_to_stealth_launch -= 1
@@ -318,6 +323,11 @@ class Trough(procgame.game.Mode):
 				   handler=self.common_launch_code)
                                    
                                         
+        def eject_coil(self):
+            wait = 1.5
+            self.game.coils[self.eject_coilname].pulse()
+            self.delay(name='nopower_retrycoil', event_type=None, delay=wait, handler=self.eject_coil)
+            
         def mode_stopped(self):
 		self.cancel_delayed('check_switches')
                 

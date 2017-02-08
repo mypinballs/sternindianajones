@@ -37,7 +37,7 @@ class Player(procgame.game.Player):
                 self.player_stats['mode_enabled']=False
                 self.player_stats['mode_running'] = False
                 self.player_stats['mode_running_id'] = 99
-                self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
                 #self.player_stats['mode_status_tracking']= [0,1,1,1,1,1,1,1,1,1,1,1,1,1] #for testing final adventure more easily
                 self.player_stats['mode_blocking'] = False
                 self.player_stats['mode_paused'] = False
@@ -100,5 +100,7 @@ class Player(procgame.game.Player):
                 self.player_stats['final_adventure_total']=0
                 self.player_stats['final_adventure_status']=False
                 self.player_stats['final_adventure_started']=False
-                
-                
+                self.player_stats['spinner_level']=0
+                self.player_stats['ringmasters_defeated'] = 0
+                self.player_stats['ringmaster_smart_bombs'] = 0
+                self.player_stats['ringmaster_score'] = 0

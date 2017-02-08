@@ -339,11 +339,7 @@ class Frankenstein(game.Mode):
             self.mode_progression(5)
             return procgame.game.SwitchStop
         
-        def sw_adventureE1_active(self,sw):
-            self.mode_progression(5)
-            return procgame.game.SwitchStop
-        
-        def sw_adventureN_active(self,sw):
+        def sw_adventureE1N_active(self,sw):
             self.mode_progression(6)
             return procgame.game.SwitchStop
         
@@ -351,11 +347,7 @@ class Frankenstein(game.Mode):
             self.mode_progression(7)
             return procgame.game.SwitchStop
         
-        def sw_adventureU_active(self,sw):
-            self.mode_progression(8)
-            return procgame.game.SwitchStop
-        
-        def sw_adventureR_active(self,sw):
+        def sw_adventureUR_active(self,sw):
             self.mode_progression(8)
             return procgame.game.SwitchStop
         

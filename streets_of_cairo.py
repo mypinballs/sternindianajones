@@ -163,7 +163,12 @@ class Streets_Of_Cairo(game.Mode):
             self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.sprite_layer,self.score_layer,self.timer_layer,self.info_layer,self.award_layer])
 
             
-        def load_dual_anim(self):
+        def load_dual_anim(self): 
+            #cancel any queued delays
+            self.cancel_delayed('monkey_chirp_delay')
+            self.cancel_delayed('create_sprite_layer')
+            self.cancel_delayed('repeat_monkey_move')
+            
             #set mode flag
             self.dual_enabled = True
 
@@ -175,17 +180,23 @@ class Streets_Of_Cairo(game.Mode):
 
             #turn shoot button lamp on - using tournament buttom
             self.game.effects.drive_lamp(self.shoot_button_lamp,'fast')
+            #disable shot lamps
+            self.reset_lamps()
             #start swordsman flasher
-            self.game.effects.drive_flasher('flasherSwordsman','fast',time=2)
+            self.game.effects.drive_flasher('flasherSwordsman','fast',time=0)
+            self.game.effects.drive_flasher('flasherCrusade','fast',time=0)
             
             #play speech & sounds
             self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=1)
-            self.cancel_delayed('monkey_chirp_delay')
+            
             self.dual_swipe(1)
 
-        def load_completed_anim(self):
 
-            self.dual_completed=1
+        def load_completed_anim(self):
+            self.dual_completed+=1 #1=shot with tournament button, 2=shot via shot to mode start
+            
+            if self.dual_completed==2:
+                self.game.set_player_stats('mode_blocking',True)
             
             self.bgnd_anim = "dmd/streets_of_cairo_dual_completed.dmd"
             anim = dmd.Animation().load(game_path+self.bgnd_anim)
@@ -193,7 +204,7 @@ class Streets_Of_Cairo(game.Mode):
             self.bgnd_layer.add_frame_listener(-1,self.award_score)
             #call the mode select end scene sequence here
             self.bgnd_layer.add_frame_listener(-1, self.mode_select.end_scene)
-            self.bgnd_layer.add_frame_listener(-1, self.eject_ball)
+            #self.bgnd_layer.add_frame_listener(-2, self.eject_ball)
             self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.timer_layer,self.info_layer,self.award_layer])
 
             #turn shoot button lamp off
@@ -202,10 +213,12 @@ class Streets_Of_Cairo(game.Mode):
             #play sounds
             self.game.sound.play('gun_shot')
 
+
         def eject_ball(self):
             #create eject delay
-            self.delay(name='eject_delay', event_type=None, delay=2, handler=self.mode_select.eject_ball)
-
+            #self.delay(name='eject_delay', event_type=None, delay=2, handler=self.mode_select.eject_ball)
+            self.delay(name='eject_delay', event_type=None, delay=2, handler=self.game.coils.grailEject.pulse)
+            
 
         def create_monkey_sprite(self,data=None,delay=None):
             
@@ -324,6 +337,9 @@ class Streets_Of_Cairo(game.Mode):
 
             #sit
             self.create_monkey_sprite([posn+(32*0),5],delay)
+            
+            #repeat
+            self.delay(name='repeat_monkey_move',delay=delay+3.5,handler=self.move_monkey)
 
             
         def mode_started(self):
@@ -362,6 +378,7 @@ class Streets_Of_Cairo(game.Mode):
             #update_lamps
             self.update_lamps()
 
+
         def mode_stopped(self):
             #save player stats
 
@@ -371,8 +388,7 @@ class Streets_Of_Cairo(game.Mode):
             score_value = (self.score_value_start*self.count)+(self.score_value_dual*self.dual_completed)
             self.game.set_player_stats('streets_of_cairo_score',score_value)
             self.game.set_player_stats('last_mode_score',score_value)
-
-
+            
             #cancel speech calls
             self.cancel_delayed('mode_speech_delay')
             self.cancel_delayed('aux_mode_speech_delay')
@@ -389,12 +405,19 @@ class Streets_Of_Cairo(game.Mode):
             #close gates
 #            self.close_gates('left')
 #            self.close_gates('right')
+            
+            #eject ball if required
+            if self.dual_completed==2:
+                self.game.set_player_stats('mode_blocking',False)
+                #self.eject_ball()
+                self.game.coils.grailEject.pulse()
 
             #swordsman
             self.game.swordsman.close()
             
             #update effects
             self.game.effects.drive_flasher('flasherSwordsman','off')
+            self.game.effects.drive_flasher('flasherCrusade','off')
 
             #reset lamps
             self.reset_lamps()
@@ -493,38 +516,37 @@ class Streets_Of_Cairo(game.Mode):
 
     
         def sw_leftLoopTop_active(self, sw):
-            if self.game.switches.rightLoopTop.time_since_change()>1:
+            if self.game.switches.rightLoopTop.time_since_change()>1 and not self.dual_enabled:
                 self.mode_progression(0)
 
             return procgame.game.SwitchStop
 
         def sw_captiveBallRear_inactive(self, sw):
-            self.mode_progression(1)
+            if not self.dual_enabled:
+                self.mode_progression(1)
             return procgame.game.SwitchStop
 
         def sw_captiveBallFront_inactive_for_200ms(self, sw):
             return procgame.game.SwitchStop
         
         def sw_rightRampMade_active(self, sw):
-            self.mode_progression(2)
+            if not self.dual_enabled:
+                self.mode_progression(2)
 
             return procgame.game.SwitchStop
 
         def sw_rightLoopTop_active(self, sw):
-            if self.game.switches.leftLoopTop.time_since_change()>1:
+            if self.game.switches.leftLoopTop.time_since_change()>1 and not self.dual_enabled:
                 self.mode_progression(3)
 
             return procgame.game.SwitchStop
 
-        def sw_grailEject_active(self, sw):
+        def sw_grailEject_active_for_400ms(self, sw):
             if self.dual_enabled:
+                self.dual_completed+=1
                 self.load_completed_anim()
                 return procgame.game.SwitchStop
-            #else:
-                #self.mode_bonus()
-
-            
-
+                
         def sw_tournamentStart_active(self, sw):
             if self.dual_enabled:
                 self.score_value_dual =  self.score_value_dual/10

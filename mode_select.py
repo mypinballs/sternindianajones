@@ -26,6 +26,7 @@ from werewolf import *
 from raven_bar import *
 from warehouse_raid import *
 from jones_vs_aliens import *
+from ringmaster import *
 from final_adventure import *
 
 
@@ -49,7 +50,7 @@ class Mode_Select(game.Mode):
             self.game.sound.register_sound('scene_started', sound_path+'mode_started.aiff')
             self.game.sound.register_sound('scene_ended', sound_path+'mode_ended.aiff')
 
-            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','jonesVsAliens']
+            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','jonesVsAliens','kingdom3']
            
             #default mode bonus value
             self.mode_bonus_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Bonus Value (Mil)'])*1000000 #2000000
@@ -75,6 +76,7 @@ class Mode_Select(game.Mode):
             self.choose_wisely = Choose_Wisely(self.game, 91,self)
             self.warehouse_raid = Warehouse_Raid(self.game, 92,self)
             self.jones_vs_aliens = Jones_Vs_Aliens(self.game, 93,self)
+            self.ringmaster = Ringmaster(self.game, 94,self)
             self.final_adventure = Final_Adventure(self.game,150)
             
              #setup the switches which pause an active mode
@@ -87,6 +89,7 @@ class Mode_Select(game.Mode):
         def reset(self):
             self.choice_id =0
             #setup flags
+            self.mode_starting = False
             self.mode_running = False
             self.secret_mode = False
             self.all_scenes_complete = False
@@ -117,8 +120,8 @@ class Mode_Select(game.Mode):
             
             
         def reset_scenes(self):
-            #celar completed scenes
-            self.select_list= [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            #clear completed scenes
+            self.select_list= [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
             self.game.set_player_stats('mode_status_tracking',self.select_list)
             self.all_scenes_complete = False
             
@@ -180,6 +183,7 @@ class Mode_Select(game.Mode):
 
         def mode_paused(self,sw=None):
             if self.mode_running:
+                self.timer_layer = None #clear time_layer reference first as not all modes use this
                 if self.current_mode_num==0:
                     self.timer_layer = self.get_the_idol.timer_layer
                 elif self.current_mode_num==1:
@@ -198,8 +202,10 @@ class Mode_Select(game.Mode):
                     self.timer_layer = self.the_three_challenges.timer_layer
                 elif self.current_mode_num==13:
                     self.timer_layer = self.jones_vs_aliens.timer_layer
+                elif self.current_mode_num==14:
+                    self.timer_layer = self.ringmaster.timer_layer
                 
-                if self.timer_layer:
+                if self.timer_layer !=None:
                     self.timer_layer.pause(True)
                     self.cancel_delayed('scene_timeout')
                     self.cancel_delayed('scene_unpause')
@@ -210,8 +216,9 @@ class Mode_Select(game.Mode):
             
             
         def mode_unpaused(self):
-            if self.mode_running and self.timer_layer:
+            if self.mode_running and self.timer_layer !=None:
                 self.timer_layer.pause(False) 
+                #self.cancel_delayed('scene_timeout')
                 self.delay(name='scene_timeout', event_type=None, delay=self.timer_layer.get_time_remaining(), handler=self.end_scene)
                 self.game.set_player_stats('mode_paused',False)
         
@@ -301,7 +308,13 @@ class Mode_Select(game.Mode):
             self.game.temple.balls=0
             
             #continue any active mode timers paused by this or other entries to the scoops (ball lock etc)
-            self.mode_unpaused()
+            #once mode is under way
+            if not self.mode_starting:
+                self.mode_unpaused()
+            else:
+                self.mode_starting = False
+            
+                
      
 
         def start_scene(self):
@@ -395,6 +408,12 @@ class Mode_Select(game.Mode):
                     self.name_text = 'JONES VS ALIENS'
                     self.info_text = 'DESTROY SHIPS'
                     self.info2_text = 'TO SAVE EARTH'
+                
+                elif self.current_mode_num==14:
+                    self.timer = self.game.user_settings['Gameplay (Feature)']['Ringmaster Timer']
+                    self.name_text = 'RINGMASTER'
+                    self.info_text = 'BATLLE RINGMASTER'
+                    self.info2_text = 'TO SAVE EARTH'
 
                 anim = dmd.Animation().load(game_path+"dmd/start_scene.dmd")
                 self.animation_layer = dmd.AnimatedLayer(frames=anim.frames,hold=True,frame_time=4)
@@ -410,15 +429,11 @@ class Mode_Select(game.Mode):
                 #update mode flags and player stats
                 self.mode_enabled=False
                 self.game.set_player_stats('mode_enabled',self.mode_enabled)
-                self.mode_running = True
-                self.game.set_player_stats('mode_running',self.mode_running)
-                self.game.set_player_stats('mode_running_id',self.current_mode_num)
 
                 #update lamp for mode start
                 self.mode_start_lamp(self.mode_enabled)
-
-                #record audits
-                audits.record_value(self,'modeStarted')
+                
+                self.mode_starting = True
                 
                 #score
                 self.game.score(self.mode_start_value)
@@ -482,6 +497,16 @@ class Mode_Select(game.Mode):
                 self.game.modes.add(self.warehouse_raid)
             elif self.current_mode_num==13:
                 self.game.modes.add(self.jones_vs_aliens)
+            elif self.current_mode_num==14:
+                self.game.modes.add(self.ringmaster)
+                
+            #update mode flags and player stats
+            self.mode_running = True
+            self.game.set_player_stats('mode_running',self.mode_running)
+            self.game.set_player_stats('mode_running_id',self.current_mode_num)
+            #record audits
+            audits.record_value(self,'modeStarted')
+
 
         def remove_selected_scene(self):
             self.log.debug("Removing Movie Scene Mode"+str(self.current_mode_num))
@@ -516,6 +541,8 @@ class Mode_Select(game.Mode):
                 self.game.modes.remove(self.warehouse_raid)
             elif self.current_mode_num==13:
                 self.game.modes.remove(self.jones_vs_aliens)
+            elif self.current_mode_num==14:
+                self.game.modes.remove(self.ringmaster)
 
                     
         def mode_text(self):
@@ -529,6 +556,8 @@ class Mode_Select(game.Mode):
 
             if self.ssd_count==0: #make sure the following delays only get called once
                 if self.current_mode_num !=2 and self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=12:#don't set timeout for these non time based modes
+                    #self.cancel_delayed('scene_timeout')
+                    self.cancel_delayed('scene_unpause')
                     self.delay(name='scene_timeout', event_type=None, delay=self.timer+time, handler=self.end_scene)
                 self.delay(name='scene_delay', event_type=None, delay=time, handler=self.add_selected_scene)
                 if self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=11:#don't eject ball for video modes, scene will eject it itself at end
@@ -562,6 +591,7 @@ class Mode_Select(game.Mode):
         def end_scene_common(self,timer):
             #cancel any running timers in case mode was completed
             self.cancel_delayed('scene_timeout')
+            self.cancel_delayed('scene_unpause')
             
             #update mode completed status tracking
             self.select_list[self.current_mode_num] =1

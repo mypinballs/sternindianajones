@@ -180,6 +180,9 @@ class Get_The_Idol(game.Mode):
                     self.game.temple.open()
             else:
                 self.game.temple.close()
+                
+            if self.mode_completed:
+                self.game.coils.grailEject.pulse()
 
             #reset music
             #self.game.sound.stop_music()
@@ -275,3 +278,7 @@ class Get_The_Idol(game.Mode):
         def sw_subway_active(self, sw):
             self.mode_progression(1)
             return procgame.game.SwitchStop
+        
+        def sw_grailEject_active(self,sw):
+            if self.mode_completed:
+                return procgame.game.SwitchStop

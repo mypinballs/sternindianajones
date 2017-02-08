@@ -160,7 +160,7 @@ class Game(game.BasicGame):
 
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.5.0'
+                self.system_version='0.5.2'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -717,17 +717,17 @@ def main():
         root_logger.addHandler(file_handler)
 
         #set invidivual log levels here
-        logging.getLogger('ij.ark').setLevel(logging.DEBUG)
-        logging.getLogger('ij.swordsman').setLevel(logging.DEBUG)
-#        logging.getLogger('ij.temple').setLevel(logging.DEBUG)
+        logging.getLogger('ij.ark').setLevel(logging.ERROR)
+        logging.getLogger('ij.swordsman').setLevel(logging.ERROR)
+        logging.getLogger('ij.temple').setLevel(logging.ERROR)
 #        logging.getLogger('ij.trough').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.base').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.poa').setLevel(logging.DEBUG)
         logging.getLogger('ij.mode_select').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.raven_bar').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.match').setLevel(logging.DEBU
-        logging.getLogger('ij.service').setLevel(logging.DEBUG)
-        logging.getLogger('ij.three_challenges').setLevel(logging.DEBUG)
+#        logging.getLogger('ij.service').setLevel(logging.DEBUG)
+#        logging.getLogger('ij.three_challenges').setLevel(logging.DEBUG)
         logging.getLogger('game.vdriver').setLevel(logging.ERROR)
         logging.getLogger('game.driver').setLevel(logging.ERROR)
         logging.getLogger('game.sound').setLevel(logging.ERROR)

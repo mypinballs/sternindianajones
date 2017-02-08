@@ -468,15 +468,15 @@ class POA(game.Mode):
             elif self.adventureV_lit==False:
                 self.sw_adventureV_active(self)
             elif self.adventureE1_lit==False:
-                self.sw_adventureE1_active(self)
+                self.sw_adventureE1N_active(self)
             elif self.adventureN_lit==False:
-                self.sw_adventureN_active(self)
+                self.sw_adventureE1N_active(self)
             elif self.adventureT_lit==False:
                 self.sw_adventureT_active(self)
             elif self.adventureU_lit==False:
-                self.sw_adventureU_active(self)
+                self.sw_adventureUR_active(self)
             elif self.adventureR_lit==False:
-                self.sw_adventureR_active(self)
+                self.sw_adventureUR_active(self)
             elif self.adventureE2_lit==False:
                 self.sw_adventureE2_active(self)
 
@@ -537,7 +537,25 @@ class POA(game.Mode):
             self.game.sound.play("target")
             
                 
-        def sw_adventureE1_active(self, sw):
+#        def sw_adventureE1_active(self, sw):
+#            if self.adventureE1_lit == False:
+#                #self.game.drive_lamp(self.lamps[3],'on')
+#                self.letters_spotted +=1
+#                self.adventureE1_lit=True;
+#                self.flag[3]=True;
+#                self.game.set_player_stats('poa_flag',self.flag)
+#                #print("adventure lamp lit: %s "%(self.lamps[3]))
+#                self.game.score(500000)
+#                self.spell_adventure()
+#            else:
+#                self.game.score(100000)
+#                if self.set2==True:
+#                    self.light_next_in_sequence()
+#
+#            self.game.sound.play("target")
+            
+        
+        def sw_adventureE1N_active(self, sw):
             if self.adventureE1_lit == False:
                 #self.game.drive_lamp(self.lamps[3],'on')
                 self.letters_spotted +=1
@@ -547,16 +565,7 @@ class POA(game.Mode):
                 #print("adventure lamp lit: %s "%(self.lamps[3]))
                 self.game.score(500000)
                 self.spell_adventure()
-            else:
-                self.game.score(100000)
-                if self.set2==True:
-                    self.light_next_in_sequence()
-
-            self.game.sound.play("target")
-            
-        
-        def sw_adventureN_active(self, sw):
-            if self.adventureN_lit == False:
+            elif self.adventureN_lit == False:
                 #self.game.drive_lamp(self.lamps[4],'on')
                 self.letters_spotted +=1
                 self.adventureN_lit=True;
@@ -593,7 +602,25 @@ class POA(game.Mode):
             self.game.sound.play("target")
             
                 
-        def sw_adventureU_active(self, sw):
+#        def sw_adventureU_active(self, sw):
+#            if self.adventureU_lit == False:
+#                #self.game.drive_lamp(self.lamps[6],'on')
+#                self.letters_spotted +=1
+#                self.adventureU_lit=True;
+#                self.flag[6]=True;
+#                self.game.set_player_stats('poa_flag',self.flag)
+#                #print("adventure lamp lit: %s "%(self.lamps[6]))
+#                self.game.score(500000)
+#                self.spell_adventure()
+#            else:
+#                self.game.score(100000)
+#                if self.set3==True:
+#                    self.light_next_in_sequence()
+#
+#            self.game.sound.play("target")
+            
+                
+        def sw_adventureUR_active(self, sw):
             if self.adventureU_lit == False:
                 #self.game.drive_lamp(self.lamps[6],'on')
                 self.letters_spotted +=1
@@ -603,16 +630,7 @@ class POA(game.Mode):
                 #print("adventure lamp lit: %s "%(self.lamps[6]))
                 self.game.score(500000)
                 self.spell_adventure()
-            else:
-                self.game.score(100000)
-                if self.set3==True:
-                    self.light_next_in_sequence()
-
-            self.game.sound.play("target")
-            
-                
-        def sw_adventureR_active(self, sw):
-            if self.adventureR_lit == False:
+            elif self.adventureR_lit == False:
                 #self.game.drive_lamp(self.lamps[7],'on')
                 self.letters_spotted +=1
                 self.adventureR_lit=True;

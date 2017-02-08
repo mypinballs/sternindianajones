@@ -213,7 +213,7 @@ class Loops(game.Mode):
                 if self.game.switches.leftLoopTop.time_since_change()<=1.5 and self.game.switches.leftLoopBottom.time_since_change()<=1.5:
                     self.multiplier()
 
-                if self.game.switches.rightRampMade.time_since_change()<=2:
+                if self.game.switches.rightRampMade.time_since_change()<=3:
                     self.combo(self.side)
                 else:
                     self.sequence(self.side)
