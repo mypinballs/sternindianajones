@@ -285,6 +285,8 @@ class Ringmaster(game.Mode):
             
             
         def load_intro2_anim(self):
+            
+            self.game.sound.stop_music()
             self.game.sound.play_music('ringmaster_play', loops=-1)
              
             self.bgnd_anim = "dmd/cv-intro-part2.dmd"

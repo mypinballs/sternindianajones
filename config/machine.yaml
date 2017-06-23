@@ -1,7 +1,7 @@
 # P-ROC Game Description file for Stern Indiana Jones
 PRGame:
     machineType: sternSAM
-    numBalls: 4
+    numBalls: 5
 PRFlippers:
     - flipperLwR
     - flipperLwL
@@ -45,12 +45,14 @@ PRSwitches:
         label: '5th Coin Slot'
     flipperLwL:
         number: SD09
+        tags: ballsearch_stop
         label: 'Lower Left Flipper'
     flipperLEOS:
         number: SD10
         label: 'Lower Left Flipper EOS'
     flipperLwR:
         number: SD11
+        tags: ballsearch_stop
         label: 'Lower Right Flipper'
     flipperREOS:
         number: SD12
@@ -124,7 +126,7 @@ PRSwitches:
         label: 'Subway'
     leftLoopBottom:
         number: S13
-        tags: poa_pause,mode_pause
+        tags: poa_pause,mode_pause,ballsearch_reset
         label: 'Left Loop Bottom'
     leftSpinner:
         number: S14
@@ -137,9 +139,10 @@ PRSwitches:
         number: S16
         label: 'Start Button'
     #col2
-    arkAutoLoad:
+    trough5:
         number: S17
-        label: 'Ark Auto Load'
+        label: 'Trough 5'
+        tags: trough
     trough4:
         number: S18
         label: 'Trough 4'
@@ -163,47 +166,47 @@ PRSwitches:
     shooterLane:
         number: S23
         label: 'Shooter Lane'
-        tags: shooter_lane,poa_pause,mode_pause
+        tags: shooter_lane,poa_pause,mode_pause,ballsearch_stop
     leftOutlane:
         number: S24
         label: 'Left Outlane'
-        tags: early_save,moonlight
+        tags: early_save,moonlight,ballsearch_reset
     leftInlane:
         number: S25
-        tags: moonlight
+        tags: moonlight,ballsearch_reset
         label: 'Left Inlane'
     leftSlingshot:
         number: S26
-        tags: moonlight
+        tags: moonlight,ballsearch_reset
         label: 'Left Slingshot'
     rightSlingshot:
         number: S27
-        tags: moonlight
+        tags: moonlight,ballsearch_reset
         label: 'Right Slingshot' 
     rightInlane:
         number: S28
-        tags: moonlight
+        tags: moonlight,ballsearch_reset
         label: 'Right Inlane'
     rightOutlane:
         number: S29
+        tags: early_save,ballsearch_reset
         label: 'Right Outlane'
-        tags: early_save
     leftJet:
         number: S30
-        tags: moonlight,poa_pause,mode_pause
+        tags: moonlight,poa_pause,mode_pause,ballsearch_reset
         label: 'Left Jet'
     topJet:
         number: S31
-        tags: moonlight,poa_pause,mode_pause
+        tags: moonlight,poa_pause,mode_pause,ballsearch_reset
         label: 'Top Jet'
     bottomJet:
         number: S32
-        tags: moonlight,poa_pause,mode_pause
+        tags: moonlight,poa_pause,mode_pause,ballsearch_reset
         label: 'Bottom Jet' 
     #col3
     rightJet:
         number: S33
-        tags: moonlight,poa_pause,mode_pause
+        tags: moonlight,poa_pause,mode_pause,ballsearch_reset
         label: 'Right Jet'
     notUsed1:
         number: S34
@@ -256,7 +259,7 @@ PRSwitches:
         label: 'Right Slingshot Top'
     rightRampEnter:
         number: S48
-        tags: poa_pause,moonlight
+        tags: poa_pause,moonlight,ballsearch_reset
         label: 'Right Ramp Enter'
     #col4
     skillShot:
@@ -439,10 +442,12 @@ PRCoils:
         pulseTime: 15
     grailEject:
         number: C04
+        tags: ballsearch
         label: 'Grail Eject'
         pulseTime: 35
     rampBallStop:
         number: C05
+        tags: ballsearch
         label: 'Ramp Ball Stop'
         pulseTime: 20
     templeMotor:
@@ -460,15 +465,19 @@ PRCoils:
     #high current group 2    
     leftJet:
         number: C09
+        tags: ballsearch
         label: 'Left Jet'
     topJet:
         number: C10
+        tags: ballsearch
         label: 'Top Jet'
     bottomJet:
         number: C11
+        tags: ballsearch
         label: 'Bottom Jet'
     rightJet:
         number: C12
+        tags: ballsearch
         label: 'Right Jet'
     leftSlingshotTop:
         number: C13
@@ -486,9 +495,11 @@ PRCoils:
     #low current group 1
     leftSlingshot:
         number: C17
+        tags: ballsearch
         label: 'Left Slingshot Top'
     rightSlingshot:
         number: C18
+        tags: ballsearch
         label: 'Right Slingshot Top'
     flasherTemple:
         number: C19
@@ -1063,7 +1074,6 @@ PRBallSave:
         rightInlane: open
         leftLoopBottom: open
         rightLoopBottom: open
-        #grailEject: open
     stopSwitches:
         shooterLane: closed
         # don't ball search if a flipper button is pressed

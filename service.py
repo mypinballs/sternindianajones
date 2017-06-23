@@ -72,7 +72,7 @@ class ServiceModeList(ServiceModeSkeleton):
 				self.item = item
 			ctr += 1
 		self.max = ctr - 1
-		self.item_layer.set_text(self.item.name)
+		self.item_layer.set_text(str(self.iterator+1)+') '+str(self.item.name))
 
 	def sw_up_active(self,sw):
 		if self.game.switches.enter.is_inactive():
@@ -150,8 +150,9 @@ class Tests(ServiceModeList):
 		self.name = 'Tests'
 		self.lamp_test = LampTest(self.game, self.priority+1, font, big_font)
 		self.coil_test = CoilTest(self.game, self.priority+1, font, big_font)
+                self.ark_test = ArkTest(self.game, self.priority+1, font, big_font)
 		self.switch_test = SwitchTest(self.game, self.priority+1, font, big_font)
-		self.items = [self.switch_test, self.lamp_test, self.coil_test]
+		self.items = [self.switch_test, self.lamp_test, self.coil_test,self.ark_test]
 		for test in extra_tests:
 			self.items.append(test)
 
@@ -761,7 +762,94 @@ class SwitchTest(ServiceModeSkeleton):
 	#	return True
         
        
-	
+class ArkTest(ServiceModeSkeleton):
+    """docstring for ResetAudits"""
+    def __init__(self, game, priority, font, big_font):
+	super(ArkTest, self).__init__(game, priority,font)
+        self.log = logging.getLogger('ij.service.ark_test')
+        self.name = 'Ark Test'
+        
+        self.switch_layer = dmd.TextLayer(1, 19, self.game.fonts['7x4'], "left")
+        
+        self.status = ''
+        self.info = ''
+        self.okToUpdate=False
+                
+                
+    def mode_started(self):
+        super(ArkTest,self).mode_started()
+        
+        self.item_layer.set_text("Balls in Ark: "+str(self.game.ark.num_balls()),color=dmd.YELLOW)
+        self.instruction_layer.set_text("Press Enter to Cycle",color=dmd.GREEN)
+        self.okToUpdate=True
+        
+    
+    def mode_stopped(self):
+        super(ArkTest,self).mode_stopped()
+        self.cancel_delayed('arktest_display_update')
+         
+         
+    def cycle_ark(self):
+        self.game.ark.reset()
+        
+        self.bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/ark_test_bgnd.dmd').frames[0])
+        self.bgnd_layer.composite_op='blacksrc'
+        self.item_layer.y=9
+        self.item_layer.set_text("Cycling Ark",color=dmd.YELLOW)
+        self.item_layer.composite_op='blacksrc'
+        self.switch_layer.set_text(self.get_ark_sw_states(),color=dmd.MAGENTA)
+        self.instruction_layer.font = self.game.fonts['7x4']
+        self.instruction_layer.set_text("Do Not Power Off",color=dmd.RED)
+        
+        self.layer = dmd.GroupedLayer(128, 32, [self.title_layer, self.item_layer, self.instruction_layer, self.switch_layer,self.bgnd_layer])
+        
+        self.delay(name='arktest_display_update',delay=5,handler=self.display_update)
+       
+        
+    def display_update(self):
+        #self.item_layer.set_text("Cycling Ark",color=dmd.YELLOW)
+        self.switch_layer.set_text(self.get_ark_sw_states(),color=dmd.MAGENTA)
+        self.instruction_layer.set_text("Balls in Ark: "+str(self.game.ark.num_balls()),color=dmd.GREEN)
+        self.cancel_delayed('arktest_display_update')
+        self.delay(name='arktest_display_update',delay=1,handler=self.display_update)
+        
+        
+    def get_ark_sw_states(self):
+        if self.game.switches.arkMotorUp.is_active():
+            up_text ="Closed"
+        else:
+             up_text ="Open"
+        text = "Ark Up Sw:"+up_text
+        
+        if self.game.switches.arkMotorDown.is_active():
+            down_text ="Closed"
+        else:
+             down_text ="Open"
+        text = text+ " Ark Down Sw:"+down_text
+        
+        return text
+        
+        
+    def sw_arkMotorUp_active(self,sw):
+        self.display_update()
+        
+    def sw_arkMotorUp_inactive(self,sw):
+        self.display_update()
+        
+    def sw_arkMotorDown_active(self,sw):
+        self.display_update()
+        
+    def sw_arkMotorDown_inactive(self,sw):
+        self.display_update()
+        
+    def sw_enter_active(self,sw):
+        if self.okToUpdate:
+            self.busy = True
+             # if enter is pressed, cycle the ark
+            self.cycle_ark()
+        else:
+            self.game.sound.play('service_cancel')
+        return game.SwitchStop	
               
             
             
@@ -876,12 +964,12 @@ class Settings(ServiceModeList):
 		self.name = name
 		self.items = []
 		self.font = font
-		for section in sorted(itemlist.iterkeys()):
-			self.items.append( SettingsEditor( self.game, priority + 1, font, big_font, str(section),itemlist[section] ))
+		for x,section in enumerate(sorted(itemlist.iterkeys())):
+			self.items.append( SettingsEditor( self.game, priority + 1, font, big_font, x,str(section),itemlist[section] ))
 
 class SettingsEditor(ServiceModeList):
 	"""Service Mode."""
-	def __init__(self, game, priority, font, big_font, name, itemlist):
+	def __init__(self, game, priority, font, big_font, id,name, itemlist):
 		super(SettingsEditor, self).__init__(game, priority, font)
                 small_font = self.game.fonts['7x4']
                 self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_adjust_bgnd.dmd').frames[0])
@@ -893,11 +981,12 @@ class SettingsEditor(ServiceModeList):
 		self.no_exit_switch = game.machine_type == 'sternWhitestar'
 		#self.title_layer.set_text('Settings')
                 
+                self.id=id+1
 		self.name = name
 		self.items = []
                 
 		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer, self.instruction_layer])
-		for item in itemlist.iterkeys():
+		for item in sorted(itemlist.iterkeys()):
 			#self.items.append( EditItem(str(item), itemlist[item]['options'], itemlist[item]['value'] ) )
 			if 'increments' in itemlist[item]:
 				num_options = ((itemlist[item]['options'][1]-itemlist[item]['options'][0]) / itemlist[item]['increments'])+1
@@ -1012,7 +1101,7 @@ class SettingsEditor(ServiceModeList):
 				self.item = item
 			ctr += 1
 		self.max = ctr - 1
-		self.item_layer.set_text(self.item.name)
+		self.item_layer.set_text(str(self.id)+'.'+str(self.iterator+1)+') '+str(self.item.name))
 		self.value_layer.set_text(str(self.item.value))
                 self.log.info('Setting :%s',self.item.name)
 		self.option_index = self.item.options.index(self.item.value)
@@ -1055,8 +1144,9 @@ class Utilities(ServiceModeList):
 		self.software_update = SoftwareUpdate(self.game, self.priority+1, font, big_font)
                 self.log_download = LogsDownload(self.game, self.priority+1, font, big_font)
                 self.set_date_time = SetDateTime(self.game, self.priority+1, font, big_font)
+                self.reset_audits = ResetAudits(self.game, self.priority+1, font, big_font)
                 self.reboot_game = Reboot(self.game, self.priority+1, font, big_font)
-		self.items = [self.software_update,self.log_download,self.reboot_game,self.set_date_time]
+		self.items = [self.software_update,self.log_download,self.reset_audits,self.reboot_game,self.set_date_time]
                 
                 
 #mode to manually update the game software
@@ -1205,7 +1295,7 @@ class LogsDownload(ServiceModeSkeleton):
 
     def __init__(self, game, priority, font, big_font):
 	super(LogsDownload, self).__init__(game, priority,font)
-        self.log = logging.getLogger('ij.logs_download')
+        self.log = logging.getLogger('ij.service.logs_download')
         
         self.usb_location = config.value_for_key_path('usb_path')
         self.logs_location = game_path+'/var/logs'
@@ -1240,8 +1330,6 @@ class LogsDownload(ServiceModeSkeleton):
             self.item_layer.set_text("Store Not Found",color=dmd.RED)
             self.instruction_layer.set_text("Check USB Drive",color=dmd.GREEN)
            
-
-       
     
     def sw_enter_active(self,sw):
         if self.okToUpdate:
@@ -1290,6 +1378,52 @@ class LogsDownload(ServiceModeSkeleton):
         self.instruction_layer.set_text("Press Exit Button",color=dmd.GREEN)
         self.spin = False
         self.busy = False
+
+
+class ResetAudits(ServiceModeSkeleton):
+    """docstring for ResetAudits"""
+    def __init__(self, game, priority, font, big_font):
+	super(ResetAudits, self).__init__(game, priority,font)
+        self.log = logging.getLogger('ij.service.reset_audits')
+        self.name = 'Reset Audits'
+        self.status = ''
+        self.info = ''
+        self.spin = False
+        self.okToUpdate=False
+                
+                
+    def mode_started(self):
+        super(ResetAudits,self).mode_started()
+        self.log.info(audits.database_path(self.game))
+        if audits.database_path(self.game) !=None:
+            self.item_layer.set_text("Audit Database Exists",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Press Enter to Clear Audits",color=dmd.GREEN)
+            self.okToUpdate=True
+            self.spin = True
+        else:
+            self.item_layer.set_text("Audit Database Cannot Be Cleared",color=dmd.RED)
+            self.instruction_layer.set_text("Press Exit Button",color=dmd.GREEN)
+                
+                    
+    def clear_audits(self):
+            audits.delete_all(self.game)
+            self.item_layer.set_text( "Audit Clearing Completed",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Press Exit Button",color=dmd.GREEN)
+            self.spin = False
+            self.busy = False
+
+
+    def sw_enter_active(self,sw):
+        if self.okToUpdate:
+            self.busy = True
+            # if enter is pressed, reboot the game
+            self.item_layer.set_text("Clearing Audit Data",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Do Not Power Off",color=dmd.RED)
+            self.spin = True
+            self.delay(delay=1,handler=self.clear_audits)
+        else:
+            self.game.sound.play('service_cancel')
+        return game.SwitchStop
       
       
 class Reboot(ServiceModeSkeleton):

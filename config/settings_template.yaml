@@ -70,6 +70,10 @@ Machine (Standard):
   'Party Mode':
     options: ['Double Flip','No Hold','Reversed','Off']
     default: 'Off'
+  'Ball Search Timer':
+    options: [10,30]
+    increments: 1
+    default: 15
 Sound:
   'Initial Volume':
     options: [1,38]
@@ -141,9 +145,16 @@ Highscore:
     default: 350000000
 Gameplay (Feature):
   'Max Balls in Ark':
-    options: [2,4]
+    options: [2,6]
     increments: 1
     default: 4  
+  'Jones Target Banks For 8 Ball':
+    options: [2,8]
+    increments: 1
+    default: 3
+  'Disable Ark Mech':
+    options: ['Yes','No']
+    default: 'No' 
   'Timed Plunger':
     options: [0,120]
     increments: 5
@@ -401,10 +412,6 @@ Gameplay (Feature):
   'Totem Hidden Music':
     options: ['Yes','No']
     default: 'Yes'
-  'Jones Target Banks For 8 Ball':
-    options: [2,8]
-    increments: 1
-    default: 3
 Network:
   'IP Address':
     options: [0,255]

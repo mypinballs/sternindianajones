@@ -106,11 +106,15 @@ general:
   highScoreResetCounter:
     type: counter
     cid1: highScoreReset
-    label: 'High Score Reset Counter'
+    label: 'High Score Reset Count'
   creditsCounter:
     type: counter
     cid1: credits
-    label: 'Credits Counter'
+    label: 'Credits'
+  arkBallsCounter:
+    type: counter
+    cid1: arkBalls
+    label: 'Balls In Ark'
   total1PlayerGames:
     type: sum
     cid1: 1PlayerGameStarted

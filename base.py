@@ -23,7 +23,7 @@ from ij_modes import *
 from indy_lanes import *
 from plane_chase import *
 from mode_select import *
-#from skillshot import *
+from skillshot import *
 from multiball import *
 
 from time import strftime
@@ -88,7 +88,7 @@ class BaseGameMode(game.Mode):
                 self.plane_chase = Plane_Chase(self.game, 52)
                 self.loops = Loops(self.game, 53)
 
-                #self.skillshot = Skillshot(self.game, 54)
+                self.skillshot = Skillshot(self.game, 54)
                 self.mode_select = Mode_Select(self.game, 60)
 
                 #higher priority basic modes
@@ -187,6 +187,8 @@ class BaseGameMode(game.Mode):
                 #start background music
                 #print("Debug - Starting General Play Music")
                 self.game.sound.play_music('general_play', loops=-1)
+                #add skillshot - removes itself
+                self.game.modes.add(self.skillshot)
         
 
         def mode_tick(self):
@@ -379,6 +381,7 @@ class BaseGameMode(game.Mode):
         def sling(self):
             self.game.score(110)
             self.game.sound.play('slingshot')
+            
             self.game.set_player_stats('slingshot_hits',self.game.get_player_stats('slingshot_hits')+1)
 
         def inlane(self):

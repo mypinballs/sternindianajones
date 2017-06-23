@@ -47,8 +47,8 @@ class Utility(game.Mode):
             #Release Stuck Balls code
 
             total_balls = self.game.trough.num_balls()+self.game.trough.num_balls_locked
-            if total_balls<self.game.num_balls_total:
-
+            
+            if total_balls<self.game.num_balls_total:              
                 self.log.info('Trough is full::%s',self.game.trough.is_full())
                 self.log.info('Balls in trough::%s',self.game.trough.num_balls())
                 self.log.info('Balls in Ark::%s',self.game.ark.num_balls())
@@ -57,15 +57,18 @@ class Utility(game.Mode):
                 
                 self.log.info('Balls Locked::%s',self.game.trough.num_balls_locked)
 
-                if self.game.switches.grailEject.is_active():
-                    self.game.coils.grailEject.pulse()
+                if self.game.ark.ark_state=="full":
+                    if self.game.switches.grailEject.is_active():
+                        self.game.coils.grailEject.pulse()
 
-                #check shooter lane
-                if self.game.switches.shooterLane.is_active():
-                    self.game.coils.ballLaunch.pulse()
+                    #check shooter lane
+                    if self.game.switches.shooterLane.is_active():
+                        self.game.coils.ballLaunch.pulse()
 
 
-                self.delay(name='release_stuck_balls_loop', event_type=None, delay=5, handler=self.release_stuck_balls)
+                    self.delay(name='release_stuck_balls_loop', event_type=None, delay=5, handler=self.release_stuck_balls)
+                else:
+                    self.log.info('Waiting for Ark, before looking for stuck balls')
             else:
                 self.cancel_delayed('release_stuck_balls_loop')
             

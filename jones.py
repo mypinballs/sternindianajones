@@ -80,18 +80,24 @@ class Jones(game.Mode):
             if self.eight_ball_multiball_lit:
                 self.game.effects.drive_lamp(self.eight_ball_lamp,'superfast')
 
+
         def reset_lamps(self):
             for i in range(len(self.jones_lamps)):
                 self.game.effects.drive_lamp(self.jones_lamps[i],'off')
                 
             self.game.effects.drive_lamp(self.eight_ball_lamp,'off')
         
+        
         def completed_lamps(self):
             for i in range(len(self.jones_lamps)):
                 self.game.effects.drive_lamp(self.jones_lamps[i],'superfast')
                 
                 
-               
+        def reset_8ball(self):  
+            self.eight_ball_multiball_lit = False
+            self.game.set_player_stats('8ball_multiball_lit',self.eight_ball_multiball_lit)
+            self.game.effects.drive_lamp(self.eight_ball_lamp,'off')
+            
                 
         def eightball_progress_display(self):
             value = self.eight_ball_bank_count-self.bank_count
@@ -194,7 +200,7 @@ class Jones(game.Mode):
                 self.voice_call(count=0,delay=1.5)
                 self.game.effects.drive_flasher('flasherArk','fast',time=0.5)
                 
-            elif self.bank_count==self.eight_ball_bank_count:
+            elif self.bank_count%self.eight_ball_bank_count==0:
                 self.eight_ball_multiball_lit = True
                 self.game.set_player_stats('8ball_multiball_lit',self.eight_ball_multiball_lit)
                 self.eightball_lit_display()

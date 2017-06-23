@@ -104,3 +104,4 @@ class Player(procgame.game.Player):
                 self.player_stats['ringmasters_defeated'] = 0
                 self.player_stats['ringmaster_smart_bombs'] = 0
                 self.player_stats['ringmaster_score'] = 0
+                self.player_stats['skillshot_level'] = 1

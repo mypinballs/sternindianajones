@@ -149,3 +149,5 @@ counters:
     label: 'Credits'
   highScoreReset:
     label: 'High Score Reset In'
+  arkBalls:
+    label: 'Balls In Ark'

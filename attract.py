@@ -131,6 +131,9 @@ class Attract(game.Mode):
                 
                 #temp gi test
                 self.gi_flutter() 
+                
+                #TODO:TEMP - remove
+                #self.game.coils.grailEject.pulse()
 
 
 #        def gi(self):
@@ -394,7 +397,7 @@ class Attract(game.Mode):
 		else:
 
 			#self.game.set_status("Ball Search!")
-			self.game.ball_search.perform_search(5)
+			self.game.ball_search.perform_search()
 		return True
 
         def coin_switch_handler(self, sw):

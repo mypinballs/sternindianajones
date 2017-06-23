@@ -152,15 +152,36 @@ class Game(game.BasicGame):
 		"""docstring for setup"""
 		self.load_config(self.yamlpath)
 
-                self.load_settings(settings_template_path, settings_path)
-		#self.sound.music_volume_offset = self.user_settings['Sound']['Music volume offset']
-                #volume_level = self.user_settings['Sound']['Initial Volume']
-		#self.sound.set_volume(volume_level/30) #make part of volume mode
-		self.load_game_data(game_data_template_path, game_data_path)
-
+                #load the settings data file
+                #this can be occasionally corrupted (blank) by hard power offs, so use some try catch here to stop a bomb out
+                try:
+                    self.load_settings(settings_template_path, settings_path)
+                except Exception, err:
+                    self.log.error('Settings Data Corrupt. Resetting....')
+                    try:
+                        os.remove(settings_path)
+                        self.load_settings(settings_template_path, settings_path)
+                        self.log.info('Settings Data File Recreated')
+                    except OSError:
+                        self.log.error('Unable to recreate Settings Data File from Template. Damn....')
+		
+                #load the game data file
+                #this can be corrupted (blank) by hard power offs, so use some try catch here to stop a bomb out
+                try:
+                    self.load_game_data(game_data_template_path, game_data_path)
+                except Exception, err:
+                    self.log.error('Game Data Corrupt. Resetting....')
+                    try:
+                        os.remove(game_data_path)
+                        self.load_game_data(game_data_template_path, game_data_path)
+                        self.log.info('Game Data File Recreated')
+                    except OSError:
+                        self.log.error('Unable to recreate Game Data File from Template. Damn....')
+            
+                    
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.5.2'
+                self.system_version='0.6.0'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -239,11 +260,21 @@ class Game(game.BasicGame):
 #		print self.game_data
 #		print "Settings:"
 #		print self.settings
-
-		self.log.info("Initial switch states:")
-		for sw in self.switches:
-			self.log.info("  %s:\t%s" % (sw.name, sw.state_str()))
                 
+                #configure of switch types and coil types (solenoid or flasher) for mypinballs controller class
+                io_controller = config.value_for_key_path(keypath='pinproc_class', default='')
+                if 'mypinballs' in io_controller:
+                    self.proc.config(self.switches,self.coils)
+
+                #config debug info
+#		self.log.info("Initial switch states:")
+#		for sw in self.switches:
+#			self.log.info("  %s:\t%s:\t%s" % (sw.number, sw.name, sw.state_str()))
+#                        
+#                self.log.info("Lamp Info:")
+#		for lamp in self.lamps:
+#			self.log.info("  %s:\t%s:\t%s" % (lamp.number, lamp.name, lamp.yaml_number))
+#                
                 #balls per game setup
                 self.balls_per_game = self.user_settings['Machine (Standard)']['Balls Per Game']
                 
@@ -717,7 +748,7 @@ def main():
         root_logger.addHandler(file_handler)
 
         #set invidivual log levels here
-        logging.getLogger('ij.ark').setLevel(logging.ERROR)
+        logging.getLogger('ij.ark').setLevel(logging.DEBUG)
         logging.getLogger('ij.swordsman').setLevel(logging.ERROR)
         logging.getLogger('ij.temple').setLevel(logging.ERROR)
 #        logging.getLogger('ij.trough').setLevel(logging.DEBUG)
@@ -725,12 +756,13 @@ def main():
 #        logging.getLogger('ij.poa').setLevel(logging.DEBUG)
         logging.getLogger('ij.mode_select').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.raven_bar').setLevel(logging.DEBUG)
-#        logging.getLogger('ij.match').setLevel(logging.DEBU
+#        logging.getLogger('ij.match').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.service').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.three_challenges').setLevel(logging.DEBUG)
         logging.getLogger('game.vdriver').setLevel(logging.ERROR)
         logging.getLogger('game.driver').setLevel(logging.ERROR)
         logging.getLogger('game.sound').setLevel(logging.ERROR)
+        logging.getLogger('mpu').setLevel(logging.INFO)
 
 
 	config = yaml.load(open(machine_config_path, 'r'))

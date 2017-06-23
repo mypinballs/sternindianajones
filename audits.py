@@ -37,6 +37,13 @@ def update_counter(game,key, value):
 	store = get_shared_store(game)
 	store.update_counter(key_path=key, value=value)
 
+def database_path(game):
+        store = get_shared_store(game)
+        return store.database_path()
+        
+def delete_all(game):
+        store = get_shared_store(game)
+	store.delete_all()
 
 def get_shared_store(game):
 	global shared_store
@@ -116,7 +123,14 @@ class AuditStore(object):
                 self.update_catalogue()
 		logging.getLogger('audits').info('Audits loaded.')
 	
-	def database_path(self):
+	
+        def delete_all(self):
+                del self.conn
+                os.remove(self.database_path())
+                self.__init__(self.game)
+          
+          
+        def database_path(self):
 		return AUDITS_PATH
 	
 

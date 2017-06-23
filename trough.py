@@ -144,7 +144,7 @@ class Trough(procgame.game.Mode):
 		self.delay(name='check_switches', event_type=None, delay=0.50, handler=self.check_switches)
 
 	def check_switches(self):
-		if self.num_balls_in_play > 0 and self.eject_sw_count==0:
+		if self.num_balls_in_play > 0 and self.eject_sw_count==0 and not self.game.ark.ark_load_in_progress: #
 			# Base future calculations on how many balls the machine 
 			# thinks are currently installed.
        	         	num_current_machine_balls = self.game.num_balls_total
