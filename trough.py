@@ -230,14 +230,16 @@ class Trough(procgame.game.Mode):
             if self.eject_sw_count > 1:
                 self.log.debug( "We're over on eject count - ball fell back in")
                 # retry the ball launch
-                self.delay("Retry",delay=1,handler=self.retry_launch)
+                self.cancel_delayed('retry')
+                self.delay('retry',delay=1,handler=self.retry_launch)
             else:
                 self.log.debug( "That's one")
 
 
         def retry_launch(self):
             self.reset_eject_count()
-            self.launch_balls(1)
+            self.launch_callback = None #clear the callback variable, as we dont want it called again
+            self.launch_balls(num=1)
             
             
         def reset_eject_count(self):

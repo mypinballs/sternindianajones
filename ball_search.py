@@ -49,6 +49,7 @@ class Ball_Search(game.Mode):
                 self.max_ball_search_attempts = 10
                 self.score1 = 0
                 self.score2 = 0
+                self.trough_issues = 0
                 self.balls_lost_count = 0
                 self.ball_search_count=0
                 self.ballsearch_attempts=0
@@ -56,7 +57,7 @@ class Ball_Search(game.Mode):
                 
                 
         def enable(self):
-            self.log.info("Ball Search Enabled")
+            self.log.debug("Ball Search Enabled")
             self.enabled = 1;
             self.ballsearch_attempts=0
             self.score1 = self.game.current_player().score
@@ -64,7 +65,7 @@ class Ball_Search(game.Mode):
          
 
 	def disable(self):
-            self.log.info("Ball Search Disabled")
+            self.log.debug("Ball Search Disabled")
             self.enabled = 0;
             self.cancel_delayed('ball_search_coil')
             self.cancel_delayed('ball_search_countdown')
@@ -111,7 +112,6 @@ class Ball_Search(game.Mode):
                 self.enable()
                  
 
-
 #	def perform_search(self, completion_wait_time, completion_handler = None):
 #		if (completion_wait_time != 0):
 #			self.ball_missing()
@@ -126,49 +126,46 @@ class Ball_Search(game.Mode):
 #		else:
 #			self.cancel_delayed(name='ball_search_countdown');
 #			self.delay(name='ball_search_countdown', event_type=None, delay=self.countdown_time, handler=self.perform_search, param=0)
-
-
-        def ball_missing_display(self,timer=2):
+            
+        
+        def issue_display(self,message1=None,message2=None,severity=1,timer=2):
+            #info_layer = dmd.TextLayer(128/2, 7, self.game.fonts['num_09Bx7'], "center", opaque=False)
+            #info_layer2 = dmd.TextLayer(128/2, 18, self.game.fonts['7px_narrow_az'], "center", opaque=False)
             info_layer = dmd.TextLayer(128/2, 7, self.game.fonts['7px_narrow_az'], "center", opaque=False)
             info_layer2 = dmd.TextLayer(128/2, 18, self.game.fonts['num_09Bx7'], "center", opaque=False)
             bgnd_layer = dmd.FrameLayer(opaque=False)
             bgnd_layer.frame = dmd.Animation().load(game_path+'dmd/scene_ended_bgnd.dmd').frames[0]
+            
+            colour = dmd.GREEN
+            if severity==2:
+                colour = dmd.RED
+            else:
+                colour = dmd.YELLOW
+            info_layer.set_text(message1, color=colour,seconds=timer)
+            info_layer2.set_text(message2,color=dmd.GREEN,blink_frames=5,seconds=2)
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer2,info_layer])
+            self.game.sound.play('elephant_alert')
+            self.log.debug(message1)
 
+            self.delay(name='clear',delay=timer, handler=self.clear)
+        
+        
+        def ball_missing_display(self,timer=2):
             multiple = ''
             balls_missing = self.game.num_balls_total - self.game.trough.num_balls()
             if balls_missing>1:
                 multiple='S'
-
-            message = str(balls_missing)+" BALL"+multiple+" MISSING!"
-            info_layer.set_text(message,color=dmd.YELLOW,seconds=timer)
-            info_layer2.set_text("SEARCHING...",color=dmd.GREEN,blink_frames=5,seconds=2)
-            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer2,info_layer])
-            self.game.sound.play('elephant_alert')
-            self.log.info(message)
-
-            self.delay(name='clear',delay=timer, handler=self.clear)
+            
+            if balls_missing>0:
+                message = str(balls_missing)+" BALL"+multiple+" MISSING!"
+                self.issue_display(message1=message, message2="SEARCHING...",timer=timer)
+            else:
+                #call this is 0 balls lost and here. Must be a trough issue with bounce backs.
+                self.trough_issue()
         
         
         def ball_lost_display(self,timer=2):
-            info_layer = dmd.TextLayer(128/2, 7, self.game.fonts['num_09Bx7'], "center", opaque=False)
-            info_layer2 = dmd.TextLayer(128/2, 18, self.game.fonts['7px_narrow_az'], "center", opaque=False)
-            bgnd_layer = dmd.FrameLayer(opaque=False)
-            bgnd_layer.frame = dmd.Animation().load(game_path+'dmd/scene_ended_bgnd.dmd').frames[0]
-
-            #multiple = ''
-            #balls_missing = self.game.num_balls_total - self.game.trough.num_balls()
-            #if balls_missing>1:
-            #    multiple='S'
-            #message = str(balls_missing)+" BALL"+multiple+" LOST!"
-            message = "BALL LOST!"
-            
-            info_layer.set_text(message, color=dmd.RED,seconds=timer)
-            info_layer2.set_text("LAUNCHING ANOTHER...",color=dmd.GREEN,blink_frames=5,seconds=2)
-            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer2,info_layer])
-            self.game.sound.play('elephant_alert')
-            self.log.info(message)
-
-            self.delay(name='clear',delay=timer, handler=self.clear)
+            self.issue_display(message1="BALL LOST!", message2="LAUNCHING ANOTHER...",severity=2,timer=timer)
             
             
         def clear(self):
@@ -210,12 +207,21 @@ class Ball_Search(game.Mode):
             self.game.trough.launch_balls(1,stealth=True,callback=self.enable)
             self.ballsearch_attempts=0
             
+            
+        def trough_issue(self):
+            self.cancel_delayed('ball_lost')
+            self.cancel_delayed('ball_search_countdown')
+            self.trough_issues+=1
+            self.issue_display(message1='TROUGH MALFUNCTION',message2='CHECK EJECT...',severity=2,timer=3)
+            self.game.trough.launch_balls(1,stealth=True,callback=self.enable)
+            self.ballsearch_attempts=0
+            
 
         def perform_search(self):
             wait = .180
             delay=wait
            
-            self.log.info("Performing Search....")
+            self.log.debug("Performing Search....")
             self.ball_missing_display()
            
             for coil in self.coils:

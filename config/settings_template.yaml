@@ -147,7 +147,7 @@ Gameplay (Feature):
   'Max Balls in Ark':
     options: [2,6]
     increments: 1
-    default: 4  
+    default: 3  
   'Jones Target Banks For 8 Ball':
     options: [2,8]
     increments: 1

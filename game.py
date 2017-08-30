@@ -181,7 +181,7 @@ class Game(game.BasicGame):
                     
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.6.0'
+                self.system_version='0.6.1'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -588,8 +588,11 @@ class Game(game.BasicGame):
 
 	def game_ended(self):
 		super(Game, self).game_ended()
-
+                
+                #remove the base game mode
                 self.modes.remove(self.base_game_mode)
+                #disable the active ball search from now the game has ended
+                self.ball_search.disable()
 
                 #self.modes.add(self.match)
                 #run the high score sequencer. Will run match automatically if no high scores to enter
