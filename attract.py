@@ -71,7 +71,7 @@ class Attract(game.Mode):
 	def mode_started(self):
 
 		# Blink the start button to notify player about starting a game.
-		self.game.lamps.startButton.schedule(schedule=0x00ff00ff, cycle_seconds=0, now=False)
+		self.update_start_lamp()
 
                 # Turn on GI lamps
 		#self.delay(name='gi_on_delay', event_type=None, delay=0, handler=self.gi)
@@ -188,13 +188,21 @@ class Attract(game.Mode):
 		#flash all lamps in groups of 8 ordered by columns
 		schedules = [0xffff0000, 0xfff0000f, 0xff0000ff, 0xf0000fff, 0x0000ffff, 0x000ffff0, 0x00ffff00, 0x0ffff000]
 		for index, lamp in enumerate(sorted(self.game.lamps, key=lambda lamp: lamp.number)):
-                    if lamp.yaml_number.startswith('L'):
+                    if lamp.yaml_number.startswith('L') and lamp.name.find('Button')<0:
 			if enable:
 				sched = schedules[index%len(schedules)]
 				lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
 			else:
 				lamp.disable()
 
+        
+        def update_start_lamp(self):
+            if audits.display(self.game,'general','creditsCounter') >0 or self.game.user_settings['Machine (Standard)']['Free Play'].startswith('Y'):
+                # Blink the start button to notify player about starting a game.
+                self.game.lamps.startButton.schedule(schedule=0x00ff00ff, cycle_seconds=0, now=False)
+            else:
+                self.game.lamps.startButton.disable()
+            
 
         def update_pricing(self):
             self.pricing_top = ''
@@ -405,6 +413,7 @@ class Attract(game.Mode):
             audits.update_counter(self.game,'credits',self.credits+1)
             self.show_pricing()
             self.game.sound.play("coin")
+            self.update_start_lamp()
             
         
         def sw_flipperLwL_active(self, sw):

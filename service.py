@@ -51,6 +51,9 @@ class ServiceModeSkeleton(game.Mode):
 
 	def sw_exit_active(self, sw):
 		self.game.modes.remove(self)
+                #restart the lamp show if exiting out of the service mode front
+                if self.name.find(self.game.system_version)>0:
+                    self.game.attract_mode.change_lampshow()
 		return True
 
 class ServiceModeList(ServiceModeSkeleton):

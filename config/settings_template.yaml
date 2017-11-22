@@ -93,11 +93,11 @@ Display:
   'Color Display X Offset':
     options: [-2500,2500]
     increments: 1
-    default: 0
+    default: 10
   'Color Display Y Offset':
     options: [-2500,2500]
     increments: 1
-    default: 35
+    default: 60
   'Left side score justify':
     # This example has no default.  The first option (right) will be used as the default.
     options: [right, left]

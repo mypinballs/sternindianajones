@@ -199,7 +199,7 @@ class POA(game.Mode):
 
                 adventure_layer = dmd.GroupedLayer(128, 32, [bgnd,A,D,V,E1,N,T,U,R,E2,completed])
                 
-                if self.game.get_player_stats('mode_running_id')!=0 and self.game.get_player_stats('mode_running_id')!=12: #do not display adventure graphic if get the idol or jones vs aliens is running
+                if self.game.get_player_stats('mode_running_id')!=0 and not self.game.get_player_stats("ark_mode_started"): #do not display adventure graphic if get the idol or ark shot modes are running
                     self.layer = adventure_layer
                 
 

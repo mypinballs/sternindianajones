@@ -181,7 +181,7 @@ class Game(game.BasicGame):
                     
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.6.1'
+                self.system_version='0.6.2'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -514,6 +514,7 @@ class Game(game.BasicGame):
                 self.modes.add(self.attract_mode)
                 
 		# Make sure flippers are off, especially for user initiated resets.
+                #TODO - TEMP Change to True for MPU testing, normally false
 		self.enable_flippers(enable=False)
                 
                 #temp addition -testing for Gerry
@@ -650,7 +651,7 @@ class Game(game.BasicGame):
                 self.party_mode = self.user_settings['Machine (Standard)']['Party Mode']
                 #stern flippers
 		for flipper in self.config['PRFlippers']:
-			self.logger.info("Programming flipper %s", flipper)
+			self.logger.info("Programming Flipper %s", flipper)
 			#setup flipper coil naming
                         main_coil = self.coils[flipper+'Main']
                         
@@ -664,6 +665,7 @@ class Game(game.BasicGame):
 			
 			switch_num = self.switches[flipper].number
 
+                        #activating flipper rules
 			drivers = []
 			if enable:
                                 if self.party_mode=='No Hold':
@@ -675,23 +677,24 @@ class Game(game.BasicGame):
                                     drivers += [pinproc.driver_state_patter(opposite_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
                                 else:
                                     drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
-                                
+                        else:
+                             main_coil.disable()
+                             
 			self.proc.switch_update_rule(switch_num, 'closed_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
 			
+                        #deactivating flipper rules
 			drivers = []
-			if enable:
-                                if self.party_mode =='Double Flip':
-                                    drivers += [pinproc.driver_state_disable(main_coil.state())]
-                                    drivers += [pinproc.driver_state_disable(opposite_coil.state())]
-                                elif self.party_mode=='Reversed':
-                                    drivers += [pinproc.driver_state_disable(opposite_coil.state())]
-                                else:
-                                    drivers += [pinproc.driver_state_disable(main_coil.state())]
+			#if enable:
+                        if self.party_mode =='Double Flip':
+                            drivers += [pinproc.driver_state_disable(main_coil.state())]
+                            drivers += [pinproc.driver_state_disable(opposite_coil.state())]
+                        elif self.party_mode=='Reversed':
+                            drivers += [pinproc.driver_state_disable(opposite_coil.state())]
+                        else:
+                            drivers += [pinproc.driver_state_disable(main_coil.state())]
                                 
 			self.proc.switch_update_rule(switch_num, 'open_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
-
-			if not enable:
-				main_coil.disable()
+                            
 
 		#bumpers
 		self.enable_bumpers(enable)

@@ -144,8 +144,10 @@ class Skillshot(game.Mode):
             self.game.score(skill_value)
 
             #lamp show - and restore previous lamps
-            self.game.lampctrl.save_state('game')
-            self.game.lampctrl.play_show('success', repeat=False,callback=self.restore_lamps)
+            #self.game.lampctrl.save_state('game')
+            #self.game.lampctrl.play_show('success', repeat=False,callback=self.restore_lamps)
+            self.game.lampctrl.play_show('success', repeat=False,callback=self.game.update_lamps)
+            
             
             self.delay(name='clear_display_delay', event_type=None, delay=timer, handler=self.clear)
 

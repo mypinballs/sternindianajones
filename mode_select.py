@@ -443,7 +443,7 @@ class Mode_Select(game.Mode):
             else:
                 timer = 0
                 #lengthen the timer if these events are running
-                if self.game.get_player_stats('multiball_started')  or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress') or self.game.get_player_stats('dog_fight_running'):
+                if self.game.get_player_stats('multiball_started')  or self.game.get_player_stats('quick_multiball_running') or self.game.get_player_stats('lock_in_progress'):
                     timer =2
                     
                 if self.game.get_player_stats('multiball_mode_started'):
