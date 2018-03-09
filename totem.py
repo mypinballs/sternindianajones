@@ -109,6 +109,14 @@ class Totem(game.Mode):
 
 
         def mode_stopped(self):
+            #end tracking - extra updates of tracking flags in case mode is stopped abruptly
+            self.multiball_running=False
+            self.multiball_started = False
+            self.multiball_ready_flag = False
+            self.game.set_player_stats('quick_multiball_running',self.multiball_running) 
+            self.game.set_player_stats('quick_multiball_started',self.multiball_started)
+            self.game.set_player_stats('quick_multiball_ready',self.multiball_ready_flag) 
+
             self.clear()
             self.game.effects.drive_flasher('flasherBackpanel','off')
             self.cancel_delayed('timeout_delay')
@@ -428,6 +436,7 @@ class Totem(game.Mode):
                 self.game.set_player_stats('quick_multiball_running',self.multiball_running) 
                 self.game.set_player_stats('quick_multiball_started',self.multiball_started)
                 self.game.set_player_stats('quick_multiball_ready',self.multiball_ready_flag) 
+
 
         def jackpot_explode(self):
             anim = dmd.Animation().load(game_path+"dmd/exploding_wall.dmd")

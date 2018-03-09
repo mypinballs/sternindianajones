@@ -35,6 +35,7 @@ class Player(procgame.game.Player):
                 self.player_stats['current_mode_num']=0
                 self.player_stats['hof_status']='off'
                 self.player_stats['mode_enabled']=False
+                self.player_stats['mode_starting']=False
                 self.player_stats['mode_running'] = False
                 self.player_stats['mode_running_id'] = 99
                 self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
@@ -68,6 +69,8 @@ class Player(procgame.game.Player):
                 self.player_stats['poa_enabled'] = False
                 self.player_stats['adventure_letters_spotted']=0
                 self.player_stats['adventure_paused'] = False
+                self.player_stats['adventure_started'] = False
+                self.player_stats['adventure_continuing'] = False
                 self.player_stats['last_mode_score']=0
                 self.player_stats['get_the_idol_score']=0
                 self.player_stats['castle_grunwald_score']=0
@@ -105,3 +108,5 @@ class Player(procgame.game.Player):
                 self.player_stats['ringmaster_smart_bombs'] = 0
                 self.player_stats['ringmaster_score'] = 0
                 self.player_stats['skillshot_level'] = 1
+                self.player_stats['adventure_flags']= [False,False,False,False,False,False]
+                self.player_stats['adventure_smart_bombs'] = 0

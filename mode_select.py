@@ -218,7 +218,7 @@ class Mode_Select(game.Mode):
         def mode_unpaused(self):
             if self.mode_running and self.timer_layer !=None:
                 self.timer_layer.pause(False) 
-                #self.cancel_delayed('scene_timeout')
+                self.cancel_delayed('scene_timeout')
                 self.delay(name='scene_timeout', event_type=None, delay=self.timer_layer.get_time_remaining(), handler=self.end_scene)
                 self.game.set_player_stats('mode_paused',False)
         
@@ -245,7 +245,7 @@ class Mode_Select(game.Mode):
 
             #create list of unplayed scene numbers
             choice_list=[]
-            for i in range(len(self.select_list)):
+            for i in range(len(self.lamp_list)):
                 if self.select_list[i]==0:
                     choice_list.append(i)
            
@@ -313,8 +313,7 @@ class Mode_Select(game.Mode):
                 self.mode_unpaused()
             else:
                 self.mode_starting = False
-            
-                
+                self.game.set_player_stats('mode_starting',self.mode_starting)
      
 
         def start_scene(self):
@@ -340,12 +339,10 @@ class Mode_Select(game.Mode):
                     self.info2_text = 'TO FIND MARION'
 
                 elif self.current_mode_num==2:
-                    #timer = self.game.user_settings['Gameplay (Feature)']['Well Of Souls Timer']
                     self.name_text = 'WELL OF SOULS'
                     self.info_text = 'SHOOT CENTER HOLE'
 
                 elif self.current_mode_num==3:
-                    #timer = self.game.user_settings['Gameplay (Feature)']['Raven Bar Timer']
                     if self.secret_mode:
                         self.name_text = 'Werewolf Attack!'.upper()
                         self.info_text = 'Secret Video Mode'.upper()
@@ -365,7 +362,6 @@ class Mode_Select(game.Mode):
                     self.info2_text = 'JONES TARGETS'
                     
                 elif self.current_mode_num==6:
-                    #timer = self.game.user_settings['Gameplay (Feature)']['Mine Cart Timer']
                     self.name_text = 'MINE CART'
                     self.info_text = 'VIDEO MODE'
 
@@ -394,7 +390,6 @@ class Mode_Select(game.Mode):
                     self.info2_text = 'TO PASS'
 
                 elif self.current_mode_num==11:
-                    #timer = self.game.user_settings['Gameplay (Feature)']['Choose Wisely Timer']
                     self.name_text = 'CHOOSE WISELY'
                     self.info_text = 'VIDEO MODE'
                 
@@ -414,6 +409,13 @@ class Mode_Select(game.Mode):
                     self.name_text = 'RINGMASTER'
                     self.info_text = 'BATLLE RINGMASTER'
                     self.info2_text = 'TO SAVE EARTH'
+                
+                self.mode_starting = True
+                self.game.set_player_stats('mode_starting',self.mode_starting)
+                
+                #pause and queue the contiuning adventure whilst we run a scene mode
+                if self.game.get_player_stats('adventure_continuing'):
+                    self.game.base_game_mode.poa.adventure_queue(True)
 
                 anim = dmd.Animation().load(game_path+"dmd/start_scene.dmd")
                 self.animation_layer = dmd.AnimatedLayer(frames=anim.frames,hold=True,frame_time=4)
@@ -422,7 +424,7 @@ class Mode_Select(game.Mode):
 
                 self.ssd_count=0#temp fix for frame_listener multi call with held
                 self.animation_layer.add_frame_listener(-1,self.scene_start_delay)
-
+                
 
                 self.layer = dmd.GroupedLayer(128, 32, [self.animation_layer,self.name_layer,self.info_layer,self.info2_layer])
 
@@ -433,7 +435,6 @@ class Mode_Select(game.Mode):
                 #update lamp for mode start
                 self.mode_start_lamp(self.mode_enabled)
                 
-                self.mode_starting = True
                 
                 #score
                 self.game.score(self.mode_start_value)
@@ -555,12 +556,12 @@ class Mode_Select(game.Mode):
             time = 2
 
             if self.ssd_count==0: #make sure the following delays only get called once
-                if self.current_mode_num !=2 and self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=12:#don't set timeout for these non time based modes
+                if self.current_mode_num !=2 and self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=11 and self.current_mode_num!=12: #don't set timeout for these non time based modes, mode 11 needs to be included here as it has its own choice timeout but not a timeout from here.
                     #self.cancel_delayed('scene_timeout')
                     self.cancel_delayed('scene_unpause')
                     self.delay(name='scene_timeout', event_type=None, delay=self.timer+time, handler=self.end_scene)
                 self.delay(name='scene_delay', event_type=None, delay=time, handler=self.add_selected_scene)
-                if self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=11:#don't eject ball for video modes, scene will eject it itself at end
+                if self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=11: #don't eject ball for video modes, scene will eject it itself at end
                     self.delay(name='eject_delay', event_type=None, delay=time-1, handler=self.eject_ball)
                 self.delay(name='clear_delay', event_type=None, delay=time, handler=self.clear)
                 self.ssd_count+=1
@@ -614,6 +615,10 @@ class Mode_Select(game.Mode):
             self.game.set_player_stats('mode_running',self.mode_running)
             self.game.set_player_stats('mode_running_id',99)
             
+            #unpause any contiuning adventures now the scene mode is finished
+            if self.game.get_player_stats('adventure_continuing'):
+                self.game.base_game_mode.poa.adventure_queue(False)
+                
             #continue any previously active mode music
             self.game.utility.resume_mode_music()  
             

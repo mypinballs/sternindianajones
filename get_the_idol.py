@@ -182,7 +182,7 @@ class Get_The_Idol(game.Mode):
                 self.game.temple.close()
                 
             if self.mode_completed:
-                self.game.coils.grailEject.pulse()
+                self.eject()
 
             #reset music
             #self.game.sound.stop_music()
@@ -256,6 +256,11 @@ class Get_The_Idol(game.Mode):
 
         def clear(self):
             self.layer = None
+            
+        
+        def eject(self):
+            #self.game.coils.grailEject.pulse()
+            self.game.base_game_mode.mode_select.eject_ball()
 
 
 #        def reset_drops(self):

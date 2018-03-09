@@ -33,7 +33,7 @@ class Choose_Wisely(game.Mode):
             self.game.sound.register_sound('cw_select', sound_path+"choose_cup.aiff")
             self.game.sound.register_sound('cw_speech0', speech_path+"choose_wisely.aiff")
             self.game.sound.register_sound('cw_speech1', speech_path+"chosen_wisely.aiff")
-            self.game.sound.register_sound('cw_speech2', speech_path+"chosen_poorly.aiff")
+            self.game.sound.register_sound('cw_speech2', speech_path+"chosen_poorly2.aiff")
             self.game.sound.register_sound('cw_speech3', speech_path+"burning_scream.aiff")
 
             #lamps setup
@@ -88,8 +88,9 @@ class Choose_Wisely(game.Mode):
 
             self.sequence_data=[]
             value = 3
+            rnum = random.randint(1,5)
             self.sequence_data.append(value)
-            for i in range(1,10+(self.level*10)):
+            for i in range(1,8+rnum+(self.level*10)):
                 value = self.sequence_data[i-1]
 
                 a=value-1
@@ -102,7 +103,7 @@ class Choose_Wisely(game.Mode):
                     a=4
                     b=4
                 
-                list =[a,b]
+                list =[a,b,a,b,a,b]
                 x = random.choice(list)
 
                 self.sequence_data.append(x)
@@ -160,11 +161,17 @@ class Choose_Wisely(game.Mode):
             self.info_layer.set_text("FLIPPERS MOVE. GUN PICKS.",blink_frames=6,color=dmd.CYAN)
             self.choose_ready = True
             
+            #create timer layer
+            self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
+            
             #turn selection button lamp on - using tournament buttom
             self.game.effects.drive_lamp(self.lamps[0],'fast')
 
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,self.grail_cup_layer,self.info_layer,self.timer_layer,self.arrow_layer])
 
+            #setup and auto kill if player doesnt choose in the time
+            self.delay(name='choice_timeout', event_type=None, delay=self.timer, handler=self.load_fail_anim1)
+             
         def move_left(self):
             if self.arrow_layer.target_x>5:
                 self.arrow_layer.target_x -=28
@@ -289,7 +296,6 @@ class Choose_Wisely(game.Mode):
             self.game.set_player_stats('video_mode_started',True)
 
             #setup additonal layers
-            self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
             self.info_layer = dmd.TextLayer(128/2, -1, self.game.fonts['07x5'], "center", opaque=False)
             #self.info_layer.set_text("SHOOT LIT SHOTS",blink_frames=1000)
 
@@ -343,7 +349,8 @@ class Choose_Wisely(game.Mode):
             self.gi(enable=True)
             
             #eject ball
-            self.game.coils.grailEject.pulse()
+            #self.game.coils.grailEject.pulse()
+            self.game.base_game_mode.mode_select.eject_ball()
             
             #enable ball search
             self.game.ball_search.enable()
@@ -353,6 +360,7 @@ class Choose_Wisely(game.Mode):
             
             #unpause totem (if qm multiball ready)
             self.game.base_game_mode.totem.mode_unpaused()
+
 
         def mode_tick(self):
             pass

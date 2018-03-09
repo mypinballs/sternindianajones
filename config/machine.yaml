@@ -118,7 +118,7 @@ PRSwitches:
     grailEject:
         #leftEject
         number: S11
-        tags: poa_pause,mode_pause
+        tags: mode_pause,poa_pause
         label: 'Grail Eject'
     subway:
         #centerEnter
@@ -126,7 +126,7 @@ PRSwitches:
         label: 'Subway'
     leftLoopBottom:
         number: S13
-        tags: poa_pause,mode_pause,ballsearch_reset
+        tags: mode_pause,ballsearch_reset
         label: 'Left Loop Bottom'
     leftSpinner:
         number: S14
@@ -259,7 +259,7 @@ PRSwitches:
         label: 'Right Slingshot Top'
     rightRampEnter:
         number: S48
-        tags: poa_pause,moonlight,ballsearch_reset
+        tags: moonlight,ballsearch_reset
         label: 'Right Ramp Enter'
     #col4
     skillShot:
@@ -279,7 +279,7 @@ PRSwitches:
         label: 'Temple Motor Down'   
     rightLoopBottom:
         number: S54
-        tags: poa_pause,mode_pause
+        tags: mode_pause
         label: 'Right Loop Bottom'
     adventureA:
         number: S55
@@ -295,7 +295,7 @@ PRSwitches:
         label: 'Adventure (V)'
     leftLoopTop:
         number: S58
-        tags: moonlight,poa_pause,mode_pause
+        tags: moonlight,mode_pause,poa_pause
         label: 'Left Loop Top'
     templeStandup:
         #centerStandup
@@ -303,6 +303,7 @@ PRSwitches:
         label: 'Temple Standup'
     rightRampMade:
         number: S60
+        tags: poa_pause
         label: 'Right Ramp Made'
     captiveBallRear:
         number: S61

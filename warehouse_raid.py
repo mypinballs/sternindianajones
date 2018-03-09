@@ -147,13 +147,13 @@ class Warehouse_Raid(game.Mode):
             self.game.sound.play_music('warehouse_background_play', loops=-1)
             self.delay(name='mode_speech_delay', event_type=None, delay=0.5, handler=self.voice_call, param=self.count)
             
-
+            
             self.game.trough.launch_balls(self.bip_start-self.game.trough.num_balls_in_play, self.ball_launch_callback, False)
             #debug trough
             #self.game.trough.debug()
-
+            
             #start ball save
-            self.game.ball_save.start(time=self.ball_save_time)
+            self.game.ball_save.start(num_balls_to_save=2,allow_multiple_saves=True,time=self.ball_save_time)
 
 
             #update_lamps

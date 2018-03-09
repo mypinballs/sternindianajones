@@ -2,6 +2,7 @@ import procgame
 import locale
 import logging
 from procgame import *
+from adventure import *
 
 base_path = config.value_for_key_path('base_path')
 game_path = base_path+"games/indyjones2/"
@@ -27,6 +28,8 @@ class POA(game.Mode):
 		super(POA, self).__init__(game, priority)
 
                 self.log = logging.getLogger('ij.poa')
+                
+                self.adventure_mode = Adventure(self.game,priority+1)
 
 		self.text_layer = dmd.TextLayer(128/2, 7, self.game.fonts['07x5'], "center")
 		self.award_layer = dmd.TextLayer(128/2, 17, self.game.fonts['num_14x10'], "center")
@@ -63,7 +66,9 @@ class POA(game.Mode):
 
         def reset(self):
                 self.adventure_started  = False
+                #self.adventure_running = False
                 self.adventure_continuing  = False
+                self.adventure_queued=False
                 self.letters_collected = 0
                 self.letters_spotted = 0
                 self.set1 = False
@@ -79,7 +84,7 @@ class POA(game.Mode):
                 self.adventureR_lit = False
                 self.adventureE2_lit = False
                 self.flag = [False,False,False,False,False,False,False,False,False]
-                self.full_sets_completed = 0
+                
                 self.pit_value_base = 20000000
                 
                 self.reset_lamps()
@@ -90,6 +95,8 @@ class POA(game.Mode):
                 self.log.info("POA Mode Started")
                 #reset variables
                 self.reset()
+                
+                self.full_sets_completed = 0 #reset each ball?
 
                 #setup mode general stuff
                 self.adventure_continue_timer = self.game.user_settings['Gameplay (Feature)']['Adventure Continue Timer']
@@ -120,9 +127,9 @@ class POA(game.Mode):
                    self.poa_requeue()
                 
                 #monitor scenario to clear continue display from running over the top of started modes
-                if self.adventure_started and self.game.get_player_stats('mode_running') and self.layer!=None:
-                    self.clear()
-
+#                if self.adventure_started and self.game.get_player_stats('mode_running') and self.layer!=None:
+#                    self.clear()
+                    
 
         def mode_stopped(self):
                 #save player specific data
@@ -208,8 +215,8 @@ class POA(game.Mode):
                     completed.composite_op = "blacksrc"
 
                     self.delay(name='poa_ready', event_type=None, delay=2, handler=self.poa_ready)
-                elif self.adventure_started:
-                    self.delay(name='act_delay', event_type=None, delay=2, handler=self.adventure_continue_display)
+                #elif self.adventure_started  
+                   # self.delay(name='act_delay', event_type=None, delay=2, handler=self.adventure_continue_display)
 
                 else:
                     self.delay(name='clear', event_type=None, delay=2, handler=self.clear)
@@ -259,10 +266,10 @@ class POA(game.Mode):
 
             #queue display change
             timer=2.5
-            if self.adventure_started:
-                self.delay(name='act_delay', event_type=None, delay=timer, handler=self.adventure_continue_display)
-            else:
-                self.delay(name='clear', event_type=None, delay=timer, handler=self.clear)
+            #if self.adventure_started:
+            #    self.delay(name='act_delay', event_type=None, delay=timer, handler=self.adventure_continue_display)
+            #else:
+            self.delay(name='clear', event_type=None, delay=timer, handler=self.clear)
 
             #update player stats - pit value
             self.game.set_player_stats('pit_value',self.pit_value)
@@ -273,16 +280,14 @@ class POA(game.Mode):
             #poa enabled logic
             self.poa_enabled()
 
+
         def poa_enabled(self):
             if self.game.get_player_stats("poa_queued")==False:
                 
                 #setup poa flasher
-                #if self.game.switches.topPost.is_inactive():
-                self.game.coils.flasherKingdom.schedule(0x30003000, cycle_seconds=0, now=True)
-
-                #setup divertor for ball to mini playfield
-                #self.game.coils.divertorMain.pulse(30)
-                #self.game.coils.divertorHold.pulse(0)
+                #self.game.coils.flasherKingdom.schedule(0x30003000, cycle_seconds=0, now=True)
+                self.game.effects.drive_flasher('flasherKingdom','medium',time=0)
+                self.game.effects.drive_flasher('flasherSkull','fast',time=2)
 
                 #play jingle
                 self.game.sound.play('poa_lit_jingle')
@@ -320,34 +325,56 @@ class POA(game.Mode):
             #stop ball
             self.stop_ball()
             
-            
             self.game.coils.flasherKingdom.disable()
+            
             self.adventure_started  = True
-            anim = dmd.Animation().load(game_path+"dmd/poa_instructions.dmd")
-            self.layer = dmd.AnimatedLayer(frames=anim.frames,opaque=True,repeat=True,frame_time=6)
+            self.adventure_continuing  = False
+            self.game.set_player_stats('adventure_started',self.adventure_started)
+            self.game.set_player_stats('adventure_continuing',self.adventure_continuing)
+            
+            self.adventure_mode.showcase_arrow_lamps() #this starts the flashing arrow lamps for instructional use
+            
+            #anim = dmd.Animation().load(game_path+"dmd/poa_instructions.dmd")
+            #self.layer = dmd.AnimatedLayer(frames=anim.frames,opaque=True,repeat=True,frame_time=6)
+            
+            anim = dmd.Animation().load(game_path+"dmd/poa_lit_bgnd.dmd")
+            bgnd_layer = dmd.AnimatedLayer(frames=anim.frames,repeat=True,frame_time=3)
+            text_layer1 = dmd.TextLayer(90, 15, self.game.fonts['8x6'], "center")
+            text_layer2 = dmd.TextLayer(90, 23, self.game.fonts['8x6'], "center")
+            text_layer1.composite_op='blacksrc'
+            text_layer2.composite_op='blacksrc'
+            text_layer1.set_text('Shoot All'.upper())
+            text_layer2.set_text('Lit Arrows'.upper())
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,text_layer1,text_layer2])
 
+            self.game.sound.play("adventure_start")
             self.game.sound.play_music('poa_play', loops=-1)
+            
             self.cancel_delayed('adventure_timeout')
-
-            self.adventure_start2(2)
+            #cancel any queued unpausing now we are ready to contiune
+            self.cancel_delayed('adventure_unpause')
+            #cancel the continune timer in case we came here from a continue
+            self.cancel_delayed('adventure_continue_timer')
+            
+            self.delay(name='adv_start_delay', event_type=None, delay=4, handler=self.adventure_start2)
 
 
         def adventure_start2(self,timer=0):
-            #cancel any queued unpausing now we are ready to contiune
-            self.cancel_delayed('adventure_unpause')
+            #add the adventure mode
+            self.game.modes.add(self.adventure_mode)
+            #release the ball
+            self.release_ball()
+            self.game.update_lamps()
+            self.adventure_continue_timer = self.game.user_settings['Gameplay (Feature)']['Adventure Continue Timer'] #reset the continue timer to stored value here for each new attempt if needed
+                
             
-            self.game.sound.play("adventure_start")
-            
-            #self.delay(name='instructions', event_type=None, delay=timer, handler=self.game.mini_playfield.instructions)
-            self.delay(name='instructions', event_type=None, delay=timer+2, handler=self.release_ball)
-            
-            self.adventure_continue()
-
-
         def adventure_continue(self):
-            #if self.game.mini_playfield.get_status()=='countdown':
-            if self.game.switches.leftInlane.time_since_change()<1:
                 self.adventure_continuing  = True
+                self.game.set_player_stats('adventure_continuing',self.adventure_continuing)
+                
+                #self.game.coils.flasherKingdom.schedule(0x30003000, cycle_seconds=0, now=True)
+                self.game.effects.drive_flasher('flasherKingdom','medium',time=0)
+                self.game.effects.drive_flasher('flasherSkull','fast',time=2)
 
                 bgnd_anim = dmd.Animation().load(game_path+"dmd/poa_continue_bgnd.dmd")
                 bgnd_layer = dmd.FrameLayer(frame=bgnd_anim.frames[0])
@@ -370,40 +397,60 @@ class POA(game.Mode):
                 self.cancel_delayed('adventure_continue_timer')
                 self.delay(name='adventure_continue_timer', event_type=None, delay=self.adventure_continue_timer, handler=self.adventure_expired)
                 self.cancel_delayed("poa_exited_check")
-            else:
-                self.delay(name='poa_exited_check', event_type=None, delay=1, handler=self.adventure_continue)
+            #else:
+            #    self.delay(name='poa_exited_check', event_type=None, delay=1, handler=self.adventure_continue)
 
 
         def adventure_continue_display(self):
             self.layer =  self.adventure_continue_layer
             
-            
-        def adventure_paused(self,sw):
+        
+        def adventure_paused(self,sw): #relating to continue
             if self.adventure_continuing:
                 self.timer_layer.pause(True)
                 self.cancel_delayed('adventure_continue_timer')
                 self.cancel_delayed('adventure_unpause')
-                self.delay(name='adventure_unpause', delay=self.pause_length,handler=self.adventure_unpaused)
+                if sw!= None:
+                    self.delay(name='adventure_unpause', delay=self.pause_length,handler=self.adventure_unpaused)
             
             
-        def adventure_unpaused(self):
-            self.timer_layer.pause(False) 
-            self.delay(name='adventure_continue_timer', event_type=None, delay=self.timer_layer.get_time_remaining(), handler=self.adventure_expired)
+        def adventure_unpaused(self): #relating to continue
+            if self.adventure_continuing:
+                self.timer_layer.pause(False) 
+                self.delay(name='adventure_continue_timer', event_type=None, delay=self.timer_layer.get_time_remaining(), handler=self.adventure_expired)
         
 
-        def adventure_expired(self):
+        def adventure_queue(self,enable): #relating to continue
+            #monitor scenario to clear pause continue timer and clear display from running over the top of starting modes
+            if enable:
+                self.adventure_paused(sw=None)
+                self.adventure_queued=True
+                self.clear()
+            else:
+                self.adventure_continue_timer = self.timer_layer.get_time_remaining()
+                self.adventure_continue()
+                #self.adventure_unpaused()
+                self.adventure_queued=False
+
+            
+        def adventure_expired(self): #change name to poa_expired?
             # Manually cancel  delays in case this function was called externally.
             self.cancel_delayed('adventure_continue_timer')
             self.cancel_delayed('poa_enabled_check')
 
             self.game.coils.flasherKingdom.disable()
             self.reset_lamps()
-            #self.game.mini_playfield.path_ended()
-            self.adventure_started  = False
-            self.adventure_continuing  = False
             
-#            self.game.sound.stop_music()
-#            self.game.sound.play_music('general_play', loops=-1)
+            #self.game.mini_playfield.path_ended()
+            #remove the adventure mode
+            if self.adventure_started:
+                self.game.modes.remove(self.adventure_mode)
+            
+            self.adventure_started  = False
+            self.game.set_player_stats('adventure_started',self.adventure_started)
+            self.adventure_continuing  = False
+            self.game.set_player_stats('adventure_continuing',self.adventure_continuing)
+            
             #continue any previously active mode music
             self.game.utility.resume_mode_music()    
 
@@ -674,13 +721,18 @@ class POA(game.Mode):
             
 
         def sw_rightRampMade_active(self, sw): #top post replacement
-            print("poa mode top post watcher")
-            if self.full_sets_completed>=1 and not self.game.get_player_stats("poa_queued"):
+            self.log.debug("poa mode top post watcher")
+            self.log.debug("full sets %s",self.full_sets_completed)
+            self.log.debug("poa queued %s",self.game.get_player_stats("poa_queued"))
+            if self.full_sets_completed>=1 and not self.game.get_player_stats("poa_queued") and self.game.switches.rightRampMade.time_since_change()>1:
                 if not self.adventure_started:
                     self.adventure_start()
-                elif self.adventure_continuing:
-                    self.adventure_start2()
-                    self.status_display()
+                elif self.adventure_continuing and not self.adventure_queued:
+#                    self.adventure_start2()
+#                    self.status_display()
+                    self.adventure_start()
+                    
+                return procgame.game.SwitchStop
 
 
         def status_display(self):

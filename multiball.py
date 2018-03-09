@@ -138,6 +138,12 @@ class Multiball(game.Mode):
 
 
         def mode_stopped(self):
+            #extra updates of status flags in case mode is stopped abruptly
+            self.multiball_running=False
+            self.multiball_started = False
+            self.game.set_player_stats('multiball_running',self.multiball_running) 
+            self.game.set_player_stats('multiball_started',self.multiball_started) 
+                
             self.jackpot('cancelled')
             self.game.set_player_stats('jackpots_collected',self.jackpot_collected)
             self.game.set_player_stats('cheat_count',self.cheat_count)

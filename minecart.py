@@ -524,7 +524,8 @@ class Minecart(game.Mode):
             self.gi(enable=True)
 
             #eject ball
-            self.game.coils.grailEject.pulse()
+            #self.game.coils.grailEject.pulse()
+            self.game.base_game_mode.mode_select.eject_ball()
             
             #enable ball search
             self.game.ball_search.enable()

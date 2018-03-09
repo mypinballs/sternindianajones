@@ -336,6 +336,10 @@ Gameplay (Feature):
     options: [1,4]
     increments: 1
     default: 1
+  'Adventure Challenge Timer':
+    options: [0,120]
+    increments: 5
+    default: 20
   'Adventure Continue Timer':
     options: [0,120]
     increments: 5

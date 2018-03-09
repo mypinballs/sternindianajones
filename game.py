@@ -181,7 +181,7 @@ class Game(game.BasicGame):
                     
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.6.2'
+                self.system_version='0.7.0'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -515,7 +515,8 @@ class Game(game.BasicGame):
                 
 		# Make sure flippers are off, especially for user initiated resets.
                 #TODO - TEMP Change to True for MPU testing, normally false
-		self.enable_flippers(enable=False)
+		#self.enable_flippers(enable=True)
+                self.enable_flippers(enable=False)
                 
                 #temp addition -testing for Gerry
                 #self.coils.swCol9Coil.pulse(0)
@@ -759,7 +760,8 @@ def main():
         logging.getLogger('ij.temple').setLevel(logging.ERROR)
 #        logging.getLogger('ij.trough').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.base').setLevel(logging.DEBUG)
-#        logging.getLogger('ij.poa').setLevel(logging.DEBUG)
+        logging.getLogger('ij.poa').setLevel(logging.DEBUG)
+        logging.getLogger('ij.adventure').setLevel(logging.DEBUG)
         logging.getLogger('ij.mode_select').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.raven_bar').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.match').setLevel(logging.DEBUG)

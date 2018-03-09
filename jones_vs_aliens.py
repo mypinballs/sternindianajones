@@ -430,7 +430,6 @@ class Jones_Vs_Aliens(game.Mode):
             
         
         def smart_bomb(self,value=1):
-            
              self.smart_bombs+=value
              if self.smart_bombs>0:
                 self.game.effects.drive_lamp(self.smart_bomb_lamp_button,'fast')
