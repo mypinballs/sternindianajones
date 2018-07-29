@@ -328,7 +328,7 @@ Gameplay (Feature):
     options: [20,90]
     increments: 5
     default: 30 
-  'Jackport Multiplier Timer':
+  'Jackpot Multiplier Timer':
     options: [5,120]
     increments: 5
     default: 30

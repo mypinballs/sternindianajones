@@ -235,7 +235,6 @@ class BaseGameMode(game.Mode):
 
 
 	def finish_ball(self):
-
                 #music fadeout
                 self.game.sound.fadeout_music()
 
@@ -260,7 +259,7 @@ class BaseGameMode(game.Mode):
 
 		# Tell the game object it can process the end of ball
 		# (to end player's turn or shoot again)
-		self.game.end_ball()
+		self.game.end_ball() # calls game.ball_ended() which removes this mode form the mode queue, calling mode_stopped()
                 
                 #garbage collection - experiemental
                 collect = gc.collect()

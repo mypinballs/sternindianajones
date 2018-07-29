@@ -85,9 +85,6 @@ class Minecart(game.Mode):
             self.award_layer.composite_op ="blacksrc"
             self.tunnel_info_layer = dmd.TextLayer(128, -1, self.game.fonts['7x4'], "right", opaque=False)
             self.tunnel_info_layer.composite_op ="blacksrc"
-            self.sprite_layer1 = dmd.AnimatedLayer(frames=None,hold=True,opaque=False,repeat=False)
-            self.sprite_layer2 = dmd.AnimatedLayer(frames=None,hold=True,opaque=False,repeat=False)
-            self.sprite_layer3 = dmd.AnimatedLayer(frames=None,hold=True,opaque=False,repeat=False)
 
             #sound setup
             self.game.sound.register_music('minecart_mode_music', music_path+"mine_cart.aiff")
@@ -106,6 +103,11 @@ class Minecart(game.Mode):
 
 
         def reset(self):
+            #screen setup
+            self.sprite_layer1 = dmd.AnimatedLayer(frames=None,hold=True,opaque=False,repeat=False)
+            self.sprite_layer2 = dmd.AnimatedLayer(frames=None,hold=True,opaque=False,repeat=False)
+            self.sprite_layer3 = dmd.AnimatedLayer(frames=None,hold=True,opaque=False,repeat=False)
+            
             #load stored vars from settings
 
             #var setup
@@ -131,8 +133,8 @@ class Minecart(game.Mode):
         def create_barrier(self,layer=0,posn=0):
             
             dmd_path = ["dmd/mine_cart_sprite_left_barrier.dmd","dmd/mine_cart_sprite_middle_barrier.dmd","dmd/mine_cart_sprite_right_barrier.dmd"]
-            x_offset = [4,2,14]
-            y_offset = [-3,-12,-2]
+            x_offset = [2,2,10]#[4,2,14]
+            y_offset = [-3,-12,-3]#[-3,-12,-2]
             barrier_frames = dmd.Animation().load(dmd_path[posn]).frames
 
             #set the sprite posn
@@ -142,11 +144,11 @@ class Minecart(game.Mode):
 
             
             if layer==1:
-                self.sprite_layer1 = SpriteLayer(frames=barrier_frames, opaque=False, hold=True, repeat=False, x=x,y=y)
+                self.sprite_layer1 = SpriteLayer(frames=barrier_frames, opaque=False, hold=True, repeat=False, x=x,y=y,frame_time=self.frame_time)
                 #load next animation part at end of this part
                 #self.sprite_layer1.add_frame_listener(-1,xx)
             elif layer==2:
-                self.sprite_layer2 = SpriteLayer(frames=barrier_frames, opaque=False, hold=True, repeat=False, x=x,y=y)
+                self.sprite_layer2 = SpriteLayer(frames=barrier_frames, opaque=False, hold=True, repeat=False, x=x,y=y,frame_time=self.frame_time)
                 #load next animation part at end of this part
                 #self.sprite_layer2.add_frame_listener(-1,xx)
 
@@ -158,15 +160,15 @@ class Minecart(game.Mode):
             if barrier_posn==0:
                 dmd_path = ["","dmd/mine_cart-left_barrier_straight_on.dmd","dmd/mine_cart-left_barrier_right_turn.dmd"]
                 x_offset = [0,-40,-34]
-                y_offset = [0,6,0]
+                y_offset = [0,4,0]
             elif barrier_posn==1:
                 dmd_path = ["dmd/mine_cart-mid_barrier_left_turn.dmd","","dmd/mine_cart-mid_barrier_right_turn.dmd"]
                 x_offset = [40,0,-36]
                 y_offset = [-2,0,-2]
             elif barrier_posn==2:
                 dmd_path = ["dmd/mine_cart-right_barrier_left_turn.dmd","dmd/mine_cart-right_barrier_straight_on.dmd",""]
-                x_offset = [34,49,0]
-                y_offset = [0,6,0]
+                x_offset = [39,49,0]
+                y_offset = [0,4,0]
             
             barrier_frames = dmd.Animation().load(dmd_path[current_posn]).frames
             
@@ -175,11 +177,11 @@ class Minecart(game.Mode):
             y = y_offset[current_posn]
           
             if layer==1:
-                self.sprite_layer1 = SpriteLayer(frames=barrier_frames, opaque=False, hold=True, repeat=False, x=x,y=y)
+                self.sprite_layer1 = SpriteLayer(frames=barrier_frames, opaque=False, hold=False, repeat=False, x=x,y=y,frame_time=self.frame_time)
                 #load next animation part at end of this part
                 #self.sprite_layer1.add_frame_listener(-1,xx)
             elif layer==2:
-                self.sprite_layer2 = SpriteLayer(frames=barrier_frames, opaque=False, hold=True, repeat=False, x=x,y=y)
+                self.sprite_layer2 = SpriteLayer(frames=barrier_frames, opaque=False, hold=False, repeat=False, x=x,y=y,frame_time=self.frame_time)
                 #load next animation part at end of this part
                 #self.sprite_layer2.add_frame_listener(-1,xx)
 

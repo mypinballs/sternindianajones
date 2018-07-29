@@ -57,6 +57,7 @@ class Choose_Wisely(game.Mode):
             self.correct_choice = 3
             self.user_choice = 3
             self.choose_ready = False
+            self.choice_selected = False
 
 
         def load_intro_anim(self):
@@ -162,15 +163,16 @@ class Choose_Wisely(game.Mode):
             self.choose_ready = True
             
             #create timer layer
-            self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
+            self.ctimer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
             
             #turn selection button lamp on - using tournament buttom
             self.game.effects.drive_lamp(self.lamps[0],'fast')
 
-            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,self.grail_cup_layer,self.info_layer,self.timer_layer,self.arrow_layer])
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,self.grail_cup_layer,self.info_layer,self.ctimer_layer,self.arrow_layer])
 
-            #setup and auto kill if player doesnt choose in the time
+            #setup an auto kill if player doesnt choose in the time
             self.delay(name='choice_timeout', event_type=None, delay=self.timer, handler=self.load_fail_anim1)
+             
              
         def move_left(self):
             if self.arrow_layer.target_x>5:
@@ -247,6 +249,7 @@ class Choose_Wisely(game.Mode):
             self.score_value = self.score_value_extra
             self.game.score(self.score_value)
 
+
         def award_score(self):
             self.score_value = self.score_value_start+(self.score_value_boost*self.level)
 
@@ -269,6 +272,9 @@ class Choose_Wisely(game.Mode):
             
             timer=2
             cup_posns = [0,28,56,84,112]
+            
+            #flag to only allow 1 selection
+            self.choice_selected = True
 
             #play sound
             self.game.sound.play('gun_shot')
@@ -296,6 +302,7 @@ class Choose_Wisely(game.Mode):
             self.game.set_player_stats('video_mode_started',True)
 
             #setup additonal layers
+            self.timer_layer = dmd.TimerLayer(128, -1, self.game.fonts['07x5'],self.timer,"right")
             self.info_layer = dmd.TextLayer(128/2, -1, self.game.fonts['07x5'], "center", opaque=False)
             #self.info_layer.set_text("SHOOT LIT SHOTS",blink_frames=1000)
 
@@ -331,9 +338,12 @@ class Choose_Wisely(game.Mode):
             #update mode player stats
             self.game.set_player_stats('video_mode_started',False)
 
+            #cancel the choice timeout timer
+            self.cancel_delayed('choice_timeout')
             #cancel speech calls
             self.cancel_delayed('mode_speech_delay')
             self.cancel_delayed('aux_mode_speech_delay')
+            
 
             #reset music
             #self.game.sound.stop_music()
@@ -409,7 +419,7 @@ class Choose_Wisely(game.Mode):
 
         def sw_tournamentStart_active(self, sw):
 
-            if self.choose_ready:
+            if self.choose_ready and not self.choice_selected:
                 self.chosen()
             return procgame.game.SwitchStop
 

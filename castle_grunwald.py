@@ -73,7 +73,7 @@ class Castle_Grunwald(game.Mode):
 
 
         def reset(self):
-           self.count = 0
+            self.count = 0
            
 
         def load_scene_anim(self,count):
@@ -168,6 +168,9 @@ class Castle_Grunwald(game.Mode):
             #cancel speech calls
             self.cancel_delayed('mode_speech_delay')
             self.cancel_delayed('aux_mode_speech_delay')
+            #cancel animation bgnd restore
+            self.cancel_delayed('animation_end_delay')
+            
 
             #reset music
             #self.game.sound.stop_music()
@@ -179,24 +182,27 @@ class Castle_Grunwald(game.Mode):
             #reset drop target
             #self.game.coils.totemDropUp.pulse()
             
+            #check map room in case ball entered eject
+            self.game.utility.check_map_room()
+            
             #lamps
             self.reset_lamps()
             
 
         def mode_progression(self):
+            if self.count<self.hits:
+                self.count+=1
 
-            self.count+=1
+                score_value = self.score_value_boost*self.count +self.score_value_start
+                self.game.set_player_stats('castle_grunwald_score',score_value)
+                self.game.set_player_stats('last_mode_score',self.game.get_player_stats('castle_grunwald_score' ))
+                #set text layers
+                self.award_layer.set_text(locale.format("%d",score_value,True),blink_frames=10,seconds=2, color=dmd.CREAM)
 
-            score_value = self.score_value_boost*self.count +self.score_value_start
-            self.game.set_player_stats('castle_grunwald_score',score_value)
-            self.game.set_player_stats('last_mode_score',self.game.get_player_stats('castle_grunwald_score' ))
-            #set text layers
-            self.award_layer.set_text(locale.format("%d",score_value,True),blink_frames=10,seconds=2, color=dmd.CREAM)
-
-            self.delay(name='scene_anim_delay', event_type=None, delay=2, handler=self.load_scene_anim, param=self.count)
+                self.delay(name='scene_anim_delay', event_type=None, delay=2, handler=self.load_scene_anim, param=self.count)
             
-            self.game.score(score_value)
-            self.game.sound.play('cg_target_hit')
+                self.game.score(score_value)
+                self.game.sound.play('cg_target_hit')
             
 
 

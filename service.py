@@ -154,8 +154,9 @@ class Tests(ServiceModeList):
 		self.lamp_test = LampTest(self.game, self.priority+1, font, big_font)
 		self.coil_test = CoilTest(self.game, self.priority+1, font, big_font)
                 self.ark_test = ArkTest(self.game, self.priority+1, font, big_font)
+                self.trough_test = TroughTest(self.game, self.priority+1, font, big_font)
 		self.switch_test = SwitchTest(self.game, self.priority+1, font, big_font)
-		self.items = [self.switch_test, self.lamp_test, self.coil_test,self.ark_test]
+		self.items = [self.switch_test, self.lamp_test, self.coil_test,self.ark_test,self.trough_test]
 		for test in extra_tests:
 			self.items.append(test)
 
@@ -600,7 +601,6 @@ class CoilTest(ServiceModeList):
                         self.set_matrix()
 		return True
 
-
 class SwitchTest(ServiceModeSkeleton):
 	"""Switch Test"""
 	def __init__(self, game, priority, font, big_font):
@@ -854,6 +854,182 @@ class ArkTest(ServiceModeSkeleton):
             self.game.sound.play('service_cancel')
         return game.SwitchStop	
               
+              
+class TroughTest(ServiceModeSkeleton):
+    """docstring for ResetAudits"""
+    def __init__(self, game, priority, font, big_font):
+	super(TroughTest, self).__init__(game, priority,font)
+        self.log = logging.getLogger('ij.service.trough_test')
+        self.name = 'Trough Test'
+        
+        self.text_trough1_layer = dmd.TextLayer(97, 20, self.game.fonts['7x4'], "left")
+        self.text_trough2_layer = dmd.TextLayer(80, 19, self.game.fonts['7x4'], "left")
+        self.text_trough3_layer = dmd.TextLayer(65, 18, self.game.fonts['7x4'], "left")
+        self.text_trough4_layer = dmd.TextLayer(1, 19, self.game.fonts['7x4'], "left")
+        self.text_trough5_layer = dmd.TextLayer(1, 19, self.game.fonts['7x4'], "left")
+        self.text_trough6_layer = dmd.TextLayer(1, 19, self.game.fonts['7x4'], "left")
+        self.text_jam_layer = dmd.TextLayer(1, 19, self.game.fonts['7x4'], "left")
+        self.text_shooter_lane_layer = dmd.TextLayer(115, 20, self.game.fonts['7x4'], "left")
+        
+        self.status = ''
+        self.info = ''
+        self.okToUpdate=False
+                
+                
+    def mode_started(self):
+        super(TroughTest,self).mode_started()
+        
+        trough_anim = dmd.Animation().load(game_path+"dmd/trough_bgnd.dmd")
+        self.trough_layer = dmd.FrameLayer(frame=trough_anim.frames[0])
+        self.trough_layer.composite_op ="blacksrc"
+        
+        self.trough_display_layer = [self.bgnd_layer,self.trough_layer,self.title_layer,self.instruction_layer]
+        
+        #create a map of the ball positions
+        #posns = [[111,15],[93,0],[93,15],[77,14],[61,13],[45,12],[29,11],[13,10]] #6 ball trough
+        posns = [[111,15],[93,0],[93,15],[77,14],[61,13],[45,12],[29,11]] #5 ball trough
+        self.ball_posns = posns
+        for id,switch in enumerate(self.game.switches.items_tagged('trough_test')):
+            self.create_ball_posn(switch,posns[id][0],posns[id][1])
+            self.add_switch_handler(name=switch.name, event_type='active', delay=0.25, handler=self.ttrough_active_sw)
+            self.add_switch_handler(name=switch.name, event_type='inactive', delay=0.25, handler=self.ttrough_inactive_sw)
+            
+            #add update for initial states
+            if switch.is_active():
+                self.ttrough_active_sw(switch)
+                self.log.info("Initial Active Trough Test Switch:%s",switch.name)
+            else:
+                self.ttrough_inactive_sw(switch)
+                self.log.info("Initial Inactive Trough Test Switch:%s",switch.name)
+        
+#        for switch in self.game.switches.items_tagged('trough_jam'):
+#            self.create_ball_posn(switch,posns[5][0],posns[5][1])
+#        
+#        for switch in self.game.switches.items_tagged('shooter_lane'):
+#            self.create_ball_posn(switch,posns[6][0],posns[6][1])
+            
+        self.layer = dmd.GroupedLayer(128, 32, self.trough_display_layer)
+        
+        
+        self.okToUpdate=True
+        
+        
+    
+    def mode_stopped(self):
+        super(TroughTest,self).mode_stopped()
+        self.cancel_delayed('arktest_display_update')
+         
+    
+    def create_ball_posn(self,sw,x,y):
+        #create a ball outline with sw number and positon in the trough
+        
+        #num = self.game.switches[sw].number
+        self.log.info('creating trough test graphics: %s',sw.name)
+        sw_num = sw.yaml_number[1:]
+        text_layer = dmd.TextLayer(x+4, y+5, self.game.fonts['tiny7'], "left")
+        text_layer.composite_op ="blacksrc"
+        text_layer.set_text(sw_num,color=dmd.RED)
+        
+        ball_anim = dmd.Animation().load(game_path+"dmd/trough_ball.dmd")
+        ball_layer = dmd.FrameLayer(frame=ball_anim.frames[1])
+        ball_layer.target_x=x
+        ball_layer.target_y=y
+        ball_layer.composite_op ="blacksrc"
+        
+        #add to the display layer group
+        self.trough_display_layer.append(ball_layer)
+        self.trough_display_layer.append(text_layer)
+        
+    
+    def ttrough_active_sw(self,sw):
+        
+        #num = self.game.switches[sw].number
+        sw_num = sw.yaml_number[1:]
+        id=(int(sw_num)-23)*-1
+
+        ball_anim = dmd.Animation().load(game_path+"dmd/trough_ball.dmd")
+        ball_layer = dmd.FrameLayer(frame=ball_anim.frames[0])
+        ball_layer.composite_op ="blacksrc"
+        ball_layer.target_x=self.ball_posns[id][0]
+        ball_layer.target_y=self.ball_posns[id][1]
+        
+        self.trough_display_layer[(id*2)+4] = ball_layer
+        self.trough_display_layer[(id*2)+5].set_text(sw_num,color=dmd.GREEN)
+        
+        self.display_update()
+        
+    
+    def ttrough_inactive_sw(self,sw):
+        
+        #num = self.game.switches[sw].number
+        sw_num = sw.yaml_number[1:]
+        id=(int(sw_num)-23)*-1
+
+        ball_anim = dmd.Animation().load(game_path+"dmd/trough_ball.dmd")
+        ball_layer = dmd.FrameLayer(frame=ball_anim.frames[1])
+        ball_layer.composite_op ="blacksrc"
+        ball_layer.target_x=self.ball_posns[id][0]
+        ball_layer.target_y=self.ball_posns[id][1]
+        
+        self.trough_display_layer[(id*2)+4] = ball_layer
+        self.trough_display_layer[(id*2)+5].set_text(sw_num,color=dmd.YELLOW)
+        
+        self.display_update()
+        
+        
+#    def trough_active_sw(self,sw,id):
+#        
+#        #num = self.game.switches[sw].number
+#        sw_num = sw.yaml_number[1:]
+#
+#        ball_anim = dmd.Animation().load(game_path+"dmd/trough_ball.dmd")
+#        ball_layer = dmd.FrameLayer(frame=ball_anim.frames[0])
+#        ball_layer.composite_op ="blacksrc"
+#        ball_layer.target_x=self.ball_posns[id][0]
+#        ball_layer.target_y=self.ball_posns[id][1]
+#        
+#        self.trough_display_layer[(id*2)+3] = ball_layer
+#        self.trough_display_layer[(id*2)+4].set_text(sw_num,color=dmd.GREEN)
+#        
+#        self.display_update()
+#    
+#    def trough_inactive_sw(self,sw,id):
+#        
+#        #num = self.game.switches[sw].number
+#        sw_num = sw.yaml_number[1:]
+#
+#        ball_anim = dmd.Animation().load(game_path+"dmd/trough_ball.dmd")
+#        ball_layer = dmd.FrameLayer(frame=ball_anim.frames[1])
+#        ball_layer.composite_op ="blacksrc"
+#        ball_layer.target_x=self.ball_posns[id][0]
+#        ball_layer.target_y=self.ball_posns[id][1]
+#        
+#        self.trough_display_layer[(id*2)+3] = ball_layer
+#        self.trough_display_layer[(id*2)+4].set_text(sw_num,color=dmd.RED)
+#        
+#        self.display_update()
+         
+           
+    def display_update(self):  
+        self.instruction_layer.set_text("Balls: "+str(self.game.trough.num_balls()),color=dmd.GREEN)
+        self.layer = dmd.GroupedLayer(128, 32, self.trough_display_layer)
+        #self.cancel_delayed('arktest_display_update')
+        #self.delay(name='arktest_display_update',delay=1,handler=self.display_update)
+    
+    
+    def launch_callback(self):
+        self.delay(name='launch_delay',delay=0.5,handler=self.game.coils.ballLaunch.pulse)
+    
+        
+    def sw_enter_active(self,sw):
+        if self.okToUpdate:
+            self.busy = True
+             # if enter is pressed, eject a ball
+            self.game.trough.launch_balls(1, self.launch_callback)
+        else:
+            self.game.sound.play('service_cancel')
+        return game.SwitchStop	
+          
             
             
 class Statistics(ServiceModeList):

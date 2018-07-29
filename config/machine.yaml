@@ -142,31 +142,31 @@ PRSwitches:
     trough5:
         number: S17
         label: 'Trough 5'
-        tags: trough
+        tags: trough,trough_test
     trough4:
         number: S18
         label: 'Trough 4'
-        tags: trough
+        tags: trough,trough_test
     trough3:
         number: S19
         label: 'Trough 3'
-        tags: trough
+        tags: trough,trough_test
     trough2:
         number: S20
         label: 'Trough 2'
-        tags: trough
+        tags: trough,trough_test
     trough1:
         number: S21
         label: 'Trough 1'
-        tags: trough,trough_eject
+        tags: trough,trough_eject,trough_test
     troughTop:
         number: S22
-        tags: trough_jam
+        tags: trough_jam,trough_test
         label: 'Trough Top'
     shooterLane:
         number: S23
         label: 'Shooter Lane'
-        tags: shooter_lane,poa_pause,mode_pause,ballsearch_stop
+        tags: shooter_lane,poa_pause,mode_pause,ballsearch_stop,trough_test
     leftOutlane:
         number: S24
         label: 'Left Outlane'
@@ -497,11 +497,11 @@ PRCoils:
     leftSlingshot:
         number: C17
         tags: ballsearch
-        label: 'Left Slingshot Top'
+        label: 'Left Slingshot'
     rightSlingshot:
         number: C18
         tags: ballsearch
-        label: 'Right Slingshot Top'
+        label: 'Right Slingshot'
     flasherTemple:
         number: C19
         label: 'Temple of Doom Flasher'

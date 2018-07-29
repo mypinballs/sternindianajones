@@ -1,6 +1,7 @@
 import procgame
 from procgame import *
 import locale
+import logging
 
 
 base_path = config.value_for_key_path('base_path')
@@ -13,6 +14,8 @@ class Bonus(game.Mode):
 	"""docstring for Bonus"""
 	def __init__(self, game, priority):
 		super(Bonus, self).__init__(game, priority)
+                
+                self.log = logging.getLogger('ij.bonus')
 
                 self.title_layer = dmd.TextLayer(128/2, 2, self.game.fonts['num_09Bx7'], "center")
 		self.value_layer = dmd.TextLayer(128/2, 16, self.game.fonts['num_14x10'], "center")
@@ -48,14 +51,18 @@ class Bonus(game.Mode):
 	def mode_started(self):
 		# Disable the flippers
 		self.game.enable_flippers(enable=False)
-                print("Debug, Bonus Mode Started")
+                
+                #disable the ball search in case of long bonus calcs!
+                self.game.ball_search.disable()
+                
+                self.log.debug("Bonus Mode Started")
 
 
 	def mode_stopped(self):
 		# Enable the flippers
 		self.game.enable_flippers(enable=True)
                 self.game.sound.stop_music()
-                print("Debug, Bonus Mode Ended")
+                self.log.debug("Bonus Mode Ended")
 
 
         def get_bonus_value(self):

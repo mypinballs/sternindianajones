@@ -110,3 +110,4 @@ class Player(procgame.game.Player):
                 self.player_stats['skillshot_level'] = 1
                 self.player_stats['adventure_flags']= [False,False,False,False,False,False]
                 self.player_stats['adventure_smart_bombs'] = 0
+                self.player_stats['trough_issue_count'] = 0

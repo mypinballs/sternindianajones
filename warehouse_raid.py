@@ -51,8 +51,8 @@ class Warehouse_Raid(game.Mode):
             self.score_layer = ModeScoreLayer(128/2, -1, self.game.fonts['9x7_bold'], self,"center")
             self.score_layer.composite_op ="blacksrc"
             self.info_layer = dmd.TextLayer(128/2, 26, self.game.fonts['07x5'], "center", opaque=False)
-            self.award_layer = dmd.TextLayer(128/2, 5, self.game.fonts['23x12'], "center", opaque=False)
-            self.award_layer.composite_op='blacksrc'
+            #self.award_layer = dmd.TextLayer(128/2, 5, self.game.fonts['23x12'], "center", opaque=False)
+            #self.award_layer.composite_op='blacksrc'
             self.box_layer = dmd.TextLayer(22, 11, self.game.fonts['8x6'], "left", opaque=False)
             
             #sound setup
@@ -98,7 +98,7 @@ class Warehouse_Raid(game.Mode):
             self.cancel_delayed('reload_bgnd_anim')
             self.delay(name='reload_bgnd_anim',delay=2,handler=self.load_bgnd_anim)
             
-            self.layer = dmd.GroupedLayer(128, 32, [self.box_layer,self.scene_layer,self.score_layer,self.info_layer,self.award_layer])
+            self.layer = dmd.GroupedLayer(128, 32, [self.box_layer,self.scene_layer,self.score_layer,self.info_layer]) #,self.award_layer
 
 
         def load_bgnd_anim(self):   
@@ -163,8 +163,7 @@ class Warehouse_Raid(game.Mode):
 
         def mode_stopped(self):
             #save player stats
-            self.items_collected+=self.running_total
-            self.game.set_player_stats('warehouse_items_collected',self.running_total)
+            self.game.set_player_stats('warehouse_items_collected',self.items_collected)
 
             score_value = self.running_total
             self.game.set_player_stats('warehouse_raid_score',score_value)
@@ -247,7 +246,7 @@ class Warehouse_Raid(game.Mode):
                 self.game.sound.play('warehouse_item_collected')
                 self.release_ball()
                 self.count= 0
-                self.running_total+=1
+                self.items_collected+=1
                 
             else:
                 self.count=1

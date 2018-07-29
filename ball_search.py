@@ -160,7 +160,7 @@ class Ball_Search(game.Mode):
                 message = str(balls_missing)+" BALL"+multiple+" MISSING!"
                 self.issue_display(message1=message, message2="SEARCHING...",timer=timer)
             else:
-                #call this is 0 balls lost and here. Must be a trough issue with bounce backs.
+                #call this as 0 balls lost and here. Must be a trough issue with bounce backs.
                 self.trough_issue()
         
         
@@ -211,9 +211,18 @@ class Ball_Search(game.Mode):
         def trough_issue(self):
             self.cancel_delayed('ball_lost')
             self.cancel_delayed('ball_search_countdown')
-            self.trough_issues+=1
-            self.issue_display(message1='TROUGH MALFUNCTION',message2='CHECK EJECT...',severity=2,timer=3)
-            self.game.trough.launch_balls(1,stealth=True,callback=self.enable)
+            self.trough_issue = self.game.get_player_stats('trough_issue_count')+1
+            
+            self.issue_display(message1='TROUGH MALFUNCTION',message2='CHECK TROUGH SWITCHES',severity=2,timer=3)
+            
+            #logic - allow 1 relaunch then auto end the ball
+            if self.trough_issue>1:
+                self.game.base_game_mode.finish_ball()
+                self.trough_issue = 0
+            else:
+                self.game.trough.launch_balls(1,stealth=True,callback=self.enable)
+            
+            self.game.set_player_stats('trough_issue_count',self.trough_issue)
             self.ballsearch_attempts=0
             
 

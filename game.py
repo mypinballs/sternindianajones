@@ -103,6 +103,8 @@ class Game(game.BasicGame):
 
                 use_desktop = config.value_for_key_path(keypath='use_desktop', default=True)
                 self.color_desktop = config.value_for_key_path(keypath='colour_desktop', default=False)
+                self.rpi_computer = config.value_for_key_path(keypath='rPi_installed', default=False)
+                self.rpi_hardware_video = config.value_for_key_path(keypath='rPi_hardware_video', default=False)
                 if use_desktop:
                     # if not color, run the old style pygame
                     if not self.color_desktop:
@@ -111,15 +113,20 @@ class Game(game.BasicGame):
                         self.desktop = Desktop()
                     # otherwise run the color display
                     else:
-                        self.log.info("Colour Desktop")
-                        from ep import EP_Desktop
-                        self.desktop = EP_Desktop()
+                        if self.rpi_computer:
+                            self.log.info("rPi Optimised Colour Desktop")
+                            from mpc import rPi_Desktop
+                            self.desktop = rPi_Desktop()
+                        else:
+                            self.log.info("Standard Colour Desktop")
+                            from ep import EP_Desktop
+                            self.desktop = EP_Desktop()
 
                 #debug
-                for coil in self.coils:
-                    self.log.debug("Game Config:"+str(coil.name)+" "+str(coil.number))
-                for lamp in self.lamps:
-                    self.log.debug("Game Config:"+str(lamp.name)+" "+str(lamp.number))
+#                for coil in self.coils:
+#                    self.log.debug("Game Config:"+str(coil.name)+" "+str(coil.number))
+#                for lamp in self.lamps:
+#                    self.log.debug("Game Config:"+str(lamp.name)+" "+str(lamp.number))
 
 
                 #setup score display
@@ -181,7 +188,7 @@ class Game(game.BasicGame):
                     
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.7.0'
+                self.system_version='0.7.1r4'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -272,8 +279,8 @@ class Game(game.BasicGame):
 #			self.log.info("  %s:\t%s:\t%s" % (sw.number, sw.name, sw.state_str()))
 #                        
 #                self.log.info("Lamp Info:")
-#		for lamp in self.lamps:
-#			self.log.info("  %s:\t%s:\t%s" % (lamp.number, lamp.name, lamp.yaml_number))
+		for lamp in self.lamps:
+			self.log.info("  %s:\t%s:\t%s" % (lamp.number, lamp.name, lamp.yaml_number))
 #                
                 #balls per game setup
                 self.balls_per_game = self.user_settings['Machine (Standard)']['Balls Per Game']

@@ -205,7 +205,7 @@ class Mode_Select(game.Mode):
                 elif self.current_mode_num==14:
                     self.timer_layer = self.ringmaster.timer_layer
                 
-                if self.timer_layer !=None:
+                if self.timer_layer !=None and not self.game.get_player_stats('mode_paused'):
                     self.timer_layer.pause(True)
                     self.cancel_delayed('scene_timeout')
                     self.cancel_delayed('scene_unpause')
@@ -216,7 +216,7 @@ class Mode_Select(game.Mode):
             
             
         def mode_unpaused(self):
-            if self.mode_running and self.timer_layer !=None:
+            if self.mode_running and self.timer_layer !=None and self.game.get_player_stats('mode_paused'):
                 self.timer_layer.pause(False) 
                 self.cancel_delayed('scene_timeout')
                 self.delay(name='scene_timeout', event_type=None, delay=self.timer_layer.get_time_remaining(), handler=self.end_scene)
@@ -322,6 +322,8 @@ class Mode_Select(game.Mode):
                 self.name_text =''
                 self.info_text =''
                 self.info2_text =''
+                self.timer_layer = None
+                self.window_posn = 5
             
                 #play sound
                 self.game.sound.play("scene_started")
@@ -331,85 +333,105 @@ class Mode_Select(game.Mode):
                     self.name_text = 'GET THE IDOL'
                     self.info_text = 'HIT TEMPLE'
                     self.info2_text = 'CAPTIVE BALL'
+                    self.window_posn = 2
 
                 elif self.current_mode_num==1:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Streets Of Cairo Timer']
                     self.name_text = 'STREETS OF CAIRO'
                     self.info_text = 'SHOOT LIT SHOTS'
                     self.info2_text = 'TO FIND MARION'
+                    self.window_posn = 4
 
                 elif self.current_mode_num==2:
                     self.name_text = 'WELL OF SOULS'
                     self.info_text = 'SHOOT CENTER HOLE'
+                    self.window_posn = 4
 
                 elif self.current_mode_num==3:
                     if self.secret_mode:
                         self.name_text = 'Werewolf Attack!'.upper()
                         self.info_text = 'Secret Video Mode'.upper()
+                        self.window_posn = 7
                     else:
                         self.name_text = 'RAVEN BAR'
                         self.info_text = 'VIDEO MODE'
+                        self.window_posn = 7
 
                 elif self.current_mode_num==4:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Monkey Brains Timer']
                     self.name_text = 'MONKEY BRAINS'
                     self.info_text = 'SHOOT LIT SHOTS'
+                    self.window_posn = 6
 
                 elif self.current_mode_num==5:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Steal The Stones Timer']
                     self.name_text = 'STEAL THE STONES'
                     self.info_text = 'SHOOT RAMP THEN'
                     self.info2_text = 'JONES TARGETS'
+                    self.window_posn = 6
                     
                 elif self.current_mode_num==6:
                     self.name_text = 'MINE CART'
                     self.info_text = 'VIDEO MODE'
+                    self.window_posn = 6
 
                 elif self.current_mode_num==7:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Rope Bridge Timer']
                     self.name_text = 'ROPE BRIDGE'
                     self.info_text = 'SHOOT RAMPS'
                     self.info2_text = 'TO CROSS ROPE BRIDGE'
+                    self.window_posn = 6
 
                 elif self.current_mode_num==8:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Castle Brunwald Timer']
                     self.name_text = 'CASTLE BRUNWALD'
                     self.info_text = 'HIT UPPER CAPTIVE BALL'
                     self.info2_text = 'TO ESCAPE CASTLE'
+                    self.window_posn = 3
 
                 elif self.current_mode_num==9:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Tank Chase Timer']
                     self.name_text = 'TANK CHASE'
                     self.info_text = 'SHOOT LOOPS'
                     self.info2_text = 'TO DESTROY TANK'
+                    self.window_posn = 5
 
                 elif self.current_mode_num==10:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['The 3 Challenges Timer']
                     self.name_text = '3 CHALLENGES'
                     self.info_text = 'SHOOT MOVING SHOTS'
                     self.info2_text = 'TO PASS'
+                    self.window_posn = 5
 
                 elif self.current_mode_num==11:
                     self.name_text = 'CHOOSE WISELY'
                     self.info_text = 'VIDEO MODE'
+                    self.window_posn = 5
                 
                 elif self.current_mode_num==12:
                     self.name_text = 'WAREHOUSE RAID'
                     self.info_text = 'LOCK BALLS ON RAMP'
                     self.info2_text = 'TO FIND ITEMS'
+                    self.window_posn = 0
                 
                 elif self.current_mode_num==13:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Jones Vs Aliens Timer']
                     self.name_text = 'JONES VS ALIENS'
                     self.info_text = 'DESTROY SHIPS'
                     self.info2_text = 'TO SAVE EARTH'
+                    self.window_posn = 1
                 
                 elif self.current_mode_num==14:
                     self.timer = self.game.user_settings['Gameplay (Feature)']['Ringmaster Timer']
                     self.name_text = 'RINGMASTER'
-                    self.info_text = 'BATLLE RINGMASTER'
+                    self.info_text = 'BATTLE RINGMASTER'
                     self.info2_text = 'TO SAVE EARTH'
+                    self.window_posn = 1
                 
+                #extra cancel of timers - built up on switches during non mode play? 
+                self.cancel_delayed('scene_timeout')
+                self.cancel_delayed('scene_unpause')
+            
                 self.mode_starting = True
                 self.game.set_player_stats('mode_starting',self.mode_starting)
                 
@@ -417,17 +439,30 @@ class Mode_Select(game.Mode):
                 if self.game.get_player_stats('adventure_continuing'):
                     self.game.base_game_mode.poa.adventure_queue(True)
 
-                anim = dmd.Animation().load(game_path+"dmd/start_scene.dmd")
-                self.animation_layer = dmd.AnimatedLayer(frames=anim.frames,hold=True,frame_time=4)
+                #create map animation with completed mode hilighting
+                bgnd_anim = dmd.Animation().load(game_path+"dmd/start_scene_bgnd.dmd")
+                self.bgnd_layer = dmd.AnimatedLayer(frames=bgnd_anim.frames,repeat=True,frame_time=4)
                 
-                self.animation_layer.add_frame_listener(-1,self.mode_text)
-
-                self.ssd_count=0#temp fix for frame_listener multi call with held
-                self.animation_layer.add_frame_listener(-1,self.scene_start_delay)
+                map_dot_posns = [[27,23],[60,11],[62,11],[87,8],[82,10],[81,11],[82,12],[81,13],[59,2],[71,5],[72,4],[73,5],[14,10],[22,22]]
+                completed_dot = dmd.Animation().load(game_path+"dmd/scene_completed_dot.dmd")
                 
-
-                self.layer = dmd.GroupedLayer(128, 32, [self.animation_layer,self.name_layer,self.info_layer,self.info2_layer])
-
+                self.map_layer = []
+                self.map_layer.append(self.bgnd_layer)
+                
+                for posn,status in enumerate(self.select_list):
+                    if status==1:
+                        mode_status_layer = dmd.FrameLayer(frame=completed_dot.frames[0])
+                        mode_status_layer.target_x = map_dot_posns[posn][0]
+                        mode_status_layer.target_y = map_dot_posns[posn][1]
+                    
+                        mode_status_layer.composite_op ="blacksrc"
+                        self.map_layer.append(mode_status_layer)
+                
+                self.layer = dmd.GroupedLayer(128, 32, self.map_layer)
+                
+                #queue the map window animation load
+                self.delay('load_map_window',delay=1,handler=self.load_map_window_animation)
+                
                 #update mode flags and player stats
                 self.mode_enabled=False
                 self.game.set_player_stats('mode_enabled',self.mode_enabled)
@@ -463,6 +498,20 @@ class Mode_Select(game.Mode):
                 self.delay(name='eject_delay', event_type=None, delay=timer, handler=self.eject_ball)
                 
                 
+        def load_map_window_animation(self):
+            window_anim = dmd.Animation().load(game_path+"dmd/start_scene_window_posn"+str(self.window_posn)+".dmd")
+            self.animation_layer = dmd.AnimatedLayer(frames=window_anim.frames,hold=True,frame_time=4)
+            self.animation_layer.composite_op ="blacksrc"
+            self.animation_layer.add_frame_listener(-1,self.mode_text)
+            self.animation_layer.add_frame_listener(-2,self.scene_start_delay)
+            self.ssd_count=0#temp fix for frame_listener multi call with held
+               
+            self.map_layer.append(self.animation_layer)
+            self.map_layer.append(self.name_layer)
+            self.map_layer.append(self.info_layer)
+            self.map_layer.append(self.info2_layer)
+            self.layer = dmd.GroupedLayer(128, 32, self.map_layer)
+            
 
         def add_selected_scene(self):
 
@@ -593,6 +642,12 @@ class Mode_Select(game.Mode):
             #cancel any running timers in case mode was completed
             self.cancel_delayed('scene_timeout')
             self.cancel_delayed('scene_unpause')
+            self.timer_layer = None
+            
+            #update mode running flag and player stats
+            self.mode_running = False
+            self.game.set_player_stats('mode_running',self.mode_running)
+            self.game.set_player_stats('mode_running_id',99)
             
             #update mode completed status tracking
             self.select_list[self.current_mode_num] =1
@@ -610,11 +665,6 @@ class Mode_Select(game.Mode):
             self.delay(name='clear_display', event_type=None, delay=timer, handler=self.pre_clear)
             self.update_lamps()
 
-            #update mode running flag and player stats
-            self.mode_running = False
-            self.game.set_player_stats('mode_running',self.mode_running)
-            self.game.set_player_stats('mode_running_id',99)
-            
             #unpause any contiuning adventures now the scene mode is finished
             if self.game.get_player_stats('adventure_continuing'):
                 self.game.base_game_mode.poa.adventure_queue(False)
