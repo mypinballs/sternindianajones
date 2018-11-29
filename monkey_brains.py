@@ -109,6 +109,9 @@ class Monkey_Brains(game.Mode):
             #open gates
             #self.open_gates('left')
             #self.open_gates('right')
+            
+            #close temple
+            self.game.temple.close()
 
             #update_lamps
             self.update_lamps()
@@ -147,6 +150,10 @@ class Monkey_Brains(game.Mode):
             #close gates
             #self.close_gates('left')
             #self.close_gates('right')
+            
+            #restore temple if required 
+            if self.game.get_player_stats('lock_lit'):
+                self.game.temple.open()
 
             #reset lamps
             self.reset_lamps()

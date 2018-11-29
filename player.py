@@ -38,7 +38,7 @@ class Player(procgame.game.Player):
                 self.player_stats['mode_starting']=False
                 self.player_stats['mode_running'] = False
                 self.player_stats['mode_running_id'] = 99
-                self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                self.player_stats['mode_status_tracking']= [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
                 #self.player_stats['mode_status_tracking']= [0,1,1,1,1,1,1,1,1,1,1,1,1,1] #for testing final adventure more easily
                 self.player_stats['mode_blocking'] = False
                 self.player_stats['mode_paused'] = False
@@ -92,6 +92,9 @@ class Player(procgame.game.Player):
 		self.player_stats['jones_vs_aliens_score'] = 0
                 self.player_stats['warehouse_items_collected']=0
                 self.player_stats['warehouse_raid_score']=0
+                self.player_stats['skull_face_stones_removed']=0
+                self.player_stats['return_the_skull_score']=0
+                self.player_stats['nuke_test_score']=0
                 self.player_stats['frankenstein_sets_completed'] = 0
                 self.player_stats['frankenstein_millions_score'] = 0
                 self.player_stats['music_playing'] = False

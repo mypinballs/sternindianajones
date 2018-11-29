@@ -18,7 +18,7 @@ music_path = game_path +"music/"
 class Utility(game.Mode):
 
 	def __init__(self, game):
-            super(Utility, self).__init__(game, 5)
+            super(Utility, self).__init__(game, 99)
 
             self.log = logging.getLogger('ij.utility')
             self.game.sound.register_sound('elephant_alert', sound_path+"elephant.aiff")
@@ -83,24 +83,44 @@ class Utility(game.Mode):
 
         def pause_game(self,active=True):
             self.game.paused = active
-            self.game.enable_flippers(True) #update flipper rules
             
             if active:
-                self.game.sound.pause()
-                #self.game.coils.flipperLwRHold.enable()
-                self.game.effects.drive_flasher('flasherPlaneGuns','fast')
-                self.game.ball_search.disable()
+                self.game.enable_flippers(False) #update flipper rules
+                drivers=[]
+                self.game.proc.switch_update_rule(self.game.switches['flipperLwR'].number, 'open_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
+                        
+                info_layer = dmd.TextLayer(128/2, 5, self.game.fonts['7px_narrow_az'], "center", opaque=False)
+                info_layer2a = dmd.TextLayer(128/2, 15, self.game.fonts['07x5'], "center", opaque=False)
+                info_layer2b = dmd.TextLayer(128/2, 21, self.game.fonts['07x5'], "center", opaque=False)
+                bgnd_layer = dmd.FrameLayer(opaque=False)
+                bgnd_layer.frame = dmd.Animation().load(game_path+'dmd/scene_ended_bgnd.dmd').frames[0]
+            
+                info_layer.set_text("GAME PAUSED", color=dmd.CYAN)
+                info_layer2a.set_text("HOLD TOURNAMENT BUTTON",color=dmd.GREEN,blink_frames=12)
+                info_layer2b.set_text("TO CONTINUE",color=dmd.GREEN,blink_frames=12)
                 
+                self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,info_layer2b,info_layer2a,info_layer])
+            
+                self.game.sound.pause()
+                self.game.coils.flipperLwRMain.pulsed_patter(2,18)
+                self.game.effects.drive_flasher('flasherSankara','medium',time=0)
+                self.game.effects.drive_lamp('tournamentStartButton','fast')
+                self.game.ball_search.disable()
+  
             else:
+                self.layer=None
                 self.game.sound.un_pause()
-                #self.game.coils.flipperLwRHold.disable()
-                self.game.effects.drive_flasher('flasherPlaneGuns','off')
+                self.game.coils.flipperLwRMain.disable()
+                self.game.effects.drive_flasher('flasherSankara','off')
+                self.game.effects.drive_lamp('tournamentStartButton','off')
                 self.game.ball_search.enable()
+                
+                self.game.enable_flippers(True) #update flipper rules
         
         
         def resume_mode_music(self):
             self.log.info('Utility Mode Music Resumer Called')
-            self.mode_music_list = ['gti_play','soc_background_play','wos_background_play','rvb_bgnd_play','monkey_brains_play','sts_background_play','minecart_mode_music','rope_bridge_play','castle_grunwald_play','tc_background_play','ttc_background_play','cw_background_play','warehouse_background_play','jones_vs_aliens_play','ringmaster_play','frankenstein_play']
+            self.mode_music_list = ['gti_play','soc_background_play','wos_background_play','rvb_bgnd_play','monkey_brains_play','sts_background_play','minecart_mode_music','rope_bridge_play','castle_grunwald_play','tc_background_play','ttc_background_play','cw_background_play','warehouse_background_play','nuke_test_play','return_the_skull_play','jones_vs_aliens_play','frankenstein_play']
             mode_running_id = self.game.get_player_stats('mode_running_id')
             mode_running = self.game.get_player_stats('mode_running')
             qm_ready = self.game.get_player_stats('quick_multiball_ready')

@@ -25,6 +25,8 @@ from choose_wisely import *
 from werewolf import *
 from raven_bar import *
 from warehouse_raid import *
+from nuke_test import *
+from return_the_skull import *
 from jones_vs_aliens import *
 from ringmaster import *
 from final_adventure import *
@@ -50,7 +52,7 @@ class Mode_Select(game.Mode):
             self.game.sound.register_sound('scene_started', sound_path+'mode_started.aiff')
             self.game.sound.register_sound('scene_ended', sound_path+'mode_ended.aiff')
 
-            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','jonesVsAliens','kingdom3']
+            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','nukeTest','returnTheSkull','jonesVsAliens']
            
             #default mode bonus value
             self.mode_bonus_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Bonus Value (Mil)'])*1000000 #2000000
@@ -75,8 +77,10 @@ class Mode_Select(game.Mode):
             self.the_three_challenges = The_Three_Challenges(self.game, 90,self)
             self.choose_wisely = Choose_Wisely(self.game, 91,self)
             self.warehouse_raid = Warehouse_Raid(self.game, 92,self)
-            self.jones_vs_aliens = Jones_Vs_Aliens(self.game, 93,self)
-            self.ringmaster = Ringmaster(self.game, 94,self)
+            self.nuke_test = Nuke_Test(self.game, 93,self)
+            self.return_the_skull = Return_The_Skull(self.game, 94, self)
+            self.jones_vs_aliens = Jones_Vs_Aliens(self.game, 95,self)
+            self.ringmaster = Ringmaster(self.game, 95,self)
             self.final_adventure = Final_Adventure(self.game,150)
             
              #setup the switches which pause an active mode
@@ -121,7 +125,7 @@ class Mode_Select(game.Mode):
             
         def reset_scenes(self):
             #clear completed scenes
-            self.select_list= [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+            self.select_list= [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
             self.game.set_player_stats('mode_status_tracking',self.select_list)
             self.all_scenes_complete = False
             
@@ -200,9 +204,11 @@ class Mode_Select(game.Mode):
                     self.timer_layer = self.tank_chase.timer_layer
                 elif self.current_mode_num==10:
                     self.timer_layer = self.the_three_challenges.timer_layer
-                elif self.current_mode_num==13:
-                    self.timer_layer = self.jones_vs_aliens.timer_layer
                 elif self.current_mode_num==14:
+                    self.timer_layer = self.return_the_skull.timer_layer
+                elif self.current_mode_num==15:
+                    self.timer_layer = self.jones_vs_aliens.timer_layer
+                elif self.current_mode_num==16:
                     self.timer_layer = self.ringmaster.timer_layer
                 
                 if self.timer_layer !=None and not self.game.get_player_stats('mode_paused'):
@@ -415,18 +421,32 @@ class Mode_Select(game.Mode):
                     self.window_posn = 0
                 
                 elif self.current_mode_num==13:
-                    self.timer = self.game.user_settings['Gameplay (Feature)']['Jones Vs Aliens Timer']
-                    self.name_text = 'JONES VS ALIENS'
-                    self.info_text = 'DESTROY SHIPS'
-                    self.info2_text = 'TO SAVE EARTH'
-                    self.window_posn = 1
+                    self.timer = self.game.user_settings['Gameplay (Feature)']['Nuke Test Timer']
+                    self.name_text = 'NUKE TEST'
+                    self.info_text = 'SHOOT ARROWS TO'
+                    self.info2_text = 'FIND SAFE ESCAPE'
+                    self.window_posn = 0
                 
                 elif self.current_mode_num==14:
-                    self.timer = self.game.user_settings['Gameplay (Feature)']['Ringmaster Timer']
-                    self.name_text = 'RINGMASTER'
-                    self.info_text = 'BATTLE RINGMASTER'
-                    self.info2_text = 'TO SAVE EARTH'
+                    self.timer = self.game.user_settings['Gameplay (Feature)']['Return The Skull Timer']
+                    self.name_text = 'RETURN THE SKULL'
+                    self.info_text = 'SHOOT RAMP THEN TEMPLE'
+                    self.info2_text = 'TO OPEN OBLIESQUE'
                     self.window_posn = 1
+                elif self.current_mode_num==15:
+                    if self.secret_mode:
+                        self.timer = self.game.user_settings['Gameplay (Feature)']['Ringmaster Timer']
+                        self.name_text = 'RINGMASTER'
+                        self.info_text = 'BATTLE RINGMASTER'
+                        self.info2_text = 'TO SAVE EARTH'
+                        self.window_posn = 1
+                    else:
+                        self.timer = self.game.user_settings['Gameplay (Feature)']['Jones Vs Aliens Timer']
+                        self.name_text = 'JONES VS ALIENS'
+                        self.info_text = 'DESTROY SHIPS'
+                        self.info2_text = 'TO SAVE EARTH'
+                        self.window_posn = 1
+
                 
                 #extra cancel of timers - built up on switches during non mode play? 
                 self.cancel_delayed('scene_timeout')
@@ -443,7 +463,7 @@ class Mode_Select(game.Mode):
                 bgnd_anim = dmd.Animation().load(game_path+"dmd/start_scene_bgnd.dmd")
                 self.bgnd_layer = dmd.AnimatedLayer(frames=bgnd_anim.frames,repeat=True,frame_time=4)
                 
-                map_dot_posns = [[27,23],[60,11],[62,11],[87,8],[82,10],[81,11],[82,12],[81,13],[59,2],[71,5],[72,4],[73,5],[14,10],[22,22]]
+                map_dot_posns = [[27,23],[60,11],[62,11],[87,8],[82,10],[81,11],[82,12],[81,13],[59,2],[71,5],[72,4],[73,5],[14,10],[16,10],[25,19],[24,20]]
                 completed_dot = dmd.Animation().load(game_path+"dmd/scene_completed_dot.dmd")
                 
                 self.map_layer = []
@@ -546,9 +566,16 @@ class Mode_Select(game.Mode):
             elif self.current_mode_num==12:
                 self.game.modes.add(self.warehouse_raid)
             elif self.current_mode_num==13:
-                self.game.modes.add(self.jones_vs_aliens)
+                self.game.modes.add(self.nuke_test)
             elif self.current_mode_num==14:
-                self.game.modes.add(self.ringmaster)
+                self.game.modes.add(self.return_the_skull)
+            elif self.current_mode_num==15:
+                if self.secret_mode:
+                    self.game.modes.add(self.ringmaster)
+                else:
+                    self.game.modes.add(self.jones_vs_aliens)
+           
+                
                 
             #update mode flags and player stats
             self.mode_running = True
@@ -590,9 +617,14 @@ class Mode_Select(game.Mode):
             elif self.current_mode_num==12:
                 self.game.modes.remove(self.warehouse_raid)
             elif self.current_mode_num==13:
-                self.game.modes.remove(self.jones_vs_aliens)
+                self.game.modes.remove(self.nuke_test)
             elif self.current_mode_num==14:
-                self.game.modes.remove(self.ringmaster)
+                self.game.modes.remove(self.return_the_skull)
+            elif self.current_mode_num==15:
+                if self.secret_mode:
+                    self.game.modes.remove(self.ringmaster)
+                else:
+                    self.game.modes.remove(self.jones_vs_aliens)
 
                     
         def mode_text(self):
@@ -605,7 +637,7 @@ class Mode_Select(game.Mode):
             time = 2
 
             if self.ssd_count==0: #make sure the following delays only get called once
-                if self.current_mode_num !=2 and self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=11 and self.current_mode_num!=12: #don't set timeout for these non time based modes, mode 11 needs to be included here as it has its own choice timeout but not a timeout from here.
+                if self.current_mode_num !=2 and self.current_mode_num!=3 and self.current_mode_num!=6 and self.current_mode_num!=11 and self.current_mode_num!=12 and self.current_mode_num!=13: #don't set timeout for these non time based modes, mode 11 needs to be included here as it has its own choice timeout but not a timeout from here.
                     #self.cancel_delayed('scene_timeout')
                     self.cancel_delayed('scene_unpause')
                     self.delay(name='scene_timeout', event_type=None, delay=self.timer+time, handler=self.end_scene)

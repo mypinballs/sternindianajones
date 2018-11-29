@@ -887,15 +887,15 @@ PRLamps:
     skullJackpot:
         number: L66
         label: 'Skull Jackpot'
-    kingdom4:
-        number: L67
-        label: 'Kingdom Scene 4'
-    kingdom3:
-        number: L68
-        label: 'Kingdom Scene 3'
     jonesVsAliens:
-        number: L69
+        number: L67
         label: 'Jones Vs Aliens'
+    returnTheSkull:
+        number: L68
+        label: 'Return The Skull'
+    nukeTest:
+        number: L69
+        label: 'Nuke Test'
     leftSpecial:
         number: L70
         label: 'Left Special'

@@ -188,7 +188,7 @@ class Game(game.BasicGame):
                     
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.7.1r4'
+                self.system_version='0.8.0'
                 self.system_name='Indiana Jones 2'.upper()
                 
                 # Setup fonts
@@ -765,6 +765,7 @@ def main():
         logging.getLogger('ij.ark').setLevel(logging.DEBUG)
         logging.getLogger('ij.swordsman').setLevel(logging.ERROR)
         logging.getLogger('ij.temple').setLevel(logging.ERROR)
+        logging.getLogger('ij.ball_search').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.trough').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.base').setLevel(logging.DEBUG)
         logging.getLogger('ij.poa').setLevel(logging.DEBUG)

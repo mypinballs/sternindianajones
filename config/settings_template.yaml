@@ -305,12 +305,20 @@ Gameplay (Feature):
     options: [5,40]
     increments: 1
     default: 20
-  'Jones Vs Aliens Timer':
-    options: [20,90]
+  'Nuke Test Timer':
+    options: [20,50]
     increments: 5
-    default: 60
+    default: 30
+  'Return The Skull Timer':
+    options: [10,60]
+    increments: 5
+    default: 30
+  'Jones Vs Aliens Timer':
+    options: [10,60]
+    increments: 5
+    default: 30
   'Ringmaster Timer':
-    options: [20,90]
+    options: [10,60]
     increments: 5
     default: 30
   'Ringmaster Extras':

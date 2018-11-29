@@ -524,7 +524,7 @@ class Multiball(game.Mode):
 
         def jackpot_value_display(self):
             time=3
-            self.jackpot_value_layer.set_text(locale.format("%d",self.jackpot_value,True),blink_frames=2)
+            self.jackpot_value_layer.set_text(locale.format("%d",self.jackpot_value*self.jackpot_x,True),blink_frames=2,color=dmd.ORANGE)
             self.layer = self.jackpot_value_layer
             self.delay(name='reset_jackpot',delay=time,handler=lambda:self.jackpot('unlit'))
 
@@ -602,10 +602,35 @@ class Multiball(game.Mode):
 
 
         def super_jackpot_ready(self):
-            self.super_jackpot_lit = True
+            #create display
+            anim = dmd.Animation().load(game_path+"dmd/super_jackpot_lit_bgnd.dmd")
+            bgnd_layer = dmd.AnimatedLayer(frames=anim.frames,repeat=True,frame_time=3)
+            text_layer1 = dmd.TextLayer(95, 3, self.game.fonts['num_09Bx7'], "center")
+            text_layer2 = dmd.TextLayer(95, 14, self.game.fonts['07x5'], "center")
+            text_layer3 = dmd.TextLayer(128/2, 23, self.game.fonts['07x5'], "center")
+            text_layer1.composite_op='blacksrc'
+            text_layer2.composite_op='blacksrc'
+            text_layer3.composite_op='blacksrc'
+
+            text_layer1.set_text('IS LIT',blink_frames=4,color=dmd.GREEN)
+            text_layer2.set_text('SHOOT TEMPLE',blink_frames=4,color=dmd.GREEN)
+            text_layer3.set_text('VALUE:'+locale.format("%d", self.jackpot_value*10, True)+' X'+str(self.jackpot_x),color=dmd.RED)
+            
+            #play speech
+            #self.game.sound.play('xxx')
+                
+            #update display layer
+            self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,text_layer1,text_layer2,text_layer3])
+
+            #lamp effects
             self.game.coils.flasherSankara.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
             self.game.coils.flasherTemple.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
+            
+            #open temple
             self.game.temple.open()
+            
+            #update flag
+            self.super_jackpot_lit = True
 
 
         def super_jackpot_collected(self):
@@ -619,7 +644,7 @@ class Multiball(game.Mode):
             self.game.sound.play('super_jackpot')
             
             #award score
-            self.game.score(self.jackpot_value*10)
+            self.game.score(self.jackpot_value*10*self.jackpot_x)
             
             self.delay(name='display_clear_delay',delay=4,handler=self.jackpot_reset)
            

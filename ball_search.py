@@ -106,7 +106,7 @@ class Ball_Search(game.Mode):
                 
         #this method will start the ball search routine if it is not called within the set timer
         def reset(self,sw):
-            if self.game.ball>0:
+            if self.game.ball>0 and not self.game.paused:
                 self.ball_resting_flag = False
                 self.disable()
                 self.enable()

@@ -270,7 +270,7 @@ class Hand_Of_Fate(game.Mode):
             elif option==self.list[6]:
                 self.frankenstein_award(type=type)
             else:
-                self.name_award()
+                self.name_award(type)
                 
             if type=='anim':            
                 self.delay(name='end_delay', event_type=None, delay=clear_time, handler=self.clear)
