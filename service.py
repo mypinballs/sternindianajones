@@ -53,7 +53,7 @@ class ServiceModeSkeleton(game.Mode):
 		self.game.modes.remove(self)
                 #restart the lamp show if exiting out of the service mode front
                 if self.name.find(self.game.system_version)>0:
-                    self.game.attract_mode.change_lampshow()
+                    self.game.attract_mode.change_lampshow()                    
 		return True
 
 class ServiceModeList(ServiceModeSkeleton):
@@ -1320,12 +1320,13 @@ class Utilities(ServiceModeList):
 		super(Utilities, self).__init__(game, priority,font)
 		
 		self.name = name
+                self.end_game = EndGame(self.game, self.priority+1, font, big_font)
 		self.software_update = SoftwareUpdate(self.game, self.priority+1, font, big_font)
                 self.log_download = LogsDownload(self.game, self.priority+1, font, big_font)
                 self.set_date_time = SetDateTime(self.game, self.priority+1, font, big_font)
                 self.reset_audits = ResetAudits(self.game, self.priority+1, font, big_font)
                 self.reboot_game = Reboot(self.game, self.priority+1, font, big_font)
-		self.items = [self.software_update,self.log_download,self.reset_audits,self.reboot_game,self.set_date_time]
+		self.items = [self.end_game,self.software_update,self.log_download,self.reset_audits,self.reboot_game,self.set_date_time]
                 
                 
 #mode to manually update the game software
@@ -1349,7 +1350,11 @@ class SoftwareUpdate(ServiceModeSkeleton):
             self.proc_uid = pwd.getpwnam("proc").pw_uid
             self.proc_gid = grp.getgrnam("proc").gr_gid
         except:
-            self.proc_uid = None
+            try:
+                self.proc_uid = pwd.getpwnam("pinball").pw_uid
+                self.proc_gid = grp.getgrnam("pinball").gr_gid
+            except:
+                self.proc_uid = None
         
         
     def mode_started(self):
@@ -1603,6 +1608,54 @@ class ResetAudits(ServiceModeSkeleton):
         else:
             self.game.sound.play('service_cancel')
         return game.SwitchStop
+    
+
+class EndGame(ServiceModeSkeleton):
+    """docstring for ResetAudits"""
+    def __init__(self, game, priority, font, big_font):
+	super(EndGame, self).__init__(game, priority,font)
+        self.log = logging.getLogger('ij.service.end_game')
+        self.name = 'End Game'
+        self.status = ''
+        self.info = ''
+        self.spin = False
+        self.okToUpdate=False
+                
+                
+    def mode_started(self):
+        super(EndGame,self).mode_started()
+    
+        if self.game.ball>0:
+            self.item_layer.set_text("Game In Progress",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Press Enter to Stop",color=dmd.GREEN)
+            self.okToUpdate=True
+            self.spin = True
+        else:
+            self.item_layer.set_text("No Game is Running",color=dmd.RED)
+            self.instruction_layer.set_text("Press Exit Button",color=dmd.GREEN)
+                
+                    
+    def end_game(self):
+            self.game.end_game()
+            #self.game.reset()
+            
+            self.item_layer.set_text("Game Stopped",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Press Exit Button",color=dmd.GREEN)
+            self.spin = False
+            self.busy = False
+
+
+    def sw_enter_active(self,sw):
+        if self.okToUpdate:
+            self.busy = True
+            # if enter is pressed, stop the game
+            self.item_layer.set_text("Stopping Game",color=dmd.YELLOW)
+            self.instruction_layer.set_text("Do Not Power Off",color=dmd.RED)
+            self.spin = True
+            self.delay(delay=1,handler=self.end_game)
+        else:
+            self.game.sound.play('service_cancel')
+        return game.SwitchStop
       
       
 class Reboot(ServiceModeSkeleton):
@@ -1805,8 +1858,8 @@ class CoinDoor(game.Mode):
                 self.status_layer_top.set_text(self.game.system_name+' '+self.game.system_version,color=dmd.ORANGE)
                 
                 self.status_messages =[]
-                self.status_messages.append('Orange Cloud Software Ltd 2015')
-                self.status_messages.append('info@orangecloud.co.uk')
+                self.status_messages.append('myPinballs Electronics 2020')
+                self.status_messages.append('info@mypinballs.co.uk')
                 self.status_messages.append('Press "ENTER" For Main Menu')
 
                 if self.game.health_status =='OK':
@@ -1845,7 +1898,8 @@ class CoinDoor(game.Mode):
 		params['thestatus'] = self.status
 		return ('content-coin-door_r1', params)
 
-	def sw_coinDoorClosed_active(self, sw):
+	#def sw_coinDoorClosed_active(self, sw):
+        def sw_statusInterlock50v_inactive(self, sw):
 		self.game.modes.remove(self)
         
        

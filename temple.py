@@ -79,7 +79,8 @@ class Temple(game.Mode):
              
         def motor(self,enable=True):
             if enable:
-                self.game.coils.templeMotor.enable()
+                #self.game.coils.templeMotor.enable()
+                self.game.coils.templeMotor.patter(on_time=10,off_time=0)
                 self.log.debug('Motor is on')
             else:
                 self.game.coils.templeMotor.disable()

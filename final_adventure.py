@@ -150,7 +150,8 @@ class Final_Adventure(game.Mode):
             if enable:
                 self.game.lamps.playfieldGI.disable()
             else:
-                self.game.lamps.playfieldGI.enable()
+                #self.game.lamps.playfieldGI.enable()
+                self.game.lamps.playfieldGI.patter(on_time=10,off_time=0)
             
             self.game.base_game_mode.pops.lighting(enable)
             

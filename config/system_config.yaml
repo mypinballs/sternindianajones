@@ -1,0 +1,73 @@
+pinproc_class: procgame.fakepinproc.FakePinPROC
+#pinproc_class: procgame.mypinballsmpu.PinballXMPU
+font_path:
+  - .
+  - ~/Documents/Pinball/p-roc/mypinballs indiana jones 2/src/shared/dmd
+base_path: /Users/jim/Documents/Pinball/p-roc/mypinballs indiana jones 2/src/
+build_version: 0.1
+build_date: 09/09/15
+std_locale: en_GB
+euro_locale: de_DE
+use_desktop: True
+colour_desktop: False
+rPi_installed: False
+rPi_hardware_video: False
+colour_dmd_installed: True
+desktop_dmd_size: 1
+game_serial: MPC1004-0000
+lamp_serial_port: /dev/tty.usbmodem1421
+lamp_serial_yaml: serial_lamps.yaml
+dmd_serial_port: /dev/cu.usbmodem1607471
+usb_path: /Volumes/UPDATE
+keyboard_switch_map:
+  # Look-up pygame constants here: http://www.pygame.org/ctypes/pygame-api/pygame.locals-module.html
+  # Diagnostic buttons
+  2: exit
+  8: down
+  9: up
+  0: enter
+  # trough and shooter
+  1: trough5
+  3: trough4
+  4: trough3
+  5: trough2
+  6: trough1
+  7: troughTop
+  #Start Button
+  s: startButton
+  #Flipper switches:
+  z: flipperLwL
+  x: flipperLwR
+ #game switches
+  q: indyI
+  w: indyN
+  e: indyD
+  r: indyY
+  m: grailEject
+  i: rightRampMade
+  o: rightInlane
+  p: rightOutlane
+  #
+  a: adventureA
+  d: adventureD
+  v: adventureV
+  y: rightSpinner
+  n: adventureE1N
+  t: tournamentStart
+  u: adventureUR
+  g: jonesJ
+  h: jonesO
+  j: jonesN
+  k: jonesE
+  l: jonesS
+  b: arkHit
+  '[': rightLoopBottom
+  ']': rightLoopTop
+  f: leftLoopTop
+  =: skillShot
+  '.': captiveBallRear
+  '/': captiveBallFront
+  ',': rightSlingshot
+  ';': templeStandup
+  '-': shooterLane
+  '\': subway

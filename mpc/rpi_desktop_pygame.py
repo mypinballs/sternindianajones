@@ -61,6 +61,8 @@ class rPi_Desktop():
         self.ctrl = 0
         self.i = 0
         self.HD = False
+        self.frame_data_store = ['0'] * 4096
+        #self.line_store=[]
 
         self.add_key_map(pygame.locals.K_LSHIFT, 3)
         self.add_key_map(pygame.locals.K_RSHIFT, 1)
@@ -85,7 +87,9 @@ class rPi_Desktop():
 
     def load_images(self,dots_path,images_path=None):
         ## dot images
-        #dot_black = pygame.image.load(dots_path+ 'DotBlack.png')
+        dot_black = pygame.image.load(dots_path+ 'DotBlack.png')
+        dot_black = pygame.transform.scale(dot_black, (self.pixel_size,self.pixel_size))
+        dot_black.convert()
         dot_dark_grey_low = pygame.image.load(dots_path+ 'DotDarkGreyLow.png')
         dot_dark_grey_low = pygame.transform.scale(dot_dark_grey_low, (self.pixel_size,self.pixel_size))
         dot_dark_grey_low.convert()
@@ -276,24 +280,24 @@ class rPi_Desktop():
 #        self.mm_banners = [image_kapow, image_boom, image_powie, image_bang, image_zap, image_doho, "GIMMICK"]
 #        self.mm_gimmick = [image_kapooya, image_jacob]
 
-        self.colors = [[None,None,None,None], # blank
-                       [None,dot_grey_low,dot_grey_mid,dot_grey], # color 1 grey
-                       [None,dot_dark_grey_low,dot_dark_grey_mid,dot_dark_grey], # color 2 dark grey
-                       [None,dot_dark_green_low,dot_dark_green_mid,dot_dark_green], # color 3 dark green
-                       [None,dot_flesh_low,dot_flesh_mid,dot_flesh], # color 4 flesh tone
-                       [None,dot_purple_low,dot_purple_mid,dot_purple], # color 5 purple
-                       [None,dot_dark_red_low,dot_dark_red_mid,dot_dark_red], # color 6 dark red
-                       [None,dot_brown_low,dot_brown_mid,dot_brown], # color 7 - Brown
-                       [None,dot_dark_brown_low,dot_dark_brown_mid,dot_dark_brown], # color 8 dark brown
-                       [None,dot_red_low,dot_red_mid,dot_red], # color 9 - Red
-                       [None,dot_green_low,dot_green_mid,dot_green], # color 10 - Green
-                       [None,dot_yellow_low,dot_yellow_mid,dot_yellow], # color 11 - Yellow
-                       [None,dot_blue_low,dot_blue_mid,dot_blue], # color 12 blue
-                       [None,dot_orange_low,dot_orange_mid,dot_orange], # color 13 orange
-                       [None,dot_cyan_low,dot_cyan_mid,dot_cyan], # color 14 - cyan
-                       [None,dot_magenta_low,dot_magenta_mid,dot_magenta], # color 15 - magenta
+        self.colors = [[dot_black,dot_black,dot_black,dot_black], # blank
+                       [dot_black,dot_grey_low,dot_grey_mid,dot_grey], # color 1 grey
+                       [dot_black,dot_dark_grey_low,dot_dark_grey_mid,dot_dark_grey], # color 2 dark grey
+                       [dot_black,dot_dark_green_low,dot_dark_green_mid,dot_dark_green], # color 3 dark green
+                       [dot_black,dot_flesh_low,dot_flesh_mid,dot_flesh], # color 4 flesh tone
+                       [dot_black,dot_purple_low,dot_purple_mid,dot_purple], # color 5 purple
+                       [dot_black,dot_dark_red_low,dot_dark_red_mid,dot_dark_red], # color 6 dark red
+                       [dot_black,dot_brown_low,dot_brown_mid,dot_brown], # color 7 - Brown
+                       [dot_black,dot_dark_brown_low,dot_dark_brown_mid,dot_dark_brown], # color 8 dark brown
+                       [dot_black,dot_red_low,dot_red_mid,dot_red], # color 9 - Red
+                       [dot_black,dot_green_low,dot_green_mid,dot_green], # color 10 - Green
+                       [dot_black,dot_yellow_low,dot_yellow_mid,dot_yellow], # color 11 - Yellow
+                       [dot_black,dot_blue_low,dot_blue_mid,dot_blue], # color 12 blue
+                       [dot_black,dot_orange_low,dot_orange_mid,dot_orange], # color 13 orange
+                       [dot_black,dot_cyan_low,dot_cyan_mid,dot_cyan], # color 14 - cyan
+                       [dot_black,dot_magenta_low,dot_magenta_mid,dot_magenta], # color 15 - magenta
                        #[None,dot_white_low,dot_white_mid,dot_white]] # default color - white
-                       [None,None,dot_white_034,dot_white_051,dot_white_068,dot_white_085,dot_white_102,dot_white_119,dot_white_136,dot_white_153,dot_white_170,dot_white_187,dot_white_204,dot_white_221,dot_white_238,dot_white_255]]
+                       [dot_black,dot_black,dot_white_034,dot_white_051,dot_white_068,dot_white_085,dot_white_102,dot_white_119,dot_white_136,dot_white_153,dot_white_170,dot_white_187,dot_white_204,dot_white_221,dot_white_238,dot_white_255]]
 
 
     def add_key_map(self, key, switch_number):
@@ -353,10 +357,10 @@ class rPi_Desktop():
         #self.screen = pygame.display.set_mode(((self.pixel_size*128),(self.pixel_size*32)),pygame.NOFRAME)
         self.log.info("Creating Window: %s x %s",lcd_screen_x,lcd_screen_y)
         self.log.info("Offsets: x:%s y:%s",self.xOffset,self.yOffset)
-        if self.game.rpi_hardware_video:
-            self.screen = pygame.display.set_mode((lcd_screen_x,lcd_screen_y),pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.OPENGL) #pygame.HWSURFACE
-        else:
-            self.screen = pygame.display.set_mode((lcd_screen_x,lcd_screen_y),pygame.FULLSCREEN)
+        #if self.game.rpi_hardware_video:
+        #    self.screen = pygame.display.set_mode((lcd_screen_x,lcd_screen_y),pygame.FULLSCREEN | pygame.DOUBLEBUF | pygame.OPENGL) #pygame.HWSURFACE
+        #else:
+        self.screen = pygame.display.set_mode((lcd_screen_x,lcd_screen_y),pygame.FULLSCREEN)
             
         pygame.mouse.set_visible(False)
         pygame.display.set_caption('A myPinballs Custom Game')
@@ -368,17 +372,18 @@ class rPi_Desktop():
         if not self.HD:
 
             frame_string = frame.get_data()
-
+            
             x = 0
             y = 0
             # fill the screen black
-            self.screen.fill((0,0,0))
-
-            for dot in frame_string:
+            #self.screen.fill((0,0,0))
+            
+            for index,dot in enumerate(frame_string):
                 dot_value = ord(dot)
+                
                 #image = None
-                # if we got something other than 0
-                if dot_value != 0:
+                #if the value is not same as stored value
+                if dot_value != ord(self.frame_data_store[index]):
                     # set the brightness and color
                     brightness = (dot_value&0xf)
                     # if we have a brightness but no color - use white
@@ -409,24 +414,33 @@ class rPi_Desktop():
                         self.screen.blit(self.colors[color][bright_value],((self.xOffset+(x*self.pixel_size)), (self.yOffset+(y*self.pixel_size))))
                     del color
                     del bright_value
+                    
+                #self.line_store.append([index,hex(dot_value)])
+                
                 del dot
                 del dot_value
 
                 #if image:
                 #    self.screen.blit(image, ((x*self.pixel_size), (y*self.pixel_size)))
                 x += 1
+                
                 if x == 128:
                     x = 0
                     y += 1
+                    #self.log.info(self.line_store)
+                    #self.line_store=[]
                 #del image
 
             #update screen depending on video hardware options
-            if self.game.rpi_hardware_video: #using gpu video ram and hardware acceleration (opengl)
-                pygame.display.flip()
-            else: #using main memory and software for updating, no hardware acceleration
-                window_rect = pygame.Rect(self.xOffset,self.yOffset,self.pixel_size*128,self.pixel_size*32)
-                pygame.display.update(window_rect)
+            #if self.game.rpi_hardware_video: #using gpu video ram and hardware acceleration (opengl)
+            #    pygame.display.flip()
+            #else: #using main memory and software for updating, no hardware acceleration
+            window_rect = pygame.Rect(self.xOffset,self.yOffset,self.pixel_size*128,self.pixel_size*32)
+            pygame.display.update(window_rect)
             
+            #store the current frame string
+            self.frame_data_store = frame.get_data()
+        
             del x
             del y
             del frame_string

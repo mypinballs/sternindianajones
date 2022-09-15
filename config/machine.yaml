@@ -31,7 +31,7 @@ PRSwitches:
         number: SD01
         label: 'Left Coin Slot'
     #using center coin slot and billacceptor plug for cabling (pink/red & black)
-    coinDoorClosed: 
+    coinDoorClosed:
         number: SD02
         label: 'coinDoorClosed'
     rightCoinSlot:
@@ -57,25 +57,25 @@ PRSwitches:
     flipperREOS:
         number: SD12
         label: 'Lower Right Flipper EOS'
-    tilt: 
+    tilt:
         number: SD17
         label: 'Plumb Bob Tilt'
-    slamTilt: 
+    slamTilt:
         number: SD18
         label: 'Slam Tilt'
-    ticketNotch: 
+    ticketNotch:
         number: SD19
         label: 'Ticket Notch'
-    exit: 
+    exit:
         number: SD21
         label: 'Exit (Service)'
-    down: 
+    down:
         number: SD22
         label: 'Down (Service)'
-    up: 
+    up:
         number: SD23
         label: 'Up (Service)'
-    enter: 
+    enter:
         number: SD24
         label: 'Enter (Service)'
 
@@ -182,7 +182,7 @@ PRSwitches:
     rightSlingshot:
         number: S27
         tags: moonlight,ballsearch_reset
-        label: 'Right Slingshot' 
+        label: 'Right Slingshot'
     rightInlane:
         number: S28
         tags: moonlight,ballsearch_reset
@@ -202,7 +202,7 @@ PRSwitches:
     bottomJet:
         number: S32
         tags: moonlight,poa_pause,mode_pause,ballsearch_reset
-        label: 'Bottom Jet' 
+        label: 'Bottom Jet'
     #col3
     rightJet:
         number: S33
@@ -210,7 +210,7 @@ PRSwitches:
         label: 'Right Jet'
     notUsed1:
         number: S34
-        label: 'Not Used 1'  
+        label: 'Not Used 1'
     mapM:
         number: S35
         label: 'Map (M)'
@@ -276,7 +276,7 @@ PRSwitches:
         label: 'Temple Motor Up'
     templeMotorDown:
         number: S53
-        label: 'Temple Motor Down'   
+        label: 'Temple Motor Down'
     rightLoopBottom:
         number: S54
         tags: mode_pause
@@ -307,7 +307,7 @@ PRSwitches:
         label: 'Right Ramp Made'
     captiveBallRear:
         number: S61
-        label: 'Cap Ball Front'
+        label: 'Cap Ball Rear'
     captiveBallFront:
         #leftRampMade - temp surrogate
         number: S62
@@ -318,6 +318,29 @@ PRSwitches:
     swordsmanForward:
         number: S64
         label: 'Sman Forward'
+    #special status switches from driver board
+    #S65-S72
+    statusInterlock20v:
+        number: S65
+        type: 'NC'
+        label: 'Interlock 20V'
+    statusInterlock50v:
+        number: S66
+        type: 'NC'
+        label: 'Interlock 50V'
+    statusZeroCross:
+        number: S67
+        tags: special
+        label: 'Zero Cross'
+    statusLamp1:
+        number: S68
+        tags: special
+        label: 'Lamp 1 Status'
+    statusLamp2:
+        number: S69
+        tags: special
+        label: 'Lamp 2 Status'
+
 
      #Old Switch defs
 #    singleDropTop:
@@ -335,7 +358,7 @@ PRSwitches:
 #        label: 'Exit Idol'
 #    gunTrigger:
 #        number: S34
-#        label: 'Gun Trigger'  
+#        label: 'Gun Trigger'
 #    centerStandup:
 #        number: S38
 #        tags: moonlight
@@ -384,7 +407,7 @@ PRSwitches:
 #        label: 'Mini PF Middle Bottom Left'
 #    miniBottomLeft:
 #        number: S68
-#        label: 'Mini PF Bottom Left' 
+#        label: 'Mini PF Bottom Left'
 #    miniTopHole:
 #        number: S72
 #        type: 'NC'
@@ -405,7 +428,7 @@ PRSwitches:
 #    miniBottomRight:
 #        number: S78
 #        label: 'Mini PF Bottom Right'
-# 
+#
 #    wheelPosition1:
 #        number: S91
 #        type: 'NC'
@@ -426,7 +449,7 @@ PRSwitches:
 #        number: S95
 #        type: 'NC'
 #        label: 'Mini PF Right Limit'
-    
+
 PRCoils:
     #high current group 1
     trough:
@@ -439,6 +462,7 @@ PRCoils:
         pulseTime: 50
     arkMagnet:
         number: C03
+        tags: magnet
         label: 'Ark Magnet'
         pulseTime: 15
     grailEject:
@@ -453,6 +477,7 @@ PRCoils:
         pulseTime: 20
     templeMotor:
         number: C06
+        tags: motor
         label: 'Temple Motor'
     arkDivertor:
         number: C07
@@ -460,10 +485,11 @@ PRCoils:
         pulseTime: 20
     shakerMotor:
         number: C08
+        tags: motor
         label: 'Shaker Motor'
-        pulseTime: 15 
-    
-    #high current group 2    
+        pulseTime: 15
+
+    #high current group 2
     leftJet:
         number: C09
         tags: ballsearch
@@ -492,7 +518,7 @@ PRCoils:
     flipperLwRMain:
         number: C16
         label: 'LR Flipper Power'
-    
+
     #low current group 1
     leftSlingshot:
         number: C17
@@ -504,61 +530,73 @@ PRCoils:
         label: 'Right Slingshot'
     flasherTemple:
         number: C19
+        tags: flasher
         label: 'Temple of Doom Flasher'
     flasherRaiders:
         number: C20
+        tags: flasher
         label: 'Raiders Flasher'
     flasherSlings:
         number: C21
-        tags: double
+        tags: flasher,double
         label: 'Slingshot Flasher'
     flasherSankara:
         number: C22
+        tags: flasher
         label: 'Sankara Flasher'
     flasherKingdom:
         number: C23
+        tags: flasher
         label: 'Kingdom Flasher'
     topper:
         number: C24
         label: 'Topper'
-        
+
     #low current group 2
     flasherRamp:
         number: C25
-        tags: double
+        tags: flasher,double
         label: 'Ramp Flasher'
     mapEject:
         number: C26
         label: 'Map Eject'
     arkMotor:
         number: C27
+        tags: motor
         label: 'Ark Motor'
     flasherBackpanel:
         number: C28
+        tags: flasher
         label: 'Backpanel Flasher'
     flasherArkFront:
         number: C29
+        tags: flasher
         label: 'Ark Front Flasher'
     swordsmanMotor:
         number: C30
+        tags: motor
         label: 'Swordman Motor'
     flasherJets:
         number: C31
-        tags: triple
+        tags: flasher,triple
         label: 'Jets Flasher'
     flasherCrusade:
         number: C32
+        tags: flasher
         label: 'Crusade Flasher'
     flasherArk:
         number: A04
+        tags: flasher
         label: 'Ark LED Flasher'
     flasherSwordsman:
         number: A05
+        tags: flasher
         label: 'Swordman LED Flasher'
     flasherSkull:
         number: A06
+        tags: flasher
         label: 'Skull LED Flasher'
-#       
+#
 #    divertorMain:
 #        number: FURM
 #        label: 'Divertor Power'
@@ -738,7 +776,7 @@ PRLamps:
         label: 'Skill - Mystery'
     skillJets:
         number: L24
-        label: 'Skill - Jets'  
+        label: 'Skill - Jets'
     #col4
     skillAdvanceScene:
         number: L25
@@ -807,7 +845,7 @@ PRLamps:
     notUsed44:
         number: L44
         tags: notused
-        label: 'Not Used' 
+        label: 'Not Used'
     kingdom:
         number: L45
         tags: movie
@@ -907,7 +945,7 @@ PRLamps:
         number: L72
         label: 'Warehouse Raid'
     #col10
-    handOfFate: 
+    handOfFate:
     #mystery
         number: L73
         label: 'Hand of Fate'
@@ -942,7 +980,7 @@ PRLamps:
         number: G01
         tags: gi
         label: 'GI Playfield'
-    
+
 #    grailJackpot:
 #        number: L26
 #        label: 'Grail Jackpot'
@@ -988,7 +1026,7 @@ PRLamps:
 #        label: 'Right Plane Top'
 #    rightLoop:
 #        number: L58
-#        label: 'Right Loop' 
+#        label: 'Right Loop'
 #    willie:
 #        number: L65
 #        label: 'Willie'
@@ -1043,7 +1081,7 @@ PRLamps:
 #    centerLock:
 #        number: L87
 #        label: 'Center Lock'
-#    
+#
 #    gi01:
 #        number: G01
 #        label: 'GI String 1'
@@ -1059,7 +1097,7 @@ PRLamps:
 #    gi05:
 #        number: G05
 #        label: 'GI String 5'
-  
+
 PRBallSave:
     pulseCoils: [leftSlingshot, rightSlingshot, leftJet, rightJet, bottomJet, topJet, mapEject, grailEject]
     resetSwitches:

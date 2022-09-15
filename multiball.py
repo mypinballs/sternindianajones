@@ -61,10 +61,10 @@ class Multiball(game.Mode):
             self.lock_animation_3 = "dmd/xxx.dmd"
 
             self.game.sound.register_music('multiball_play', music_path+"multiball.aiff")
-            
+
             self.game.sound.register_sound('electricity', sound_path+"electricity.aiff")
             self.game.sound.register_sound('electricity', sound_path+"ij40066_ark_magnet.aiff")
-            
+
             self.game.sound.register_sound('lock', sound_path+"lock.aiff")
             self.game.sound.register_sound('jackpot_attempt', sound_path+"jackpot_attempt.aiff")
 
@@ -77,8 +77,8 @@ class Multiball(game.Mode):
             self.game.sound.register_sound('jackpot3', speech_path+"triple_jackpot.aiff")
             self.game.sound.register_sound('super_jackpot', speech_path+"super_jackpot.aiff")
             self.game.sound.register_sound('8ball_start_speech', speech_path+"ij402CF_dont_look_marrion.aiff")
-            
-            
+
+
             self.jackpot_lamps = ['arkJackpot','stonesJackpot','grailJackpot','skullJackpot']
 
             self.balls_in_play = 0
@@ -90,20 +90,20 @@ class Multiball(game.Mode):
             self.super_jackpot_value = 100000000
             self.cheat_value_start = 5000000
             self.cheat_value_boost = 1000000
-            
+
             self.hits_needed = int(self.game.user_settings['Gameplay (Feature)']['Temple Hits For Lock'])
             self.loopin_jackpot_start = int(self.game.user_settings['Gameplay (Feature)']['Loopin Jackpots Start'])
-            
-            self.loopin_jackpots = Loopin_Jackpots(self.game,priority-1)
-        
 
-        def reset(self):     
+            self.loopin_jackpots = Loopin_Jackpots(self.game,priority-1)
+
+
+        def reset(self):
             pass
 
 
         def mode_started(self):
             self.reset()
-            
+
             #update player stats for mode
             self.balls_needed = 3
             self.jackpot_value = self.jackpot_base
@@ -120,19 +120,19 @@ class Multiball(game.Mode):
             self.multiball_running = self.game.get_player_stats('multiball_running')
             self.multiball_started = self.game.get_player_stats('multiball_started')
             self.ark_hits = self.game.get_player_stats('ark_hits')
-            
-            
+
+
             #self.log.info('multiball started flag:%s',self.multiball_started)
             #self.log.info('multiball running flag:%s',self.multiball_running)
             self.log.info('balls locked:%s',self.balls_locked)
             self.log.info('lock lit:%s',self.lock_lit)
-            
+
             #temple logic for main locks
             if self.lock_lit:
                 self.game.temple.open()
             else:
-                self.game.temple.close() 
-            
+                self.game.temple.close()
+
             #update lamps
             self.update_lamps()
 
@@ -141,24 +141,24 @@ class Multiball(game.Mode):
             #extra updates of status flags in case mode is stopped abruptly
             self.multiball_running=False
             self.multiball_started = False
-            self.game.set_player_stats('multiball_running',self.multiball_running) 
-            self.game.set_player_stats('multiball_started',self.multiball_started) 
-                
+            self.game.set_player_stats('multiball_running',self.multiball_running)
+            self.game.set_player_stats('multiball_started',self.multiball_started)
+
             self.jackpot('cancelled')
             self.game.set_player_stats('jackpots_collected',self.jackpot_collected)
             self.game.set_player_stats('cheat_count',self.cheat_count)
             self.game.set_player_stats('lock_progress_hits',self.hits)
             self.game.set_player_stats('ark_hits',self.ark_hits)
-            
+
             #safety magnet disable
             self.cancel_delayed('queue_ark_power')
             self.game.coils.arkMagnet.disable()
-            
+
             #remove looping jackpots mode if started
             if self.ark_hits>=self.loopin_jackpot_start:
                 self.game.modes.remove(self.loopin_jackpots)
-            
-                 
+
+
         def mode_tick(self):
             if self.multiball_started:
                 self.balls_in_play = self.game.trough.num_balls_in_play
@@ -174,7 +174,7 @@ class Multiball(game.Mode):
                     #start tracking
                     self.multiball_running = True;
                     self.game.set_player_stats('multiball_running',self.multiball_running)
-            
+
                 if self.multiball_running:
                     self.multiball_tracking()
 
@@ -187,7 +187,7 @@ class Multiball(game.Mode):
                 self.balls_locked +=1
             else:
                 self.balls_locked=self.balls_needed
-                
+
             self.lock_in_progress = True
 
             #self.game.trough.num_balls_locked = self.balls_locked #update trough mode regarding locked balls
@@ -200,7 +200,7 @@ class Multiball(game.Mode):
 
             #update idol state
             #self.game.idol.lock()
-            
+
             #pause any active modes
             self.game.base_game_mode.mode_select.mode_paused(sw=None)
 
@@ -218,7 +218,7 @@ class Multiball(game.Mode):
 
             #score
             self.game.score(self.lock_ball_score)
-                
+
             #reset lock logic after delay
             self.delay(name='reset_lock_delay', event_type=None, delay=2, handler=self.reset_lock)
 
@@ -235,28 +235,28 @@ class Multiball(game.Mode):
 #            self.game.trough.launch_balls(1,callback=self.launch_callback,stealth=False) #stealth false, bip +1
 #            self.next_ball_ready = True
 #            self.game.ball_save.start(time=5)
-#                
-#                
+#
+#
         def launch_callback(self):
             pass
 
-        
+
         def reset_lock(self):
             self.game.temple.close()
-            
+
             self.lock_lit = False
             self.lock_in_progress = False
             self.game.set_player_stats('lock_lit',self.lock_lit)
             self.game.set_player_stats('lock_in_progress',self.lock_in_progress)
-            
+
             self.hits_needed = int(self.game.user_settings['Gameplay (Feature)']['Temple Hits For Lock'])
             self.hits = 0
-            
+
             #Note: active mode timers are restarted ewhen ball is ejected via mode_select
 
             self.update_lamps()
-            
-            
+
+
         def ark_hit(self):
             self.ark_hits+=1
             self.log.info('Ark Hits Total:%s',self.ark_hits)
@@ -267,15 +267,15 @@ class Multiball(game.Mode):
             self.game.effects.drive_shaker('slow')
             self.cancel_delayed('queue_ark_power')
             self.delay(name='queue_ark_power',delay=0.1,handler=self.ark_power)
-            
+
             if self.ark_hits==self.loopin_jackpot_start:
                 self.game.modes.add(self.loopin_jackpots)
-                
-            
+
+
         def ark_power(self):
              self.game.coils.arkMagnet.patter(original_on_time=25, on_time=10, off_time=60)
              self.delay(name='ark_magnet_disable',delay=0.6,handler=self.game.coils.arkMagnet.disable)
-        
+
 
         def update_score(self):
             score = self.game.current_player().score
@@ -283,18 +283,18 @@ class Multiball(game.Mode):
 
         def update_jackpot_worth(self):
             self.jackpot_worth_layer.set_text(locale.format("%d", self.jackpot_value, True)+" X"+str(self.jackpot_x),color=dmd.ORANGE)
-      
-    
+
+
         def gi_flutter(self):
             self.log.info("GI FLUTTER")
             self.game.lamps.playfieldGI.schedule(0x000C0F0F,cycle_seconds=1)
-            
-            
+
+
         def multiball_start(self):
 #           #set flags
             self.multiball_started = True
             self.game.set_player_stats('multiball_started', self.multiball_started)
-            
+
             #check is any additional ball launches are needed - multi-player game etc
 #            if self.game.idol.balls_in_idol<self.balls_needed:
 #                additional_balls = self.balls_needed-self.game.idol.balls_in_idol
@@ -304,7 +304,7 @@ class Multiball(game.Mode):
 
             #cancel the backup start procedure now we are starting
             self.cancel_delayed('queue_multiball_start')
-            
+
             #animations
             #self.game.set_status("MULTIBALL!") #debug
             anim = dmd.Animation().load(game_path+"dmd/multiball_start.dmd")
@@ -321,20 +321,20 @@ class Multiball(game.Mode):
             #start multiball music
             self.game.sound.play_music('multiball_play', loops=-1)
 
-            self.balls_locked=0  
+            self.balls_locked=0
             self.game.set_player_stats('balls_locked',self.balls_locked)
-            
+
             #turn on ball save
             self.game.ball_save.start(num_balls_to_save=3,allow_multiple_saves=True,time=10)
-            
+
             #restart the totem mode if quick multiball is not running and stacking therefore isnt happening
             if not self.game.get_player_stats('quick_multiball_running'):
                 self.game.base_game_mode.totem.restart()
-                
+
             #pause any active modes
             self.game.base_game_mode.mode_select.mode_paused(sw=None)
-            
-            
+
+
         def multiball_launch(self):
              #'8 ball' ready logic and effects - may be more than 8 balls depending on ark ball store settings.
             if self.game.get_player_stats('8ball_multiball_lit') and self.game.user_settings['Gameplay (Feature)']['Disable Ark Mech'].startswith('N'):
@@ -345,30 +345,30 @@ class Multiball(game.Mode):
                 self.game.effects.drive_flasher('flasherSlings','super',time=1)
                 self.gi_flutter()
                 self.game.ark.empty()
-                
+
             #launch balls - locks are virtual on stern indy
             additional_balls = self.balls_needed-1
             self.game.trough.launch_balls(additional_balls,callback=self.launch_callback,stealth=False)
-                      
-            
+
+
         def multiball_tracking(self):
             #end check
             if self.balls_in_play==1:
                 #end tracking
                 self.multiball_running=False
                 self.multiball_started = False
-                self.game.set_player_stats('multiball_running',self.multiball_running) 
+                self.game.set_player_stats('multiball_running',self.multiball_running)
                 self.game.set_player_stats('multiball_started',self.multiball_started)
 
                 #update poa player stats - moved to jackpot cancelled
                 #self.game.set_player_stats("poa_queued",False)
-                
+
                 #close the temple scoop if open
                 self.game.temple.close()
-                
+
                 #self.game.sound.stop_music()
                 #self.game.sound.play_music('general_play', loops=-1)
-                
+
                 #continue any modes previously active
                 self.game.utility.resume_mode_music()
                 self.game.base_game_mode.mode_select.mode_unpaused()
@@ -382,38 +382,38 @@ class Multiball(game.Mode):
                     self.jackpot('cancelled')
                     #clear the display
                     self.clear()
-                
+
                 #restart the totem mode
                 self.game.base_game_mode.totem.restart()
-                
+
                 #reset the 8 ball flag if required
                 if self.game.get_player_stats('8ball_multiball_lit'):
-                    self.game.base_game_mode.jones.reset_8ball()
+                    self.game.base_game_mode.jones.reset()
                     self.balls_needed = 3
-                
-                    
+
+
             elif self.balls_in_play==0: #what to do if last 2 or more balls drain together
                 #end tracking
                 self.multiball_running=False
                 self.multiball_started = False
-                self.game.set_player_stats('multiball_running',self.multiball_running) 
-                self.game.set_player_stats('multiball_started',self.multiball_started) 
+                self.game.set_player_stats('multiball_running',self.multiball_running)
+                self.game.set_player_stats('multiball_started',self.multiball_started)
                 #update poa player stats
                 #self.game.set_player_stats("poa_queued",False)
-                
+
                 #close the temple scoop if open
                 self.game.temple.close()
-                
+
                 #cancel jackpot
                 self.jackpot('cancelled')
                 #clear the display
                 self.clear()
-                
+
                 #reset the 8 ball flag if required
                 if self.game.get_player_stats('8ball_multiball_lit'):
-                    self.game.base_game_mode.jones.reset_8ball()
+                    self.game.base_game_mode.jones.reset()
                     self.balls_needed = 3
-                
+
             #ark control logic for 8 ball play only
             #start an ark relaod if:
                 # - 8 ball play activated
@@ -428,14 +428,15 @@ class Multiball(game.Mode):
             #self.log.info('Ark Reload in Progress:%s',self.game.ark.ark_load_in_progress)
             #self.log.info('Ball Save Active Flag:%s',self.game.ball_save.is_active())
             #self.log.info('Num Balls in trough:%s',self.game.trough.num_balls())
-            
+
             if self.game.get_player_stats('8ball_multiball_lit') and self.game.user_settings['Gameplay (Feature)']['Disable Ark Mech'].startswith('N') and self.game.ark.ark_state == "reload" and not self.game.ark.ark_load_in_progress and not self.game.ball_save.is_active() and self.game.switches.trough1.is_active(0.5):
                 self.log.info('Starting Ark Load')
                 self.game.ark.load_ball_start()
 
 
+
         def multiball_display(self,num):
-            
+
             anim1 = dmd.Animation().load(game_path+"dmd/ark.dmd")
             anim2 = dmd.Animation().load(game_path+"dmd/sankara_stone.dmd")
             anim3 = dmd.Animation().load(game_path+"dmd/grail.dmd")
@@ -473,11 +474,11 @@ class Multiball(game.Mode):
             animation_layer3.target_y=21
             animation_layer4.target_x=95
             animation_layer4.target_y=20
-            
+
             self.score_layer.x = 128/2
             self.score_layer.y=-1
             self.score_layer.justify='center'
-            
+
             info_layer1 = dmd.TextLayer(128/2, 8, self.game.fonts['07x5'], "center", opaque=False)
             info_layer2 = dmd.TextLayer(128/2, 14, self.game.fonts['07x5'], "center", opaque=False)
 
@@ -509,7 +510,7 @@ class Multiball(game.Mode):
 
             self.layer = dmd.GroupedLayer(128, 32, [animation_layer,self.jackpot_worth_layer,self.score_layer,title_layer])
 
-        
+
         def jackpot_collected_display(self,num):
             anim = dmd.Animation().load(game_path+"dmd/jackpot.dmd")
             animation_layer = dmd.AnimatedLayer(frames=anim.frames,repeat=True,frame_time=6)
@@ -542,7 +543,7 @@ class Multiball(game.Mode):
 
                     #update display
                     self.jackpot_lit_display(self.jackpot_collected)
-                    
+
                     #speech
                     self.game.sound.play_voice('hit_jackpot')
 
@@ -567,12 +568,12 @@ class Multiball(game.Mode):
 #                   self.layer = dmd.GroupedLayer(128, 32, [self.animation_layer,self.text_layer])
 
                     #self.jackpot_x = self.game.idol.balls_in_idol+1
-                    
+
                     self.game.effects.drive_shaker('medium')
-                    
+
                     self.game.score(self.jackpot_value*self.jackpot_x)
                     self.jackpot_collected+=1
-                        
+
                     if self.jackpot_collected>4:
                         self.super_jackpot_collected()
                     else:
@@ -585,7 +586,7 @@ class Multiball(game.Mode):
                             self.game.sound.play_voice('jackpot'+str(self.jackpot_x))
                         else:
                             self.game.sound.play_voice('jackpot3')
-                    
+
                 elif status=='cancelled':
                     self.game.coils.flasherArkFront.disable()
                     self.game.coils.flasherSkull.disable()
@@ -594,10 +595,10 @@ class Multiball(game.Mode):
 
                     #update poa player stats
                     self.game.set_player_stats("poa_queued",False)
-                    
+
                     if self.super_jackpot_lit:
                         self.jackpot_reset()
-                    
+
                     self.clear()
 
 
@@ -615,20 +616,20 @@ class Multiball(game.Mode):
             text_layer1.set_text('IS LIT',blink_frames=4,color=dmd.GREEN)
             text_layer2.set_text('SHOOT TEMPLE',blink_frames=4,color=dmd.GREEN)
             text_layer3.set_text('VALUE:'+locale.format("%d", self.jackpot_value*10, True)+' X'+str(self.jackpot_x),color=dmd.RED)
-            
+
             #play speech
             #self.game.sound.play('xxx')
-                
+
             #update display layer
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,text_layer1,text_layer2,text_layer3])
 
             #lamp effects
             self.game.coils.flasherSankara.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
             self.game.coils.flasherTemple.schedule(schedule=0x30003000 , cycle_seconds=0, now=True)
-            
+
             #open temple
             self.game.temple.open()
-            
+
             #update flag
             self.super_jackpot_lit = True
 
@@ -642,12 +643,12 @@ class Multiball(game.Mode):
             self.game.lampctrl.play_show('jackpot', repeat=False,callback=self.game.update_lamps)
             #speech
             self.game.sound.play('super_jackpot')
-            
+
             #award score
             self.game.score(self.jackpot_value*10*self.jackpot_x)
-            
+
             self.delay(name='display_clear_delay',delay=4,handler=self.jackpot_reset)
-           
+
 
         def jackpot_reset(self):
             #reset jackpot count to start again
@@ -670,15 +671,15 @@ class Multiball(game.Mode):
 
             #play speech
             length = self.game.sound.play('you_cheat')
-            
+
             #update counter
             self.cheat_count+=1
-            
+
             #continue ball lock after cheat anim and speech
             self.lock_enabled() #update the lock flags anyway
             self.delay(delay=length+0.25,handler=self.lock_ball)
-            
-            
+
+
         def lock_progress_display(self):
             value = self.hits_needed-self.hits
             timer =2
@@ -694,7 +695,7 @@ class Multiball(game.Mode):
 
             #set display layer
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,text_layer1,text_layer2,text_layer3])
-            
+
             self.delayed_clear(timer)
 
 
@@ -707,10 +708,10 @@ class Multiball(game.Mode):
             text_layer2 = dmd.TextLayer(88, 18, self.game.fonts['9x7_bold'], "center", opaque=False)
             text_layer1.set_text('LOCK',seconds=timer,color=dmd.GREEN)
             text_layer2.set_text('IS LIT',blink_frames=10,seconds=timer,color=dmd.GREEN)
-            
+
             #set display layer
             self.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,text_layer1,text_layer2])
-            
+
             self.delayed_clear(timer)
 
 
@@ -718,23 +719,23 @@ class Multiball(game.Mode):
             self.lock_lit = True;
             #self.game.idol.lock_lit=  self.lock_lit
             self.game.set_player_stats('lock_lit',self.lock_lit)
-            
+
             #update display
             self.lock_lit_display()
-            
+
             #open temple
             self.game.temple.open()
 
             self.game.score(self.lock_enabled_score)
             self.update_lamps()
-          
-          
+
+
         def lock_progress(self):
             if not self.lock_lit:
                 self.hits +=1
 
                 if self.hits==self.hits_needed:
-                    self.lock_lit = True     
+                    self.lock_lit = True
                     audits.record_value(self.game,'lockLit')
                     self.lock_enabled()
                 else:
@@ -742,7 +743,7 @@ class Multiball(game.Mode):
 
             else:
                 pass
-        
+
 #        def reset_drops(self):
 #            if self.game.switches.dropTargetLeft.is_active() or self.game.switches.dropTargetMiddle.is_active() or  self.game.switches.dropTargetRight.is_active():
 #                self.game.coils.centerDropBank.pulse(100)
@@ -754,14 +755,14 @@ class Multiball(game.Mode):
                     self.game.effects.drive_lamp('templeArrow','medium')
                 else:
                     self.game.effects.drive_lamp('templeArrow','off')
-                
+
             for i in range(self.jackpot_collected):
                 self.game.effects.drive_lamp(self.jackpot_lamps[i],'on')
 
 
         def delayed_clear(self,timer=2):
             self.delay(name='clear_delay', event_type=None, delay=timer, handler=self.clear)
-            
+
         def clear(self):
             self.layer = None
 
@@ -799,7 +800,7 @@ class Multiball(game.Mode):
             elif self.multiball_running:
                 #self.game.idol.hold()
                 self.game.temple.balls+=1
-                
+
                 if not self.super_jackpot_lit:
                     self.jackpot_x+=1
                     if self.jackpot_x==2:
@@ -815,7 +816,7 @@ class Multiball(game.Mode):
 #        def sw_exitIdol_active(self,sw):
 #            if self.multiball_running and self.jackpot_x>1:
 #                 self.jackpot_x-=1
-        
+
         def sw_captiveBallRear_active(self, sw): #instead of left ramp
             if self.multiball_running:
                 value = 2000000
@@ -850,7 +851,7 @@ class Multiball(game.Mode):
                 self.game.screens.raise_jackpot(2,value)
 
             #return procgame.game.SwitchStop
-            
+
         def sw_mapEject_active(self, sw):
             if self.multiball_running:
                 value = 10000000
@@ -859,14 +860,14 @@ class Multiball(game.Mode):
 
             #return procgame.game.SwitchStop
 
-        def sw_arkHit_active(self, sw):  
+        def sw_arkHit_active(self, sw):
             if self.multiball_running and self.jackpot_status!='lit' and self.jackpot_collected<4:
                 self.jackpot('lit')
                 self.game.score(500000)
                 return procgame.game.SwitchStop
-            elif not self.game.get_player_stats('ark_mode_started'):    
+            elif not self.game.get_player_stats('ark_mode_started'):
                 self.ark_hit()
-            
+
 
         #start ball save for next ball after lock
 #        def sw_shooterLane_open_for_1s(self,sw):

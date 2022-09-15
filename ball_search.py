@@ -37,7 +37,7 @@ class Ball_Search(game.Mode):
 			self.add_switch_handler(name=str(switch), event_type='inactive', delay=None, handler=self.reset)
 		for switch in self.stop_switches:
 			self.add_switch_handler(name=str(switch), event_type='active', delay=None, handler=self.stop)
-                        self.add_switch_handler(name=str(switch), event_type='inactive', delay=None, handler=self.reset)
+                        #self.add_switch_handler(name=str(switch), event_type='inactive', delay=None, handler=self.reset)
 
                 #output game defs
                 self.log.info("Ball Search Coils are:%s",self.coils)
@@ -49,7 +49,7 @@ class Ball_Search(game.Mode):
                 self.max_ball_search_attempts = 10
                 self.score1 = 0
                 self.score2 = 0
-                self.trough_issues = 0
+                self.trough_issue_count = 0
                 self.balls_lost_count = 0
                 self.ball_search_count=0
                 self.ballsearch_attempts=0
@@ -211,18 +211,18 @@ class Ball_Search(game.Mode):
         def trough_issue(self):
             self.cancel_delayed('ball_lost')
             self.cancel_delayed('ball_search_countdown')
-            self.trough_issue = self.game.get_player_stats('trough_issue_count')+1
+            self.trough_issue_count = self.game.get_player_stats('trough_issue_count')+1
             
             self.issue_display(message1='TROUGH MALFUNCTION',message2='CHECK TROUGH SWITCHES',severity=2,timer=3)
             
             #logic - allow 1 relaunch then auto end the ball
-            if self.trough_issue>1:
+            if self.trough_issue_count>1:
                 self.game.base_game_mode.finish_ball()
-                self.trough_issue = 0
+                self.trough_issue_count = 0
             else:
                 self.game.trough.launch_balls(1,stealth=True,callback=self.enable)
             
-            self.game.set_player_stats('trough_issue_count',self.trough_issue)
+            self.game.set_player_stats('trough_issue_count',self.trough_issue_count)
             self.ballsearch_attempts=0
             
 

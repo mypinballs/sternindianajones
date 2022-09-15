@@ -394,7 +394,7 @@ class Return_The_Skull(game.Mode):
         
         def sw_templeStandup_active(self, sw):
             self.game.sound.play('rts_shot_unlit')
-            self.game.score(self.score_extra/10)
+            self.game.score(self.score_value_extra/10)
             
             return procgame.game.SwitchStop
         

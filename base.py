@@ -38,13 +38,13 @@ music_path = game_path +"music/"
 
 
 class BaseGameMode(game.Mode):
-	"""docstring for AttractMode"""
-	def __init__(self, game):
-		super(BaseGameMode, self).__init__(game, 2)
+        """docstring for AttractMode"""
+        def __init__(self, game):
+                super(BaseGameMode, self).__init__(game, 2)
 
                 self.log = logging.getLogger('ij.base')
 
-		self.layer = None # Presently used for tilt layer
+                self.layer = None # Presently used for tilt layer
 
                 #register music files
                 self.game.sound.register_music('general_play', music_path+"general_play.aiff")
@@ -71,10 +71,10 @@ class BaseGameMode(game.Mode):
                     self.game.sound.register_sound('outlane_speech', speech_path+"lost_your_ball01.aiff")
                     self.game.sound.register_sound('outlane_speech', speech_path+"situation_not_improved01.aiff")
                     self.game.sound.register_sound('outlane_speech', speech_path+"ij4031F_maybe_but_not_today.aiff")
-                    
+
                 self.game.sound.register_sound('outlane_speech', speech_path+"blank.aiff")
 
-                
+
                 #setup modes
                 #lower priority basic modes
                 self.spinner = Spinner(self.game, 40)
@@ -82,7 +82,7 @@ class BaseGameMode(game.Mode):
                 #self.narrow_escape = Narrow_Escape(self.game, 41)
                 self.jones = Jones(self.game, 42)
                 self.indy_lanes = Indy_Lanes(self.game, 43)
-                
+
                 #medium priority basic modes
                 self.totem = Totem(self.game, 51)
                 self.plane_chase = Plane_Chase(self.game, 52)
@@ -96,52 +96,52 @@ class BaseGameMode(game.Mode):
                 self.poa = POA(self.game, 96)
 
 
-	def mode_started(self):
+        def mode_started(self):
 
                 #debug
                 print("Basic Game Mode Started, Ball "+str(self.game.ball))
                 #set player status
                 self.game.set_player_stats('status','general')
 
-		#Disable any previously active lamp
-		for lamp in self.game.lamps:
-			lamp.disable()
+                #Disable any previously active lamp
+                for lamp in self.game.lamps:
+                        lamp.disable()
 
                 #Update lamp status's for all modes
                 self.game.update_lamps()
 
-		# Turn on the GIs
-		# Some games don't have controllable GI's (ie Stern games)
-		#self.game.lamps.gi01.pulse(0)
-		#self.game.lamps.gi02.pulse(0)
-		#self.game.lamps.gi03.pulse(0)
-		#self.game.lamps.gi04.pulse(0)
+                # Turn on the GIs
+                # Some games don't have controllable GI's (ie Stern games)
+                #self.game.lamps.gi01.pulse(0)
+                #self.game.lamps.gi02.pulse(0)
+                #self.game.lamps.gi03.pulse(0)
+                #self.game.lamps.gi04.pulse(0)
 
-		# Enable the flippers
+                # Enable the flippers
                 #print "Game Config: "+str(self.game.config)
-		self.game.enable_flippers(True)
-                
+                self.game.enable_flippers(True)
+
                 #setup flags
                 self.ball_served= False
                 self.ball_saved = False
                 # Each time this mode is added to game Q, set this flag true.
-		self.ball_starting = True
+                self.ball_starting = True
 
                 #setup basic modes
                 self.add_basic_modes(self);
 
-		# Put the ball into play and start tracking it.
-		self.game.trough.launch_balls(1, self.ball_launch_callback)
+                # Put the ball into play and start tracking it.
+                self.game.trough.launch_balls(1, self.ball_launch_callback)
 
                 # Enable ball search in case a ball gets stuck during gameplay.
-		self.game.ball_search.enable()
+                self.game.ball_search.enable()
 
-		# Reset tilt warnings and status
-		self.game.tilt.reset()
+                # Reset tilt warnings and status
+                self.game.tilt.reset()
 
-		# In case a higher priority mode doesn't install it's own ball_drained
-		# handler.
-		self.game.trough.drain_callback = self.ball_drained_callback
+                # In case a higher priority mode doesn't install it's own ball_drained
+                # handler.
+                self.game.trough.drain_callback = self.ball_drained_callback
 
                 #ball save callback - exp
                 self.game.ball_save.callback = self.ball_save_callback
@@ -179,7 +179,7 @@ class BaseGameMode(game.Mode):
             self.ball_saved = True
 
 
-	def ball_launch_callback(self):
+        def ball_launch_callback(self):
             #print("Debug - Ball Starting var is:"+str(self.ball_starting))
             if self.ball_starting:
                 #print("Debug - Starting Ball Save Lamp")
@@ -189,7 +189,7 @@ class BaseGameMode(game.Mode):
                 self.game.sound.play_music('general_play', loops=-1)
                 #add skillshot - removes itself
                 self.game.modes.add(self.skillshot)
-        
+
 
         def mode_tick(self):
             if self.game.switches.startButton.is_active(1) and self.game.switches.flipperLwL.is_active(1) and self.game.switches.flipperLwR.is_active():
@@ -197,22 +197,22 @@ class BaseGameMode(game.Mode):
                 self.game.sound.stop_music()
                 self.game.end_run_loop()
 
-		while len(self.game.dmd.frame_handlers) > 0:
+                while len(self.game.dmd.frame_handlers) > 0:
                     del self.game.dmd.frame_handlers[0]
 
-		del self.game.proc
+                del self.game.proc
 
 
-	def mode_stopped(self):
+        def mode_stopped(self):
 
                 print("Basic Game Mode Ended, Ball "+str(self.game.ball))
 
-		# Ensure flippers are disabled
-		self.game.enable_flippers(enable=False)
+                # Ensure flippers are disabled
+                self.game.enable_flippers(enable=False)
 
-		# Deactivate the ball search logic so it won't search due to no
-		# switches being hit.
-		self.game.ball_search.disable()
+                # Deactivate the ball search logic so it won't search due to no
+                # switches being hit.
+                self.game.ball_search.disable()
 
                 self.game.modes.remove(self.spinner)
                 self.game.modes.remove(self.pops)
@@ -225,42 +225,42 @@ class BaseGameMode(game.Mode):
                 self.game.modes.remove(self.mode_select)
                 self.game.modes.remove(self.multiball)
                 self.game.modes.remove(self.poa)
-                
-                
-	def ball_drained_callback(self):
+
+
+        def ball_drained_callback(self):
                 # temp addition of ball_served flag checking to try and resolve trough ball launch bounce in
-		if self.game.trough.num_balls_in_play == 0 and self.ball_served and not self.game.get_player_stats('final_adventure_started'):
+                if self.game.trough.num_balls_in_play == 0 and self.ball_served and not self.game.get_player_stats('final_adventure_started'):
                     # End the ball
                     self.finish_ball()
 
 
-	def finish_ball(self):
+        def finish_ball(self):
                 #music fadeout
                 self.game.sound.fadeout_music()
 
                 # Create the bonus mode so bonus can be calculated.
-		self.bonus = Bonus(self.game, 98)
-		self.game.modes.add(self.bonus)
+                self.bonus = Bonus(self.game, 98)
+                self.game.modes.add(self.bonus)
 
-		# Only compute bonus if it wasn't tilted away. 23/02/2011
-		if not self.game.tilt.get_status():
+                # Only compute bonus if it wasn't tilted away. 23/02/2011
+                if not self.game.tilt.get_status():
                     self.bonus.calculate(self.end_ball)
-		else:
+                else:
                     self.end_ball()
                     self.layer = None
 
 
-	def end_ball(self):
+        def end_ball(self):
                 #remove bonus mode
                 self.game.modes.remove(self.bonus)
 
                 #reset ball served flag
                 self.ball_served=False
 
-		# Tell the game object it can process the end of ball
-		# (to end player's turn or shoot again)
-		self.game.end_ball() # calls game.ball_ended() which removes this mode form the mode queue, calling mode_stopped()
-                
+                # Tell the game object it can process the end of ball
+                # (to end player's turn or shoot again)
+                self.game.end_ball() # calls game.ball_ended() which removes this mode form the mode queue, calling mode_stopped()
+
                 #garbage collection - experiemental
                 collect = gc.collect()
                 remaining_garbage = gc.garbage
@@ -274,44 +274,44 @@ class BaseGameMode(game.Mode):
             self.sa_layer.add_frame_listener(-1, self.shoot_again_cleanup)
             self.layer=self.sa_layer
             self.game.sound.play('shoot_again')
-            
-            
+
+
         def shoot_again_cleanup(self,wait=2):
             self.delay(name='sa_cleanup',delay=wait,handler=self.clear)
-            
-            
+
+
         def clear(self):
             self.layer = None
-            
-            
-	def sw_startButton_active(self, sw):
-		if self.game.ball == 1 and len(self.game.players)<self.game.max_players:
-			p = self.game.add_player()
-			self.log.info(p.name + " added!")
+
+
+        def sw_startButton_active(self, sw):
+                if self.game.ball == 1 and len(self.game.players)<self.game.max_players:
+                        p = self.game.add_player()
+                        self.log.info(p.name + " added!")
                         audits.record_value(self,'gameStarted')
 
         def sw_startButton_active_for_2s(self, sw):
-		if self.game.ball > 1 and self.game.user_settings['Machine (Standard)']['Game Restart']:
-			self.game.set_status("Reset!")
+                if self.game.ball > 1 and self.game.user_settings['Machine (Standard)']['Game Restart']:
+                        self.game.set_status("Reset!")
 
-			# Need to build a mechanism to reset AND restart the game.  If one ball
-			# is already in play, the game can restart without plunging another ball.
-			# It would skip the skill shot too (if one exists).
+                        # Need to build a mechanism to reset AND restart the game.  If one ball
+                        # is already in play, the game can restart without plunging another ball.
+                        # It would skip the skill shot too (if one exists).
 
-			# Currently just reset the game.  This forces the ball(s) to drain and
-			# the game goes to AttractMode.  This makes it painfully slow to restart,
-			# but it's better than nothing.
-			self.game.reset()
-			return True
+                        # Currently just reset the game.  This forces the ball(s) to drain and
+                        # the game goes to AttractMode.  This makes it painfully slow to restart,
+                        # but it's better than nothing.
+                        self.game.reset()
+                        return True
 
 
-	def sw_shooterLane_open_for_1s(self,sw):
-		if self.ball_starting:
-			self.ball_starting = False
-			ball_save_time = 10
-			self.game.ball_save.start(num_balls_to_save=1, time=ball_save_time, now=True, allow_multiple_saves=False)
-		#else:
-		#	self.game.ball_save.disable()
+        def sw_shooterLane_open_for_1s(self,sw):
+                if self.ball_starting:
+                        self.ball_starting = False
+                        ball_save_time = 10
+                        self.game.ball_save.start(num_balls_to_save=1, time=ball_save_time, now=True, allow_multiple_saves=False)
+                #else:
+                #        self.game.ball_save.disable()
 
         def sw_shooterLane_active_for_150ms(self,sw):
             self.ball_served = True
@@ -321,17 +321,17 @@ class BaseGameMode(game.Mode):
                 self.game.coils.ballLaunch.pulse()
                 self.ball_saved = False
 
-	# Note: Game specific item
-	# Set the switch name to the launch button on your game.
-	# If manual plunger, remove the whole section.
-#	def sw_tournamentStart_active(self, sw):
-#		if self.game.switches.shooterLane.is_active():
-#			self.game.coils.ballLaunch.pulse()
+        # Note: Game specific item
+        # Set the switch name to the launch button on your game.
+        # If manual plunger, remove the whole section.
+#        def sw_tournamentStart_active(self, sw):
+#                if self.game.switches.shooterLane.is_active():
+#                        self.game.coils.ballLaunch.pulse()
 #                        self.game.coils.flasherRightSide.schedule(0x00003333, cycle_seconds=2, now=True)
-#                        
+#
 #                if self.game.switches.flipperLwL.is_active() and self.ball_starting:
 #                        self.game.modes.add(self.skillshot)
-                        
+
         def sw_shooterLane_inactive_for_50ms(self,sw):
             if self.ball_served:
                 self.game.sound.play("gun_shot")
@@ -348,15 +348,17 @@ class BaseGameMode(game.Mode):
 #                self.skillshot.clear_lamps()
 
 
-	# Allow service mode to be entered during a game.
-	def sw_enter_active(self, sw):
+        # Allow service mode to be entered during a game.
+        def sw_enter_active(self, sw):
                 self.game.modes.remove(self.game.coin_door)
-		self.game.modes.add(self.game.service_mode)
-		return True
-        
+                self.game.modes.add(self.game.service_mode)
+                return True
+
         #coin door mode control
-        def sw_coinDoorClosed_inactive(self, sw):
-		self.game.modes.add(self.game.coin_door)
+        #def sw_coinDoorClosed_inactive(self, sw):
+        def sw_statusInterlock50v_active_for_500ms(self, sw):
+            if not self.game.modes.__contains__(self.game.coin_door):
+                self.game.modes.add(self.game.coin_door)
 
 
         def sw_leftSlingshot_active(self,sw):
@@ -380,7 +382,7 @@ class BaseGameMode(game.Mode):
         def sling(self):
             self.game.score(110)
             self.game.sound.play('slingshot')
-            
+
             self.game.set_player_stats('slingshot_hits',self.game.get_player_stats('slingshot_hits')+1)
 
         def inlane(self):
@@ -393,15 +395,14 @@ class BaseGameMode(game.Mode):
             if not self.game.ball_save.is_active() and not self.game.get_player_stats("multiball_started") and not self.game.get_player_stats("quick_multiball_started") and not self.game.get_player_stats('multiball_mode_started'):
                 self.game.sound.play("outlane_sound")
                 self.game.sound.play("outlane_speech")
-                
+
                 self.game.lampctrl.play_show('end_ball', repeat=False,callback=self.game.update_lamps)
 
 
         #pause game logic
-        def sw_tournamentStart_active_for_250ms(self,sw): 
-             if self.game.ball>0: 
+        def sw_tournamentStart_active_for_250ms(self,sw):
+             if self.game.ball>0:
                 if self.game.switches.flipperLwR.is_active(0.5) and not self.game.paused:
                     self.game.utility.pause_game(True)
                 elif self.game.paused:
                     self.game.utility.pause_game(False)
-            

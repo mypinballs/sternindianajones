@@ -27,8 +27,8 @@ class Indy_Lanes(game.Mode):
 
             self.log = logging.getLogger('ij.indy_lanes')
 
-            self.hof = Hand_Of_Fate(self.game,95)#95 priority+1
-           
+            self.hof = Hand_Of_Fate(self.game,100)#higher priority than poa
+
             self.bonus_layer = dmd.TextLayer(90, -1, self.game.fonts['num_09Bx7'], "center", opaque=False)
             self.bonus_layer.composite_op="blacksrc"
             self.loop_layer = dmd.TextLayer(90, 24, self.game.fonts['6x6_bold'], "center", opaque=False)
@@ -46,14 +46,14 @@ class Indy_Lanes(game.Mode):
 
             self.lane_flag = [False,False,False,False]
             self.lamps = ['indyI','indyN','indyD','indyY']
-           
+
             #setup friend collection order
             self.friends = ['marrion','willie','sallah','shorty','drJones']
             shuffle(self.friends)
 
             #self.bonus_lamps = ['bonus2X','bonus4X','bonus6X','bonus8X']
 
-            
+
             self.loop_base_value = 1000000
             self.lane_unlit_value = 50000
             self.lane_lit_value = 10000
@@ -87,7 +87,7 @@ class Indy_Lanes(game.Mode):
 
         def mode_started(self):
             self.reset()
-            
+
             #load player specific data
             #-------------------------
             self.lane_flag = self.game.get_player_stats('indy_lanes_flag')
@@ -96,10 +96,10 @@ class Indy_Lanes(game.Mode):
             self.bonusx = self.game.get_player_stats('bonus_x')
             self.loop_value =self.game.get_player_stats('loop_value')
             #-------------------------
-            
+
             #update lamp states
             self.update_lamps()
-            
+
 
         def mode_stopped(self):
             #save player specific data
@@ -117,7 +117,7 @@ class Indy_Lanes(game.Mode):
 
             self.game.set_player_stats('loop_value',self.loop_value)
             #-------------------------
-            
+
             #remove hof mode if needed
             if self.game.get_player_stats('hof_status') !='off':
                 self.game.modes.remove(self.hof)
@@ -207,7 +207,7 @@ class Indy_Lanes(game.Mode):
                     self.delay(name='bonus_text', event_type=None, delay=2, handler=self.extra_ball_lit)
                 elif self.bonusx ==10:
                     self.delay(name='bonus_text', event_type=None, delay=2, handler=self.max_bonus)
-                 
+
                 #light hof inlane lights - should we call hof mode instead to do this????
                 #self.hof.ready()
                 if self.game.get_player_stats('hof_status') =='off':
@@ -215,7 +215,7 @@ class Indy_Lanes(game.Mode):
                     #setup mode link
                     self.hof.advance_bonusx = self.advance_bonusx
 
-                #flash all lamps when completed then reset after delay  
+                #flash all lamps when completed then reset after delay
                 self.completed()
                 self.delay(name='reset_lanes', event_type=None, delay=1.5, handler=self.reset)
 
@@ -225,8 +225,8 @@ class Indy_Lanes(game.Mode):
             for i in range(self.letters_spotted):
                 self.lane_flag[i]=True;
             self.spell_indy()
-            
-            
+
+
         def extra_ball_lit(self):
             self.game.extra_ball.lit()
 
@@ -252,27 +252,27 @@ class Indy_Lanes(game.Mode):
 
                 #update friend lamps
                 #self.update_friend_lamps() - no friend lamps
-                
-                
+
+
         def friend_voice_call(self):
             self.game.sound.play_voice(self.friends[self.friends_collected-1])
-            
+
 
 
         def lanes(self,id):
             if self.lane_flag[id] == False:
-                
+
                 self.letters_spotted +=1
                 self.lane_flag[id]=True;
                 #update player stats var
                 self.game.set_player_stats('indy_lanes_flag',self.lane_flag)
                 #print("indy lamp lit: %s "%(self.lamps[id]))
                 self.game.score(self.lane_unlit_value)
-                
+
                 #play sounds
                 if self.letters_spotted ==4:
                     self.game.sound.play('lane_fanfare')
-                    
+
                     self.spell_indy()
                 else:
                     self.game.sound.play('lane_unlit')
@@ -320,7 +320,7 @@ class Indy_Lanes(game.Mode):
 
             for i in range(start,end,inc):
                 if flag_orig[i]:
-                    
+
                     if direction=='left':
                         j=i-1
                         if j<0:
@@ -361,4 +361,3 @@ class Indy_Lanes(game.Mode):
 
 #        def sw_flipperLwR_active(self, sw):
 #            self.lane_change('right')
-

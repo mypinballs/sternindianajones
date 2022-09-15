@@ -49,7 +49,7 @@ class Attract(game.Mode):
                 self.game.sound.register_sound('flipperAttract', speech_path+"ij40320_my_name_is_indiana_jones.aiff")
                 self.game.sound.register_sound('flipperAttract', speech_path+"ij40327_call_it_the_jungle.aiff")
                 self.game.sound.register_sound('flipperAttract', speech_path+"ij40330_never_happen_again.aiff")
-               
+
 
                 self.sound_timestamp = time.time()
 
@@ -62,8 +62,8 @@ class Attract(game.Mode):
                 for switch in self.coin_switchnames:
 			self.add_switch_handler(name=switch, event_type='active', \
 				delay=None, handler=self.coin_switch_handler)
-                
-                
+
+
 	def mode_topmost(self):
 		pass
 
@@ -86,7 +86,7 @@ class Attract(game.Mode):
                 #self.game.coils.subwayRelease.pulse(100)
 
                 #check for stuck balls
-                
+
                 #self.delay(name='idol_empty_delay', event_type=None, delay=2, handler=self.init_idol)
                 self.delay(name='stuck_balls_release_delay', event_type=None, delay=2, handler=self.game.utility.release_stuck_balls)
                 self.delay(name='map_room_check_delay', event_type=None, delay=2, handler=self.game.utility.check_map_room)
@@ -96,7 +96,6 @@ class Attract(game.Mode):
 
                 #create dmd attract screens
                 self.mypinballs_logo = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/mypinballs_logo.dmd').frames[0])
-                #self.mypinballs_logo.transition = dmd.CrossFadeTransition(width=128,height=32)
                 self.mypinballs_logo.transition = dmd.ExpandTransition(direction='horizontal')
 
                 #self.williams_logo = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/williams_animated.dmd').frames[0])
@@ -128,10 +127,10 @@ class Attract(game.Mode):
 
                 #fadeout music (if any running)
                 self.delay(name='music_fadeout_delay', event_type=None, delay=10, handler=lambda:self.game.sound.fadeout_music(3000))
-                
+
                 #temp gi test
-                self.gi_flutter() 
-                
+                self.gi_flutter()
+
                 #TODO:TEMP - remove
                 #self.game.coils.grailEject.pulse()
 
@@ -141,7 +140,7 @@ class Attract(game.Mode):
 #            self.game.lamps.gi02.pulse(0)
 #            self.game.lamps.gi03.pulse(0)
 #            self.game.lamps.gi04.pulse(0)
-        
+
         def gi_flutter(self):
             self.log.info("GI FLUTTER")
             self.game.lamps.playfieldGI.schedule(0x000C0F0F,cycle_seconds=1)
@@ -158,7 +157,7 @@ class Attract(game.Mode):
             else:
                 self.game.idol.home()
 
-       
+
         def change_lampshow(self):
 		shuffle(self.game.lampshow_keys)
                 delay=10
@@ -186,7 +185,8 @@ class Attract(game.Mode):
 
         def standard_lampshow(self, enable=True):
 		#flash all lamps in groups of 8 ordered by columns
-		schedules = [0xffff0000, 0xfff0000f, 0xff0000ff, 0xf0000fff, 0x0000ffff, 0x000ffff0, 0x00ffff00, 0x0ffff000]
+		#schedules = [0xffff0000, 0xfff0000f, 0xff0000ff, 0xf0000fff, 0x0000ffff, 0x000ffff0, 0x00ffff00, 0x0ffff000]
+                schedules = [0xcccccccc, 0x66666666, 0x33333333, 0x99999999]
 		for index, lamp in enumerate(sorted(self.game.lamps, key=lambda lamp: lamp.number)):
                     if lamp.yaml_number.startswith('L') and lamp.name.find('Button')<0:
 			if enable:
@@ -195,14 +195,14 @@ class Attract(game.Mode):
 			else:
 				lamp.disable()
 
-        
+
         def update_start_lamp(self):
             if audits.display(self.game,'general','creditsCounter') >0 or self.game.user_settings['Machine (Standard)']['Free Play'].startswith('Y'):
                 # Blink the start button to notify player about starting a game.
                 self.game.lamps.startButton.schedule(schedule=0x00ff00ff, cycle_seconds=0, now=False)
             else:
                 self.game.lamps.startButton.disable()
-            
+
 
         def update_pricing(self):
             self.pricing_top = ''
@@ -229,8 +229,8 @@ class Attract(game.Mode):
         def show_pricing(self):
             self.update_pricing()
             self.layer = self.coins_layer
-            
-            
+
+
         def create_high_scores(self,script):
             # Read the categories
             for category in self.game.highscore_categories:
@@ -238,7 +238,7 @@ class Attract(game.Mode):
                 initLine1 = None
                 scoreLine1 = None
 
-                
+
                 for index, score in enumerate(category.scores):
                     score_str = locale.format("%d", score.score, True) # Add commas to the score.
 
@@ -247,7 +247,7 @@ class Attract(game.Mode):
                         ## score 1 is the grand champion, gets its own frame
                         if index == 0:
                             # this is the new style for the 12 init max
-                            
+
                             title = dmd.TextLayer(128/2, 0, self.game.fonts['5px_az'], "center", opaque=False).set_text("Grand Champion".upper(),color=dmd.YELLOW)
                             initsLine = dmd.TextLayer(64, 7, self.game.fonts['9px_az'], "center", opaque=False).set_text(score.inits,color=dmd.GREEN)
                             scoreLine = dmd.TextLayer(64, 18, self.game.fonts['10x7_bold'], "center", opaque=False).set_text(score_str)
@@ -256,10 +256,10 @@ class Attract(game.Mode):
                             combined.transition = dmd.PushTransition(direction='west')
                             # add it to the stack
                             script.append({'seconds':6.0, 'layer':combined})
-                            
+
                              # this section handles scores 2 through 5 (high scores 1 through 4)
                         else:
-                            
+
                             title = dmd.TextLayer(128/2, 0, self.game.fonts['5px_az'], "center", opaque=False).set_text("Highest Scores".upper(),color=dmd.ORANGE)
                             initsLine = dmd.TextLayer(64, 7, self.game.fonts['9px_az'], "center", opaque=False).set_text(str(index) + ") " + score.inits,color=dmd.YELLOW)
                             scoreLine = dmd.TextLayer(64, 18, self.game.fonts['10x7_bold'], "center", opaque=False).set_text(score_str,color=dmd.BROWN)
@@ -267,7 +267,7 @@ class Attract(game.Mode):
                             combined.transition = dmd.PushTransition(direction='west')
                             # add it to the stack
                             script.append({'seconds':4.0, 'layer':combined})
-                            
+
                     # generate screens for Treasure Champion
                     if category.game_data_key == 'TreasureChampionData':
                         bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/mode_bonus_bgnd.dmd").frames[0])
@@ -278,7 +278,7 @@ class Attract(game.Mode):
                         combined.transition = dmd.PushTransition(direction='west')
                         # add it to the stack
                         script.append({'seconds':5.0, 'layer':combined})
-                            
+
                     # generate screens for POA Champion
                     if category.game_data_key == 'POAChampionData':
                         bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/mode_bonus_bgnd.dmd").frames[0])
@@ -289,7 +289,7 @@ class Attract(game.Mode):
                         combined.transition = dmd.PushTransition(direction='west')
                         # add it to the stack
                         script.append({'seconds':5.0, 'layer':combined})
-                    
+
                     # generate screens for Loop Champion
                     if category.game_data_key == 'LoopChampionData':
                         bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/mode_bonus_bgnd.dmd").frames[0])
@@ -317,7 +317,7 @@ class Attract(game.Mode):
 #                    new_layer = dmd.FrameLayer(frame=frame)
 #                    new_layer.transition = dmd.PushTransition(direction='west')
 #                    script.append({'seconds':2.0, 'layer':new_layer})
-                
+
                 self.create_high_scores(script)
 
                 if self.game.user_settings['Machine (Standard)']['Show Date and Time'].startswith('Y'):
@@ -351,7 +351,7 @@ class Attract(game.Mode):
              if time.time()-self.sound_timestamp>5:
                 self.game.sound.play_voice('flipperAttract')
                 self.sound_timestamp=time.time()
-                
+
 
 	# Enter service mode when the enter button is pushed.
 	def sw_enter_active(self, sw):
@@ -365,11 +365,13 @@ class Attract(game.Mode):
 
 	def sw_exit_active(self, sw):
 		return True
-         
+
         #coin door mode control
-        def sw_coinDoorClosed_inactive(self, sw):
-		self.game.modes.add(self.game.coin_door)
-		
+        #def sw_coinDoorClosed_inactive(self, sw):
+        def sw_statusInterlock50v_active_for_500ms(self, sw):
+                if not self.game.modes.__contains__(self.game.coin_door):
+                    self.game.modes.add(self.game.coin_door)
+
 
 	# Outside of the service mode, up/down control audio volume.
 	#def sw_down_active(self, sw):
@@ -381,8 +383,8 @@ class Attract(game.Mode):
 		#volume = int(self.game.sound.volume_up())
 		#self.game.set_status("Volume Up : " + str(volume*10)+"%")
 		#return True
-            
-        
+
+
 
 	# Start button starts a game if the trough is full.  Otherwise it
 	# initiates a ball search.
@@ -414,8 +416,8 @@ class Attract(game.Mode):
             self.show_pricing()
             self.game.sound.play("coin")
             self.update_start_lamp()
-            
-        
+
+
         def sw_flipperLwL_active(self, sw):
                 self.sound_effects()
 

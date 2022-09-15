@@ -42,6 +42,7 @@ class Player(procgame.game.Player):
                 #self.player_stats['mode_status_tracking']= [0,1,1,1,1,1,1,1,1,1,1,1,1,1] #for testing final adventure more easily
                 self.player_stats['mode_blocking'] = False
                 self.player_stats['mode_paused'] = False
+                self.player_stats['film_set_flags'] = [0,0,0,0]
                 self.player_stats['multiball_mode_started'] = False
                 self.player_stats['path_mode_started'] = False
                 self.player_stats['temple_mode_started'] = False
@@ -58,6 +59,9 @@ class Player(procgame.game.Player):
                 self.player_stats['quick_multiball_running'] = False
                 self.player_stats['qm_jackpots_collected'] = 0
                 self.player_stats['jackpots_collected'] = 0
+                self.player_stats['super_qm_qualified'] = False
+                self.player_stats['super_quick_multiball_started'] = False
+                self.player_stats['super_quick_multiball_running'] = False
                 self.player_stats['cheat_count'] = 0
                 self.player_stats['treasures_collected']=0
                 self.player_stats['balls_locked'] = 0

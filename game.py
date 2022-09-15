@@ -96,23 +96,21 @@ class Game(game.BasicGame):
 		self.lampctrl = procgame.lamps.LampController(self)
 		self.settings = {}
 
+                self.colour_dmd = None
+
                 #set the dmd colour map - level 1 is mask and set to 0
                 #dmd_map = [0, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
                 dmd_map = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5, 11, 12, 13, 14, 15]
                 self.proc.set_dmd_color_mapping(dmd_map)
 
                 use_desktop = config.value_for_key_path(keypath='use_desktop', default=True)
-                self.color_desktop = config.value_for_key_path(keypath='colour_desktop', default=False)
+                self.colour_desktop = config.value_for_key_path(keypath='colour_desktop', default=False)
+                colour_dmd_installed = config.value_for_key_path(keypath='colour_dmd_installed', default=False)
                 self.rpi_computer = config.value_for_key_path(keypath='rPi_installed', default=False)
                 self.rpi_hardware_video = config.value_for_key_path(keypath='rPi_hardware_video', default=False)
                 if use_desktop:
-                    # if not color, run the old style pygame
-                    if not self.color_desktop:
-                        self.log.info("Standard Desktop")
-                        from procgame.desktop import Desktop
-                        self.desktop = Desktop()
-                    # otherwise run the color display
-                    else:
+                    #if colour, run colour desktop
+                    if self.colour_desktop:
                         if self.rpi_computer:
                             self.log.info("rPi Optimised Colour Desktop")
                             from mpc import rPi_Desktop
@@ -121,6 +119,19 @@ class Game(game.BasicGame):
                             self.log.info("Standard Colour Desktop")
                             from ep import EP_Desktop
                             self.desktop = EP_Desktop()
+
+                    # if not color, run the old style pygame
+                    else:
+                        self.log.info("Standard Desktop")
+                        from procgame.desktop import Desktop
+                        self.desktop = Desktop()
+
+                #if colour dmd run colour dmd desktop
+                if colour_dmd_installed:
+                    self.log.info("Colour DMD Panel Installed")
+                    from mpc import rgbLedDMDMatrix
+                    self.colour_dmd = rgbLedDMDMatrix(self)
+
 
                 #debug
 #                for coil in self.coils:
@@ -131,7 +142,7 @@ class Game(game.BasicGame):
 
                 #setup score display
                 self.score_display = ScoreDisplay(self, 0)
-                
+
                 #create displayed audits dict
                 self.displayed_audits = yaml.load(open(displayed_audits_path, 'r'))
                 #load and update audits database
@@ -141,6 +152,21 @@ class Game(game.BasicGame):
                 self.health_status = ''
                 self.switch_error_log =[]
                 self.device_error_log=[]
+
+
+        #add control for update of last dmd frame onto a colour rgb dmd panel
+        def show_last_frame(self):
+                #super(Game, self).show_last_frame()
+
+                if self.last_frame:
+                    if self.colour_dmd:
+			self.colour_dmd.draw(self.last_frame)
+                    if self.desktop:
+			self.desktop.draw(self.last_frame)
+
+                    self.last_frame = None
+                    del self.last_frame
+
 
 
 	def save_settings(self):
@@ -153,7 +179,7 @@ class Game(game.BasicGame):
 
         def create_player(self, name):
 		return Player(name)
-                
+
 
 	def setup(self):
 		"""docstring for setup"""
@@ -171,7 +197,7 @@ class Game(game.BasicGame):
                         self.log.info('Settings Data File Recreated')
                     except OSError:
                         self.log.error('Unable to recreate Settings Data File from Template. Damn....')
-		
+
                 #load the game data file
                 #this can be corrupted (blank) by hard power offs, so use some try catch here to stop a bomb out
                 try:
@@ -184,13 +210,13 @@ class Game(game.BasicGame):
                         self.log.info('Game Data File Recreated')
                     except OSError:
                         self.log.error('Unable to recreate Game Data File from Template. Damn....')
-            
-                    
+
+
                 #define system status var
                 self.system_status='power_up'
-                self.system_version='0.8.0'
+                self.system_version='0.8.3'
                 self.system_name='Indiana Jones 2'.upper()
-                
+
                 # Setup fonts
 		self.fonts = {}
 		#self.fonts['jazz18'] = font_jazz18
@@ -202,43 +228,43 @@ class Game(game.BasicGame):
                 self.fonts['7x4'] = dmd.font_named("font_7x4.dmd")
                 self.fonts['7x4'].tracking = -1
                 self.fonts['7x4'].composite_op ="blacksrc"
-                
+
                 self.fonts['07x5'] = dmd.font_named("font_7x5.dmd")
                 self.fonts['07x5'].tracking = -1
                 self.fonts['07x5'].composite_op ="blacksrc"
-                
+
                 self.fonts['6x6_bold'] = dmd.font_named("font_8x7_bold.dmd")
                 self.fonts['6x6_bold'].tracking = -1
                 self.fonts['6x6_bold'].composite_op ="blacksrc"
-                
+
                 self.fonts['8x6'] = dmd.font_named("font_9x6_bold.dmd")
                 self.fonts['8x6'].tracking = -1
                 self.fonts['8x6'].composite_op ="blacksrc"
-                
+
                 self.fonts['num_09Bx7'] = dmd.font_named("font_10x7_bold.dmd")
                 self.fonts['num_09Bx7'].tracking = -1
                 self.fonts['num_09Bx7'].composite_op ="blacksrc"
-                
+
                 self.fonts['9x7_bold'] = dmd.font_named("font_10x7_bold.dmd")
                 self.fonts['9x7_bold'].tracking = -1
                 self.fonts['9x7_bold'].composite_op ="blacksrc"
-                
+
                 self.fonts['10x7_bold'] = dmd.font_named("font_12x8_bold.dmd")
                 self.fonts['10x7_bold'].tracking = -1
                 self.fonts['10x7_bold'].composite_op ="blacksrc"
-                
+
                 self.fonts['14x9_bold'] = dmd.font_named("font_14x9.dmd")
                 self.fonts['14x9_bold'].tracking = -1
                 self.fonts['14x9_bold'].composite_op ="blacksrc"
-                
+
                 self.fonts['23x12'] = dmd.font_named("font_23x12_bold.dmd")
                 self.fonts['23x12'].tracking = -1
                 self.fonts['23x12'].composite_op ="blacksrc"
-                
+
                 self.fonts['30x13'] = dmd.font_named("font_30x13_bold.dmd")
                 self.fonts['30x13'].tracking = -1
                 self.fonts['30x13'].composite_op ="blacksrc"
-                
+
                 self.fonts['4px_az'] = dmd.font_named("font_7x4.dmd")
                 self.fonts['5px_az'] = dmd.font_named("font_7x5.dmd")
                 self.fonts['5px_inv_az'] = dmd.font_named("font_7x5_inverted.dmd")
@@ -248,7 +274,7 @@ class Game(game.BasicGame):
                 self.fonts['7px_bold_az'] = dmd.font_named("Font_14_CactusCanyon.dmd")
                 self.fonts['9px_az'] = dmd.font_named("Font_15_CactusCanyon.dmd")
                 self.fonts['10px_az'] = dmd.font_named("Font_Custom_10px_AZ.dmd")
-                
+
                 #setup paths
                 self.paths = {}
                 self.paths['game'] = game_path
@@ -267,31 +293,31 @@ class Game(game.BasicGame):
 #		print self.game_data
 #		print "Settings:"
 #		print self.settings
-                
+
                 #configure of switch types and coil types (solenoid or flasher) for mypinballs controller class
                 io_controller = config.value_for_key_path(keypath='pinproc_class', default='')
                 if 'mypinballs' in io_controller:
                     self.proc.config(self.switches,self.coils)
 
                 #config debug info
-#		self.log.info("Initial switch states:")
-#		for sw in self.switches:
-#			self.log.info("  %s:\t%s:\t%s" % (sw.number, sw.name, sw.state_str()))
-#                        
-#                self.log.info("Lamp Info:")
+		self.log.info("Initial switch states:")
+		for sw in self.switches:
+			self.log.info("  %s:\t%s:\t%s" % (sw.number, sw.name, sw.state_str()))
+#
+                self.log.info("Lamp Info:")
 		for lamp in self.lamps:
 			self.log.info("  %s:\t%s:\t%s" % (lamp.number, lamp.name, lamp.yaml_number))
-#                
+#
                 #balls per game setup
                 self.balls_per_game = self.user_settings['Machine (Standard)']['Balls Per Game']
-                
+
                 #moonlight setup
                 self.moonlight_minutes = self.user_settings['Gameplay (Feature)']['Moonlight Mins to Midnight']
                 self.moonlight_flag = False
-                
+
 		self.setup_ball_search()
                 self.score_display.set_left_players_justify(self.user_settings['Display']['Left side score justify'])
-                
+
                 #speech setup
                 self.extended_speech = self.boolean_format(self.user_settings['Sound']['Extended Speech'])
                 self.log.info('Extended Speech Enabled:%s',self.extended_speech)
@@ -351,14 +377,14 @@ class Game(game.BasicGame):
 		self.setup_highscores()
                 #allow access of hs initials from other modes
                 self.last_entered_inits = None
-                        
+
 
                 #Setup Date & Time Display
                 self.show_date_time = self.user_settings['Machine (Standard)']['Show Date and Time']
 
                 #Maximum Players
                 self.max_players = 4;
-                
+
                 #setup paused flag
                 self.paused = False
 
@@ -400,7 +426,7 @@ class Game(game.BasicGame):
 
 
                 # set up the color desktop if we're using that
-                if self.color_desktop:
+                if self.colour_desktop:
                     self.desktop.draw_window(self.user_settings['Display']['Color Display Pixel Size'],self.user_settings['Display']['Color Display X Offset'],self.user_settings['Display']['Color Display Y Offset'])
                     # load the images for the colorized display
                     self.desktop.load_images(dots_path)
@@ -410,7 +436,7 @@ class Game(game.BasicGame):
 		# initiated reset occurs, do everything in self.reset() and call it
 		# now and during a user initiated reset.
 		self.reset()
-        
+
         def setup_highscores(self):
 		self.highscore_categories = []
 
@@ -436,7 +462,7 @@ class Game(game.BasicGame):
 		cat.score_suffix_plural = ' Artifacts'
                 cat.score_for_player = lambda player: player.player_stats['treasures_collected']
 		self.highscore_categories.append(cat)
-                
+
                 #Loopin' Ramp Champion
 		cat = highscore.HighScoreCategory()
 		cat.game_data_key = 'LoopChampionData'
@@ -448,16 +474,16 @@ class Game(game.BasicGame):
 
 		for category in self.highscore_categories:
 			category.load_from_game(self)
-                        
-        
+
+
         def start_highscore_sequence(self):
 		seq_manager = EntrySequenceManager(game=self, priority=150)
 		seq_manager.ready_handler = self.highscore_entry_ready_to_prompt
 		seq_manager.finished_handler = self.highscore_entry_finished
-		
+
 		seq_manager.logic = procgame.highscore.CategoryLogic(game=self, categories=self.highscore_categories)
 		self.modes.add(seq_manager)
-	
+
 	def highscore_entry_ready_to_prompt(self, mode, prompt):
 		#banner_mode = Billboard(game=self, priority=8)
 		#banner_mode.show_text(text=('Great Score'.upper(), prompt.left.upper()), seconds=None)
@@ -465,21 +491,21 @@ class Game(game.BasicGame):
                 self.sound.stop_music()
                 self.sound.play_music('hs_entry_music', loops=-1)
                 self.sound.play_voice('well_done')
-                
+
                 bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/hs_entry_bgnd.dmd").frames[0])
                 title_layer = dmd.TextLayer(128/2, 10, self.fonts['8x6'], "center", opaque=False).set_text("Great Score".upper(),color=dmd.CYAN)
                 player_layer = dmd.TextLayer(128/2, 18, self.fonts['8x6'], "center", opaque=False).set_text(prompt.left.upper(),color=dmd.CYAN)
                 # combine the parts together
                 self.utility.layer = dmd.GroupedLayer(128, 32, [bgnd_layer,title_layer,player_layer])
-                
+
 		self.utility.delay(delay=3, handler=lambda: self.highscore_banner_complete(mode=mode))
 
 
 	def highscore_banner_complete(self, mode):
                 self.utility.layer=None
 		mode.prompt()
-          
-                
+
+
         def highscore_entry_finished(self, mode):
 		self.modes.remove(mode)
                 self.modes.add(self.match)
@@ -487,8 +513,8 @@ class Game(game.BasicGame):
                 #store high score on hs server
 #                if self.user_settings['Network']['Store High Scores on Server']=='Yes':
 #                    p = self.current_player()
-#                    self.hs_server.store_score(self.last_entered_inits,p.score)          
-                    
+#                    self.hs_server.store_score(self.last_entered_inits,p.score)
+
 
         def set_player_stats(self,id,value):
             p = self.current_player()
@@ -502,7 +528,7 @@ class Game(game.BasicGame):
 		# Reset the entire game framework
 		super(Game, self).reset()
 
-		# Add the basic modes to the mode queue	
+		# Add the basic modes to the mode queue
 		self.modes.add(self.ball_search)
                 self.modes.add(self.utility)
                 self.modes.add(self.effects)
@@ -519,12 +545,12 @@ class Game(game.BasicGame):
                 self.modes.add(self.screens)
                 self.modes.add(self.volume)
                 self.modes.add(self.attract_mode)
-                
+
 		# Make sure flippers are off, especially for user initiated resets.
                 #TODO - TEMP Change to True for MPU testing, normally false
 		#self.enable_flippers(enable=True)
                 self.enable_flippers(enable=False)
-                
+
                 #temp addition -testing for Gerry
                 #self.coils.swCol9Coil.pulse(0)
                 #self.log.info('%s On',self.coils.swCol9Coil.label)
@@ -545,7 +571,7 @@ class Game(game.BasicGame):
                 if self.user_settings['Machine (Standard)']['Free Play'].startswith('N'):
                     credits =  audits.display(self,'general','creditsCounter')
                     audits.update_counter(self,'credits',credits-1)
-                    
+
                 #moonlight check - from Eric P of CCC fame
                 #-----------------------------------------
                 # Check the time
@@ -568,22 +594,22 @@ class Game(game.BasicGame):
 
                 self.log.info("Moonlight Flag:%s",self.moonlight_flag)
                 #-----------------------------------------
-                
-                
+
+
 #        def add_player(self):
 #                super(Game, self).add_player()
 #                audits.record_value(self,'gameStarted')
-        
-        
+
+
         def shoot_again(self):
             super(Game, self).shoot_again() #calls ball_starting
-         
+
             self.base_game_mode.shoot_again()
-                
-	
+
+
         def ball_starting(self):
 		super(Game, self).ball_starting()
-		
+
                 #check for moonlight
                 if self.moonlight_flag and not self.get_player_stats('moonlight_status'):
                     self.modes.add(self.moonlight)
@@ -597,7 +623,7 @@ class Game(game.BasicGame):
 
 	def game_ended(self):
 		super(Game, self).game_ended()
-                
+
                 #remove the base game mode
                 self.modes.remove(self.base_game_mode)
                 #disable the active ball search from now the game has ended
@@ -605,13 +631,13 @@ class Game(game.BasicGame):
 
                 #self.modes.add(self.match)
                 #run the high score sequencer. Will run match automatically if no high scores to enter
-                self.start_highscore_sequence() 
-                
+                self.start_highscore_sequence()
+
                 #record audits
                 #-------------
                 self.game_time = time.time()-self.start_time
                 audits.record_value(self,'gameTime',self.game_time)
-                
+
                 #p = self.current_player()
                 for p in self.players:
                     audits.record_value(self,'gamePlayed')
@@ -633,7 +659,7 @@ class Game(game.BasicGame):
 
             self.log.debug('Switch Errors:%s',self.switch_error_log)
 
-            
+
 	def set_status(self, text):
 		self.dmd.set_message(text, 3)
 		print(text)
@@ -641,7 +667,7 @@ class Game(game.BasicGame):
 	def extra_ball_count(self):
 		p = self.current_player()
 		p.extra_balls += 1
-                
+
 
 	def setup_ball_search(self):
 		# No special handlers in starter game.
@@ -662,7 +688,7 @@ class Game(game.BasicGame):
 			self.logger.info("Programming Flipper %s", flipper)
 			#setup flipper coil naming
                         main_coil = self.coils[flipper+'Main']
-                        
+
                         #setup opposite flipper coil naming for party modes
                         oppflipper = ''
                         if flipper.endswith('R'):
@@ -670,26 +696,26 @@ class Game(game.BasicGame):
                         elif flipper.endswith('L'):
                             oppflipper = flipper[:-1]+'R'
                         opposite_coil = self.coils[oppflipper+'Main']
-			
+
 			switch_num = self.switches[flipper].number
 
-                        #activating flipper rules
+                        #activating flipper rules # patter timing 2 on, 18 off, now 2 on 24 off
 			drivers = []
 			if enable:
                                 if self.party_mode=='No Hold':
                                     drivers += [pinproc.driver_state_pulse(main_coil.state(), main_coil.default_pulse_time)]
                                 elif self.party_mode =='Double Flip':
-                                    drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
-                                    drivers += [pinproc.driver_state_patter(opposite_coil.state(), 2, 18, opposite_coil.default_pulse_time, True)]
+                                    drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 24, main_coil.default_pulse_time, True)]
+                                    drivers += [pinproc.driver_state_patter(opposite_coil.state(), 2, 24, opposite_coil.default_pulse_time, True)]
                                 elif self.party_mode=='Reversed':
-                                    drivers += [pinproc.driver_state_patter(opposite_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
+                                    drivers += [pinproc.driver_state_patter(opposite_coil.state(), 2, 24, main_coil.default_pulse_time, True)]
                                 else:
-                                    drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 18, main_coil.default_pulse_time, True)]
+                                    drivers += [pinproc.driver_state_patter(main_coil.state(), 2, 24, main_coil.default_pulse_time, True)]
                         else:
                              main_coil.disable()
-                             
+
 			self.proc.switch_update_rule(switch_num, 'closed_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
-			
+
                         #deactivating flipper rules
 			drivers = []
 			#if enable:
@@ -700,9 +726,9 @@ class Game(game.BasicGame):
                             drivers += [pinproc.driver_state_disable(opposite_coil.state())]
                         else:
                             drivers += [pinproc.driver_state_disable(main_coil.state())]
-                                
+
 			self.proc.switch_update_rule(switch_num, 'open_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
-                            
+
 
 		#bumpers
 		self.enable_bumpers(enable)
@@ -755,7 +781,7 @@ def main():
         #setup logging to file
         datetime = str(time.strftime("%Y-%m-%d %H-%M-%S"))
         file_handler = logging.FileHandler(game_path +'var/logs/'+serial+' Game Log '+datetime+'.log')
-        file_handler.setLevel(logging.INFO)
+        file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s"))
 
  #       root_logger.addHandler(handler)
@@ -765,8 +791,8 @@ def main():
         logging.getLogger('ij.ark').setLevel(logging.DEBUG)
         logging.getLogger('ij.swordsman').setLevel(logging.ERROR)
         logging.getLogger('ij.temple').setLevel(logging.ERROR)
-        logging.getLogger('ij.ball_search').setLevel(logging.DEBUG)
-#        logging.getLogger('ij.trough').setLevel(logging.DEBUG)
+        logging.getLogger('ij.ball_search').setLevel(logging.ERROR)
+        logging.getLogger('ij.trough').setLevel(logging.DEBUG)
 #        logging.getLogger('ij.base').setLevel(logging.DEBUG)
         logging.getLogger('ij.poa').setLevel(logging.DEBUG)
         logging.getLogger('ij.adventure').setLevel(logging.DEBUG)
@@ -778,7 +804,8 @@ def main():
         logging.getLogger('game.vdriver').setLevel(logging.ERROR)
         logging.getLogger('game.driver').setLevel(logging.ERROR)
         logging.getLogger('game.sound').setLevel(logging.ERROR)
-        logging.getLogger('mpu').setLevel(logging.INFO)
+        logging.getLogger('game').setLevel(logging.ERROR)
+        logging.getLogger('mpu').setLevel(logging.ERROR) #ERROR
 
 
 	config = yaml.load(open(machine_config_path, 'r'))
@@ -795,10 +822,10 @@ def main():
         except Exception, err:
                 log = logging.getLogger()
                 log.exception('We are stopping here!:')
-                
+
 	finally:
 		del game
-                
+
 
 
 if __name__ == '__main__': main()

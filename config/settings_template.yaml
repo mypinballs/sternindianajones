@@ -81,7 +81,7 @@ Sound:
     default: 10
   'Extended Speech':
     options: ['Yes','No']
-    default: 'Yes'  
+    default: 'Yes'
 #  'Music Volume Offset':
 #    options: [-0.4,0.4]
 #    increments: 0.1
@@ -101,6 +101,10 @@ Display:
   'Left side score justify':
     # This example has no default.  The first option (right) will be used as the default.
     options: [right, left]
+  'RGB DMD Brightness':
+    options: [10,100]
+    increments: 5
+    default: 60
 Replay:
   'Replay Type':
     options: ['none','auto','fixed','incremental']
@@ -147,14 +151,14 @@ Gameplay (Feature):
   'Max Balls in Ark':
     options: [2,6]
     increments: 1
-    default: 3  
+    default: 3
   'Jones Target Banks For 8 Ball':
     options: [2,8]
     increments: 1
     default: 3
   'Disable Ark Mech':
     options: ['Yes','No']
-    default: 'No' 
+    default: 'No'
   'Timed Plunger':
     options: [0,120]
     increments: 5
@@ -192,7 +196,7 @@ Gameplay (Feature):
     default: 30
   'Plane Chase Memory':
     options: ['No','Yes']
-    default: 'Yes' 
+    default: 'Yes'
   'Dog Fight Timer':
     options: [5,30]
     increments: 5
@@ -203,15 +207,15 @@ Gameplay (Feature):
   'Mode Timers Pause Length':
     options: [1,4]
     increments: 0.5
-    default: 2 
+    default: 2
   'Mode Bonus Value (Mil)':
     options: [1,5]
     increments: 0.5
-    default: 2 
+    default: 2
   'Mode Start Value (Mil)':
     options: [1,5]
     increments: 0.5
-    default: 3 
+    default: 3
   'Get The Idol Timer':
     options: [5,120]
     increments: 5
@@ -221,7 +225,7 @@ Gameplay (Feature):
     default: 'Medium'
   'Get The Idol Awards Locks':
     options: ['Yes','No']
-    default: 'Yes'  
+    default: 'Yes'
   'Streets Of Cairo Timer':
     options: [5,120]
     increments: 5
@@ -309,6 +313,9 @@ Gameplay (Feature):
     options: [20,50]
     increments: 5
     default: 30
+  'Nuke Test Awards Locks':
+    options: ['Yes','No']
+    default: 'No'
   'Return The Skull Timer':
     options: [10,60]
     increments: 5
@@ -327,15 +334,15 @@ Gameplay (Feature):
   'Frankenstein Timer':
     options: [20,90]
     increments: 5
-    default: 60 
+    default: 60
   'Loopin Jackpots Start':
     options: [20,100]
     increments: 5
-    default: 50 
+    default: 50
   'Loopin Jackpots Timer':
     options: [20,90]
     increments: 5
-    default: 30 
+    default: 30
   'Jackpot Multiplier Timer':
     options: [5,120]
     increments: 5
@@ -358,7 +365,7 @@ Gameplay (Feature):
   'Path of Adventure Pit Lit Level':
     options: [2,6]
     increments: 1
-    default: 3 
+    default: 3
   'Lower Playfield Extra Ball Lit Hold':
     options: ['On','Off']
     default: 'On'
@@ -447,4 +454,3 @@ Network:
   'Display Server Scores in Attract':
     options: ['Yes','No']
     default: 'No'
-

@@ -48,7 +48,7 @@ class Utility(game.Mode):
 
             total_balls = self.game.trough.num_balls()+self.game.trough.num_balls_locked
             
-            if total_balls<self.game.num_balls_total:              
+            if total_balls<self.game.num_balls_total and self.game.is_game_over():              
                 self.log.info('Trough is full::%s',self.game.trough.is_full())
                 self.log.info('Balls in trough::%s',self.game.trough.num_balls())
                 self.log.info('Balls in Ark::%s',self.game.ark.num_balls())

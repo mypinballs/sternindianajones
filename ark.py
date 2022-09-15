@@ -117,7 +117,8 @@ class Ark(game.Mode):
                 
         def motor(self,enable=True):
             if enable:
-                self.game.coils.arkMotor.enable()
+                #self.game.coils.arkMotor.enable()
+                self.game.coils.arkMotor.patter(on_time=10,off_time=0)
                 self.ark_moving = True
             else:
                 self.game.coils.arkMotor.disable()

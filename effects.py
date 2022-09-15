@@ -130,11 +130,13 @@ class Effects(game.Mode):
                 elif style == 'medium':
                     #self.game.coils['shakerMotor'].schedule(schedule=0x30003000, cycle_seconds=0, now=True)
                     time=0.75
-                    self.game.coils['shakerMotor'].enable()
+                    #self.game.coils['shakerMotor'].enable()
+                    self.game.coils['shakerMotor'].patter(on_time=10,off_time=2)
                 elif style == 'fast':
                     #self.game.coils['shakerMotor'].schedule(schedule=0x11111111, cycle_seconds=0, now=True)
                     time=1.2
-                    self.game.coils['shakerMotor'].enable()
+                    #self.game.coils['shakerMotor'].enable()
+                    self.game.coils['shakerMotor'].patter(on_time=10,off_time=0)
                 
                 self.delay(name='shaker_off', event_type=None, delay=time, handler=self.game.coils['shakerMotor'].disable)
                 

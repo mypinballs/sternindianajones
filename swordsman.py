@@ -75,7 +75,8 @@ class Swordsman(game.Mode):
              
         def motor(self,enable=True):
             if enable:
-                self.game.coils.swordsmanMotor.enable()
+                #self.game.coils.swordsmanMotor.enable()
+                self.game.coils.swordsmanMotor.patter(on_time=10,off_time=0)
                 self.log.debug('Motor is on')
             else:
                 self.game.coils.swordsmanMotor.disable()
