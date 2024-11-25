@@ -2,18 +2,18 @@ pinproc_class: procgame.fakepinproc.FakePinPROC
 #pinproc_class: procgame.mypinballsmpu.PinballXMPU
 font_path:
   - .
-  - ~/Documents/Pinball/p-roc/mypinballs indiana jones 2/src/shared/dmd
-base_path: /Users/jim/Documents/Pinball/p-roc/mypinballs indiana jones 2/src/
-build_version: 0.1
-build_date: 09/09/15
+  - ~/Documents/software dev/Pinball Software/mypinballs indiana jones 2/src/shared/dmd
+base_path: /Users/jimaskey/Documents/software dev/Pinball Software/mypinballs indiana jones 2/src/
+build_version: 0.2
+build_date: 01/11/20
 std_locale: en_GB
 euro_locale: de_DE
 use_desktop: True
-colour_desktop: False
+colour_desktop: True
 rPi_installed: False
 rPi_hardware_video: False
-colour_dmd_installed: True
-desktop_dmd_size: 1
+colour_dmd_installed: False
+desktop_dmd_size: 3
 game_serial: MPC1004-0000
 lamp_serial_port: /dev/tty.usbmodem1421
 lamp_serial_yaml: serial_lamps.yaml

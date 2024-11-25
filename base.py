@@ -51,10 +51,10 @@ class BaseGameMode(game.Mode):
                 #register speech call files
                 self.game.sound.register_sound('dont_touch_anything', speech_path+"dont_touch_anything.aiff")
 
-                self.game.sound.register_sound('slingshot', sound_path+"sling_1.aiff")
-                self.game.sound.register_sound('slingshot', sound_path+"sling_2.aiff")
-                self.game.sound.register_sound('slingshot', sound_path+"sling_3.aiff")
-                self.game.sound.register_sound('slingshot', sound_path+"sling_4.aiff")
+                self.game.sound.register_sound('slingshot', sound_path+"sling_1.ogg") #exp to see if sounds play faster with different formats
+                self.game.sound.register_sound('slingshot', sound_path+"sling_2.ogg")
+                self.game.sound.register_sound('slingshot', sound_path+"sling_3.ogg")
+                self.game.sound.register_sound('slingshot', sound_path+"sling_4.ogg")
 
                 self.game.sound.register_sound('inlane', sound_path+"inlane.aiff")
                 self.game.sound.register_sound('gun_shot', sound_path+"gun_shot_deep.aiff")
@@ -84,7 +84,7 @@ class BaseGameMode(game.Mode):
                 self.indy_lanes = Indy_Lanes(self.game, 43)
 
                 #medium priority basic modes
-                self.totem = Totem(self.game, 51)
+                self.totem = Totem(self.game, 50)
                 self.plane_chase = Plane_Chase(self.game, 52)
                 self.loops = Loops(self.game, 53)
 
@@ -191,6 +191,10 @@ class BaseGameMode(game.Mode):
                 self.game.modes.add(self.skillshot)
 
 
+        def ball_launch_callback_2(self):
+            pass
+
+
         def mode_tick(self):
             if self.game.switches.startButton.is_active(1) and self.game.switches.flipperLwL.is_active(1) and self.game.switches.flipperLwR.is_active():
                 print("reset button code entered")
@@ -232,6 +236,9 @@ class BaseGameMode(game.Mode):
                 if self.game.trough.num_balls_in_play == 0 and self.ball_served and not self.game.get_player_stats('final_adventure_started'):
                     # End the ball
                     self.finish_ball()
+                
+                if self.game.trough.num_balls_in_play == 0 and self.ball_starting and not self.ball_served: #exp for zero score change when ball drained
+                     self.game.trough.launch_balls(1, callback=self.ball_launch_callback_2)
 
 
         def finish_ball(self):
@@ -260,6 +267,7 @@ class BaseGameMode(game.Mode):
                 # Tell the game object it can process the end of ball
                 # (to end player's turn or shoot again)
                 self.game.end_ball() # calls game.ball_ended() which removes this mode form the mode queue, calling mode_stopped()
+                self.game.set_player_stats('ball_start_score',self.game.current_player().score)
 
                 #garbage collection - experiemental
                 collect = gc.collect()
@@ -305,19 +313,30 @@ class BaseGameMode(game.Mode):
                         return True
 
 
-        def sw_shooterLane_open_for_1s(self,sw):
+        def start_ballsave_with_score(self): #starts ball save and updates ball_starting flag only after player has scored some points
+            wait=0.5
+            if self.game.current_player().score>self.game.get_player_stats('ball_start_score'):
                 if self.ball_starting:
                         self.ball_starting = False
+                        self.ball_served = True
                         ball_save_time = 10
                         self.game.ball_save.start(num_balls_to_save=1, time=ball_save_time, now=True, allow_multiple_saves=False)
-                #else:
-                #        self.game.ball_save.disable()
+                self.cancel_delayed('repeat_start_ballsave')
+            else:
+                self.delay(name='repeat_start_ballsave',delay=wait,handler=self.start_ballsave_with_score)
 
-        def sw_shooterLane_active_for_150ms(self,sw):
-            self.ball_served = True
+        
+        def sw_shooterLane_open_for_1s(self,sw):
+            self.start_ballsave_with_score()
+
+
+        # def sw_shooterLane_active_for_150ms(self,sw):
+            # self.ball_served = True
+
 
         def sw_shooterLane_active_for_500ms(self,sw):
-            if self.ball_saved:
+            #if self.ball_saved:
+            if not self.skillshot.is_started() and not self.ball_starting: #better autoshooter logic in case ball ends up in shooter lane by mistake during game
                 self.game.coils.ballLaunch.pulse()
                 self.ball_saved = False
 
@@ -333,7 +352,7 @@ class BaseGameMode(game.Mode):
 #                        self.game.modes.add(self.skillshot)
 
         def sw_shooterLane_inactive_for_50ms(self,sw):
-            if self.ball_served:
+            if self.ball_starting:
                 self.game.sound.play("gun_shot")
                 self.game.lampctrl.play_show('start_ball', repeat=False,callback=self.game.update_lamps)
 

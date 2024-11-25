@@ -515,9 +515,11 @@ PRCoils:
     flipperLwLMain:
         number: C15
         label: 'LL Flipper Power'
+        pulseTime: 35
     flipperLwRMain:
         number: C16
         label: 'LR Flipper Power'
+        pulseTime: 35
 
     #low current group 1
     leftSlingshot:
@@ -872,7 +874,7 @@ PRLamps:
     tankChase:
         number: L52
         label: 'Tank Chase'
-    castleGrunwald:
+    castleBrunwald:
         number: L53
         label: 'Castle Brunwald'
     rightSpinner:
@@ -905,11 +907,11 @@ PRLamps:
         number: L61
         tags: jet
         label: 'Left Jet'
-    rightJet:
+    bottomJet:
         number: L62
         tags: jet
         label: 'Left Jet'
-    bottomJet:
+    rightJet:
         number: L63
         tags: jet
         label: 'Left Jet'

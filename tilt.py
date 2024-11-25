@@ -8,8 +8,8 @@ sound_path = game_path +"sound/"
 music_path = game_path +"music/"
 
 class Tilt(game.Mode):
-	"""docstring for Bonus"""
-	def __init__(self, game, priority):
+        """docstring for Bonus"""
+        def __init__(self, game, priority):
             super(Tilt, self).__init__(game, priority)
 
             self.game.sound.register_sound('tilt warning', speech_path+"carefully.aiff")
@@ -25,14 +25,22 @@ class Tilt(game.Mode):
             self.times_warned = 0
             self.layer = None
             self.tilted = False
+            self.slam_tilted = False
 
 
-	def mode_started(self):
+        def mode_started(self):
             self.num_tilt_warnings = self.game.user_settings['Machine (Standard)']['Tilt Warnings']
             self.reset()
-		
+                
 
         def get_status(self):
+            if self.status==0:
+                return False
+            elif self.status==1:
+                return True
+        
+
+        def is_titled(self):
             if self.status==0:
                 return False
             elif self.status==1:
@@ -55,13 +63,13 @@ class Tilt(game.Mode):
         def tilt(self):
 
                 #check if already in a tilt state
-		if self.status == 0:
+                if self.status == 0:
 
                         #set status
                         self.status = 1
                         self.tilted = True
 
-			#update display
+                        #update display
                         self.cancel_delayed('clear_display_delay')
                         self.tilt_display('Tilt')
 
@@ -71,26 +79,28 @@ class Tilt(game.Mode):
                         self.game.sound.play('tilt')
                         self.delay('tilt_speech_delay',delay=2,handler=lambda:self.game.sound.play_voice('tilt_speech'))
 
-			#turn off flippers
-			self.game.enable_flippers(enable=False)
+                        #turn off flippers
+                        self.game.enable_flippers(enable=False)
+                        #end all active modes!
+                        self.game.modes.remove(self.game.base_game_mode)
 
-			# Make sure ball won't be saved when it drains.
-			self.game.ball_save.disable()
+                        # Make sure ball won't be saved when it drains.
+                        self.game.ball_save.disable()
 
-			# Make sure the ball search won't run while ball is draining.
-			self.game.ball_search.disable()
+                        # Make sure the ball search won't run while ball is draining.
+                        self.game.ball_search.disable()
 
-			#turn off all lamps
-			for lamp in self.game.lamps:
-				lamp.disable()
+                        #turn off all lamps
+                        for lamp in self.game.lamps:
+                                lamp.disable()
 
                         #check for stuck balls
-			self.game.utility.release_stuck_balls()
+                        self.game.utility.release_stuck_balls()
 
                         if self.tilt_callback:
                             self.tilt_callback()
 
-			
+                        
         def warning(self):
             self.game.sound.stop('tilt warning')
             self.game.sound.play('tilt warning')
@@ -98,6 +108,8 @@ class Tilt(game.Mode):
 
 
         def slam_tilt(self):
+            self.slam_tilted = True
+            self.status = 1
             self.tilt_display('Slam Tilt',3)
             self.delay('reset_system',delay=3,handler=self.system_reset)
 
@@ -109,21 +121,18 @@ class Tilt(game.Mode):
             self.game.reset()
             
 
-       
 
+        # switch handlers
+        # --------------------
+        def sw_tilt_active(self, sw):
+            if self.game.switches.tilt.time_since_change()>1 and self.game.ball>0 and self.game.coin_door not in self.game.modes and self.game.service_mode not in self.game.modes:
+                self.times_warned += 1
+                if self.times_warned == self.num_tilt_warnings:
+                    if not self.tilted:
+                        self.tilt()
+                else:
+                    self.warning()
 
-	def sw_tilt_active(self, sw):
-            self.times_warned += 1
-            
-            if self.times_warned == self.num_tilt_warnings:
-                if not self.tilted:
-                    self.tilt()
-            else:
-                self.warning()
-
-
-
-	def sw_slamTilt_active(self, sw):
-            #self.slam_tilt()
-            pass #temp TODO: Remove this once random switch activation isseu resolved
-
+        def sw_slamTilt_active(self, sw):
+            if self.game.switches.slamTilt.time_since_change()>1 and not self.slam_titled:
+                self.slam_tilt()

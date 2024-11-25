@@ -234,7 +234,7 @@ class Jones_Vs_Aliens(game.Mode):
             self.reset()
 
             #setup additonal layers
-            self.timer_layer = dmd.TimerLayer(128, 25, self.game.fonts['07x5'],self.timer,"right")
+            self.timer_layer = dmd.TimerLayer(128, 25, self.game.fonts['07x5'],self.timer,"right", colour=dmd.YELLOW)
             self.destroyed_layer = dmd.TextLayer(128/2, 12, self.game.fonts['8x6'], "center", opaque=False)
             self.info_layer = dmd.TextLayer(128/2, 24, self.game.fonts['07x5'], "center", opaque=False)
 

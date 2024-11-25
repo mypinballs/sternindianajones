@@ -58,12 +58,12 @@ class Jones(game.Mode):
 
 
         def reset(self):
-            self.jones_flags = [False,False,False,False,False]
+            self.reset_jones()
             self.bank_count = 0
-            self.running_total = 0
-
             self.reset_8ball()
 
+        def reset_jones(self):
+            self.jones_flags = [False,False,False,False,False]
 
         def set_lamps(self,id):
             self.game.effects.drive_lamp(self.jones_lamps[id],'smarton')
@@ -102,7 +102,8 @@ class Jones(game.Mode):
 
 
         def eightball_progress_display(self):
-            value = self.eight_ball_bank_count-self.bank_count
+            #value = self.eight_ball_bank_count-self.bank_count
+            value = self.eight_ball_bank_count-(self.bank_count%self.eight_ball_bank_count)
             timer =2
             #create display layer
             anim = dmd.Animation().load(game_path+"dmd/shorty_plain.dmd")
@@ -201,12 +202,12 @@ class Jones(game.Mode):
             self.game.sound.play('jones_completed')
             self.game.score(self.completed_score)
 
-            if self.bank_count<self.eight_ball_bank_count:
+            #if self.bank_count<self.eight_ball_bank_count:
+            if self.bank_count%self.eight_ball_bank_count>0:
                 self.eightball_progress_display()
                 self.voice_call(count=0,delay=1.5)
                 self.game.effects.drive_flasher('flasherArk','fast',time=0.5)
-
-            elif self.bank_count%self.eight_ball_bank_count==0:
+            else:
                 self.eight_ball_multiball_lit = True
                 self.game.set_player_stats('8ball_multiball_lit',self.eight_ball_multiball_lit)
                 self.eightball_lit_display()
@@ -214,11 +215,16 @@ class Jones(game.Mode):
                 self.game.effects.drive_flasher('flasherArk','fast',time=2)
                 self.gi_flutter()
 
-            self.delay(name='reset_jones', delay=1, handler=self.reset)
+            self.delay(name='queue_reset_jones', delay=1, handler=self.progress_continue)
+
+
+        def progress_continue(self):
+            self.reset_jones()
+            self.update_lamps()
 
 
         def gi_flutter(self):
-            self.log.info("GI FLUTTER")
+            self.log.debug("GI FLUTTER")
             self.game.lamps.playfieldGI.schedule(0x000C0F0F,cycle_seconds=1)
 
 

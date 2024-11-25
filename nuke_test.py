@@ -114,6 +114,7 @@ class Nuke_Test(game.Mode):
 
             #set mode player stats
             self.game.set_player_stats('temple_mode_started',True)
+            self.game.set_player_stats("path_mode_started",True)
 
             #setup timer layer
             self.timer_layer = dmd.TimerLayer(103, 5, self.game.fonts['23x12'],self.timer)
@@ -145,8 +146,11 @@ class Nuke_Test(game.Mode):
             #cancel queued delays
             self.cancel_delayed('nuke_timeout')
 
-            #set mode player stats
+            #set temple mode stats
             self.game.set_player_stats('temple_mode_started',False)
+            #update poa player stats
+            self.game.set_player_stats("path_mode_started",False)
+            self.game.set_player_stats("poa_queued",False)
 
             self.game.set_player_stats('nuke_test_score',self.running_total)
             self.game.set_player_stats('last_mode_score',self.running_total)

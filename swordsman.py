@@ -2,6 +2,7 @@
 # ----------------
 # Copyright (C) 2016 myPinballs, Orange Cloud Software Ltd
 
+import pinproc
 import procgame
 import locale
 import logging
@@ -15,7 +16,7 @@ music_path = game_path +"music/"
 
 class Swordsman(game.Mode):
 
-	def __init__(self, game, priority):
+        def __init__(self, game, priority):
             super(Swordsman, self).__init__(game, priority)
 
             self.log = logging.getLogger('ij.swordsman')
@@ -29,7 +30,9 @@ class Swordsman(game.Mode):
 
 
         def mode_started(self):
-            self.close()
+            #enable the hardware rule to stop the motor
+            #self.swordsman_hware_rule(enable=True)
+            self.close() 
             
 
         def mode_tick(self):
@@ -37,6 +40,20 @@ class Swordsman(game.Mode):
         
         def get_state(self):
             return self.swordsman_state
+        
+
+        def swordsman_hware_rule(self, enable):
+            self.log.info('Swordsman Hardware Rule - Enable:%s',enable)
+
+            main_coil = self.game.coils.swordsmanMotor
+            switch_num = self.game.switches['swordsmanForward'].number
+
+            drivers = []
+            if enable:
+                self.log.info('Swordsman Switch Hardware Rule Activated')
+                drivers += [pinproc.driver_state_disable(main_coil.state())]
+            self.game.proc.switch_update_rule(switch_num, 'closed_nondebounced', {'notifyHost':False, 'reloadActive':False}, drivers, len(drivers) > 0)
+
         
  
         def open(self):
@@ -59,20 +76,29 @@ class Swordsman(game.Mode):
                 self.swordsman_state = "closed"
                 
         
-        def cycle_swordsman(self,enable=True): 
+        def cycle(self,enable=True): 
             self.cycle_flag = enable
             if enable:
-                self.open()
+                if self.swordsman_state == "closed":
+                    self.open()
+                elif self.swordsman_state == "open":
+                    self.close()
             else:
                 self.close()
         
+
+        def open_when_init(self):
+            if self.swordsman_state == "closed":
+                self.open()
+            else:
+                self.delay(name='wait_for_init', event_type=None, delay=1, handler=self.open_when_init)
+            
         
         def disable(self):
             self.motor(False)
             self.cycle_flag = False
             
             
-             
         def motor(self,enable=True):
             if enable:
                 #self.game.coils.swordsmanMotor.enable()
@@ -82,7 +108,7 @@ class Swordsman(game.Mode):
                 self.game.coils.swordsmanMotor.disable()
                 self.log.debug('Motor is off')
                 
-           
+
 
                 
         #switch handlers
@@ -91,9 +117,10 @@ class Swordsman(game.Mode):
             if self.swordsman_state=="closing":
                 self.motor(False)
                 self.swordsman_state = "closed"
+                self.swordsman_hware_rule(True)
             
             if self.cycle_flag:
-                self.delay(delay=0.5, handler=self.open)
+                self.delay(delay=3, handler=self.open)
 #            else:
 #                self.swordsman_state = "closed"
                 
@@ -105,9 +132,10 @@ class Swordsman(game.Mode):
             if self.swordsman_state=="opening":
                 self.motor(False)
                 self.swordsman_state = "open"
+                self.swordsman_hware_rule(False)
             
             if self.cycle_flag:
-                self.delay(delay=0.5, handler=self.close)
+                self.delay(delay=3, handler=self.close)
 #            else:
 #                self.swordsman_state = "open"
             

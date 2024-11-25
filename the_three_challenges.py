@@ -255,7 +255,7 @@ class The_Three_Challenges(game.Mode):
         def mode_progression(self):
             if not self.shot_sequence_running:
                 self.count+=1
-                self.timer+=10
+                self.timer+=20
                 self.mode_select.mode_paused(sw=None)
 
                 #stop the ball

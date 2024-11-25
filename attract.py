@@ -20,14 +20,14 @@ music_path = game_path +"music/"
 
 
 class Attract(game.Mode):
-	"""docstring for AttractMode"""
-	def __init__(self, game):
-		super(Attract, self).__init__(game, 1)
+        """docstring for AttractMode"""
+        def __init__(self, game):
+                super(Attract, self).__init__(game, 1)
                 self.log = logging.getLogger('ij.attract')
                 self.display_order = [0,1,2,3,4,5,6,7,8,9]
-		self.display_index = 0
+                self.display_index = 0
 
-		#setup attract sounds for flipper presses
+                #setup attract sounds for flipper presses
                 self.game.sound.register_sound('flipperAttract', sound_path+'burp.aiff')
                 self.game.sound.register_sound('flipperAttract', speech_path+"ij402CC_bellak.aiff")
                 self.game.sound.register_sound('flipperAttract', speech_path+"ij402CD_bellaks_staff_is_too_long.aiff")
@@ -60,21 +60,31 @@ class Attract(game.Mode):
                     self.log.info("Coin Switch is:"+switch.name)
 
                 for switch in self.coin_switchnames:
-			self.add_switch_handler(name=switch, event_type='active', \
-				delay=None, handler=self.coin_switch_handler)
+                        self.add_switch_handler(name=switch, event_type='active', \
+                                delay=None, handler=self.coin_switch_handler)
+
+                #setup lamp sets
+                self.film_mode_lamps = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleBrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','nukeTest','returnTheSkull','jonesVsAliens']
+                self.jackpot_lamps = ['arkJackpot','stonesJackpot','grailJackpot','skullJackpot']
+                self.skillshot_lamps = ['skillIndy','skillSwordsman','skillMystery','skillJets']
+                self.indy_lamps = ['indyI','indyN','indyD','indyY']
+                self.jones_lamps = ['jonesJ','jonesO','jonesN','jonesE','jonesS']
+                self.arrow_lamps = ['crusadeArrow','leftLoopArrow','templeArrow','raidersArrow','rightRampArrow','rightLoopArrow']
+                self.film_lamps = ['lastCrusade','templeOfDoom','raiders','kingdom']
+                self.map_lamps = ['mapM','mapA','mapP']
+                self.misc_lamps = ['leftSpecial','leftSpinner','cairoSwordsman','xMarksTheSpot','8Ball','rightSpinner','liteMystery','rightSpecial']
+
+        def mode_topmost(self):
+                pass
 
 
-	def mode_topmost(self):
-		pass
+        def mode_started(self):
 
-
-	def mode_started(self):
-
-		# Blink the start button to notify player about starting a game.
-		self.update_start_lamp()
+                # Blink the start button to notify player about starting a game.
+                self.update_start_lamp()
 
                 # Turn on GI lamps
-		#self.delay(name='gi_on_delay', event_type=None, delay=0, handler=self.gi)
+                #self.delay(name='gi_on_delay', event_type=None, delay=0, handler=self.gi)
                 #self.log.info("attract mode after gi turn on")
 
                 # run feature lamp patterns
@@ -82,11 +92,14 @@ class Attract(game.Mode):
                 self.change_lampshow()
                 #self.standard_lampshow()
 
+                #clear any leftover tilts
+                if self.game.tilt.get_status()==1:
+                    self.game.tilt.reset()
+
                 #debug subway release issues
                 #self.game.coils.subwayRelease.pulse(100)
 
                 #check for stuck balls
-
                 #self.delay(name='idol_empty_delay', event_type=None, delay=2, handler=self.init_idol)
                 self.delay(name='stuck_balls_release_delay', event_type=None, delay=2, handler=self.game.utility.release_stuck_balls)
                 self.delay(name='map_room_check_delay', event_type=None, delay=2, handler=self.game.utility.check_map_room)
@@ -110,7 +123,7 @@ class Attract(game.Mode):
                 self.game_over_layer.transition = dmd.ExpandTransition(direction='horizontal')#dmd.CrossFadeTransition(width=128,height=32)
 
                 self.scores_layer = dmd.TextLayer(128/2, 11, self.game.fonts['num_09Bx7'], "center", opaque=True).set_text("HIGH SCORES",color=dmd.BROWN)
-		self.scores_layer.transition = dmd.PushTransition(direction='west')
+                self.scores_layer.transition = dmd.PushTransition(direction='west')
 
                 #setup date & time info
                 self.day_layer = dmd.DateLayer(128/2, 5, self.game.fonts['tiny7'],"day", "center", opaque=False, colour=dmd.ORANGE)
@@ -122,6 +135,9 @@ class Attract(game.Mode):
                 #update the pricing
                 self.update_pricing()
 
+                #still cant believe i'm adding this :(
+                self.lyman_tribute()
+
                 #run attract dmd screens
                 self.attract_display()
 
@@ -130,6 +146,9 @@ class Attract(game.Mode):
 
                 #temp gi test
                 self.gi_flutter()
+
+                #open the swordsman for attract
+                self.game.swordsman.open_when_init()
 
                 #TODO:TEMP - remove
                 #self.game.coils.grailEject.pulse()
@@ -159,41 +178,44 @@ class Attract(game.Mode):
 
 
         def change_lampshow(self):
-		shuffle(self.game.lampshow_keys)
-                delay=10
+                delay=25
+                shuffle(self.game.lampshow_keys)
 
                 self.game.lampctrl.stop_show()
+                self.game.lampctrl.play_show(self.game.lampshow_keys[0], repeat=False, callback=self.standard_lampshow)
 
                 #turn gi on or off depending on lampshow chosen from shuffle
 #                if self.game.lampshow_keys[0].find('flasher',0)>0:
 #                    self.gi_off()
-#                else:
+#                else:  
 #                    self.gi()
 
-                if not self.lamp_show_set:
-                    #self.log.info('running pattern lamp show')
-                    self.game.lampctrl.play_show(self.game.lampshow_keys[0], repeat=True)
-                    self.lamp_show_set=True
-                else:
-                    #self.log.info('running standard lamp show')
-                    self.standard_lampshow()
-                    self.lamp_show_set=False
-                    delay=30
-
-		self.delay(name='lampshow', event_type=None, delay=delay, handler=self.change_lampshow)
+                self.delay(name='lampshow', event_type=None, delay=delay, handler=self.change_lampshow)
 
 
-        def standard_lampshow(self, enable=True):
-		#flash all lamps in groups of 8 ordered by columns
-		#schedules = [0xffff0000, 0xfff0000f, 0xff0000ff, 0xf0000fff, 0x0000ffff, 0x000ffff0, 0x00ffff00, 0x0ffff000]
-                schedules = [0xcccccccc, 0x66666666, 0x33333333, 0x99999999]
-		for index, lamp in enumerate(sorted(self.game.lamps, key=lambda lamp: lamp.number)):
-                    if lamp.yaml_number.startswith('L') and lamp.name.find('Button')<0:
-			if enable:
-				sched = schedules[index%len(schedules)]
-				lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
-			else:
-				lamp.disable()
+        # def standard_lampshow(self, enable=True):
+                #flash all lamps in groups of 8 ordered by columns
+                #schedules = [0xffff0000, 0xfff0000f, 0xff0000ff, 0xf0000fff, 0x0000ffff, 0x000ffff0, 0x00ffff00, 0x0ffff000]
+                # schedules = [0xcccccccc, 0x66666666, 0x33333333, 0x99999999]
+                # for index, lamp in enumerate(sorted(self.game.lamps, key=lambda lamp: lamp.number)):
+                    # if lamp.yaml_number.startswith('L') and lamp.name.find('Button')<0:
+                        # if enable:
+                                # sched = schedules[index%len(schedules)]
+                                # lamp.schedule(schedule=sched, cycle_seconds=0, now=False)
+                        # else:
+                                # lamp.disable()
+
+        def standard_lampshow(self,enable=True):
+            lamp_sets =  [self.film_mode_lamps,self.jackpot_lamps,self.skillshot_lamps,self.indy_lamps,self.jones_lamps,self.arrow_lamps,self.film_lamps,self.map_lamps,self.misc_lamps]
+
+            schedules = [0xffff0000, 0xfff0000f, 0xff0000ff, 0xf0000fff, 0x0000ffff, 0x000ffff0, 0x00ffff00, 0x0ffff000]
+            for set in lamp_sets:    
+                for index, lamp in enumerate(set):
+                    if enable:
+                        sched = schedules[index%len(schedules)]
+                        self.game.lamps[lamp].schedule(schedule=sched, cycle_seconds=0, now=False)
+                    else:
+                        self.game.lamps[lamp].disable()
 
 
         def update_start_lamp(self):
@@ -229,6 +251,16 @@ class Attract(game.Mode):
         def show_pricing(self):
             self.update_pricing()
             self.layer = self.coins_layer
+
+        def lyman_tribute(self):
+            bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+"dmd/mode_bonus_bgnd.dmd").frames[0])
+            title = dmd.TextLayer(128/2, 0, self.game.fonts['5px_az'], "center", opaque=False).set_text("CODE CHAMPION",color=dmd.CYAN)
+            initsLine = dmd.TextLayer(64, 7, self.game.fonts['9px_az'], "center", opaque=False).set_text("LYMAN",color=dmd.WHITE)
+            infoLine1 = dmd.TextLayer(64, 17, self.game.fonts['4px_az'], "center", opaque=False).set_text("Inspiration. Genius. Legend.",color=dmd.ORANGE)
+            infoLine2 = dmd.TextLayer(64, 23, self.game.fonts['4px_az'], "center", opaque=False).set_text("Thanks for the games x".upper(),color=dmd.ORANGE)
+            self.lyman_tribute_layer = dmd.GroupedLayer(128,32,[bgnd_layer,initsLine,infoLine1,infoLine2,title])
+            self.lyman_tribute_layer.transition = dmd.PushTransition(direction='south')
+
 
 
         def create_high_scores(self,script):
@@ -308,17 +340,19 @@ class Attract(game.Mode):
                 script.append({'seconds':5.0, 'layer':self.mypinballs_logo})
                 script.append({'seconds':7.0, 'layer':self.williams_logo})
                 script.append({'seconds':3.0, 'layer':self.indy_logo})
-		script.append({'seconds':3.0, 'layer':self.coins_layer})
-		#script.append({'seconds':20.0, 'layer':self.credits_layer})
-		script.append({'seconds':3.0, 'layer':None})
+                script.append({'seconds':3.0, 'layer':self.coins_layer})
+                #script.append({'seconds':20.0, 'layer':self.credits_layer})
+                script.append({'seconds':3.0, 'layer':None})
 
                 #script.append({'seconds':3.0, 'layer':self.scores_layer})
-#		for frame in highscore.generate_highscore_frames(self.game.highscore_categories):
+#                for frame in highscore.generate_highscore_frames(self.game.highscore_categories):
 #                    new_layer = dmd.FrameLayer(frame=frame)
 #                    new_layer.transition = dmd.PushTransition(direction='west')
 #                    script.append({'seconds':2.0, 'layer':new_layer})
 
                 self.create_high_scores(script)
+
+                script.append({'seconds':4.0, 'layer':self.lyman_tribute_layer})
 
                 if self.game.user_settings['Machine (Standard)']['Show Date and Time'].startswith('Y'):
                     script.append({'seconds':10.0, 'layer':self.date_time_layer})
@@ -333,18 +367,21 @@ class Attract(game.Mode):
 
                 script.insert(index,{'seconds':time, 'layer':self.game_over_layer})
 
-		self.layer = dmd.ScriptedLayer(width=128, height=32, script=script)
+                self.layer = dmd.ScriptedLayer(width=128, height=32, script=script)
                 #self.layer = dmd.ScriptedLayer(128, 32, [{'seconds':10.0, 'layer':self.mypinballs_logo}, {'seconds':2.0, 'layer':self.press_start}, {'seconds':2.0, 'layer':None}])
                 #self.game.set_status("V1.0")
 
 
 
-	def mode_stopped(self):
-		self.game.lampctrl.stop_show()
+        def mode_stopped(self):
+                self.game.lampctrl.stop_show()
+                #close the swordsman
+                self.game.swordsman.close()
 
 
-	def mode_tick(self):
-		pass
+
+        def mode_tick(self):
+                pass
 
 
         def sound_effects(self):
@@ -353,18 +390,18 @@ class Attract(game.Mode):
                 self.sound_timestamp=time.time()
 
 
-	# Enter service mode when the enter button is pushed.
-	def sw_enter_active(self, sw):
+        # Enter service mode when the enter button is pushed.
+        def sw_enter_active(self, sw):
                 self.game.modes.remove(self.game.coin_door)
                 self.game.lampctrl.stop_show()
                 self.cancel_delayed('lampshow')
-		for lamp in self.game.lamps:
-			lamp.disable()
-		self.game.modes.add(self.game.service_mode)
-		return True
+                for lamp in self.game.lamps:
+                        lamp.disable()
+                self.game.modes.add(self.game.service_mode)
+                return True
 
-	def sw_exit_active(self, sw):
-		return True
+        def sw_exit_active(self, sw):
+                return True
 
         #coin door mode control
         #def sw_coinDoorClosed_inactive(self, sw):
@@ -373,42 +410,42 @@ class Attract(game.Mode):
                     self.game.modes.add(self.game.coin_door)
 
 
-	# Outside of the service mode, up/down control audio volume.
-	#def sw_down_active(self, sw):
-		#volume = int(self.game.sound.volume_down())
-		#self.game.set_status("Volume Down : " + str(volume*10)+"%")
-		#return True
+        # Outside of the service mode, up/down control audio volume.
+        #def sw_down_active(self, sw):
+                #volume = int(self.game.sound.volume_down())
+                #self.game.set_status("Volume Down : " + str(volume*10)+"%")
+                #return True
 
-	#def sw_up_active(self, sw):
-		#volume = int(self.game.sound.volume_up())
-		#self.game.set_status("Volume Up : " + str(volume*10)+"%")
-		#return True
+        #def sw_up_active(self, sw):
+                #volume = int(self.game.sound.volume_up())
+                #self.game.set_status("Volume Up : " + str(volume*10)+"%")
+                #return True
 
 
 
-	# Start button starts a game if the trough is full.  Otherwise it
-	# initiates a ball search.
-	# This is probably a good place to add logic to detect completely lost balls.
-	# Perhaps if the trough isn't full after a few ball search attempts, it logs a ball
-	# as lost?
-	def sw_startButton_active(self, sw):
-		if self.game.trough.is_full():
-			# Remove attract mode from mode queue - Necessary?
-			self.game.modes.remove(self)
-			# Initialize game
+        # Start button starts a game if the trough is full.  Otherwise it
+        # initiates a ball search.
+        # This is probably a good place to add logic to detect completely lost balls.
+        # Perhaps if the trough isn't full after a few ball search attempts, it logs a ball
+        # as lost?
+        def sw_startButton_active(self, sw):
+                if self.game.trough.is_full():
+                        # Remove attract mode from mode queue - Necessary?
+                        self.game.modes.remove(self)
+                        # Initialize game
                         if self.game.switches.flipperLwR.is_active(0.5):
                             self.game.start_game(force_moonlight=True)
                         else:
                             self.game.start_game(force_moonlight=False)
-			# Add the first player
-			self.game.add_player()
-			# Start the ball.  This includes ejecting a ball from the trough.
-			self.game.start_ball()
-		else:
+                        # Add the first player
+                        self.game.add_player()
+                        # Start the ball.  This includes ejecting a ball from the trough.
+                        self.game.start_ball()
+                else:
 
-			#self.game.set_status("Ball Search!")
-			self.game.ball_search.perform_search()
-		return True
+                        #self.game.set_status("Ball Search!")
+                        self.game.ball_search.perform_search()
+                return True
 
         def coin_switch_handler(self, sw):
             self.credits =  audits.display(self.game,'general','creditsCounter')

@@ -14,7 +14,7 @@ Machine (Standard):
   'Tilt Warnings':
     options: [1,10]
     increments: 1
-    default: 3
+    default: 2
   'Maximum Extra Balls':
     options: [0,10]
     increments: 1
@@ -22,7 +22,7 @@ Machine (Standard):
   'Maximum Extra Balls/Ball In Play':
     options: [0,10]
     increments: 1
-    default: 0
+    default: 3
   'Custom Message':
     options: [true,false]
     default: false
@@ -34,7 +34,7 @@ Machine (Standard):
     default: 'Euro'
   'Show Date and Time':
     options: ['Yes','No']
-    default: 'No'
+    default: 'Yes'
   'Allow Dim Illumination':
     options: ['Yes','No']
     default: 'No'
@@ -42,7 +42,7 @@ Machine (Standard):
     options: ['Yes','No']
     default: 'No'
   'Tournament Type':
-    options: ['Local','Internet']
+    options: ['Local','Scorbit']
     default: 'Local'
   'Euro. Score Format':
     options: ['Yes','No']
@@ -57,7 +57,7 @@ Machine (Standard):
     default: 4
   'No Bonus Flips':
     options: ['Yes','No']
-    default: 'No'
+    default: 'Yes'
   'Game Restart':
     options: [true,false]
     default: true
@@ -65,6 +65,9 @@ Machine (Standard):
     options: ['Yes','No']
     default: 'Yes'
   'Shaker Installed':
+    options: ['Yes','No']
+    default: 'No'
+  'Topper Installed':
     options: ['Yes','No']
     default: 'No'
   'Party Mode':
@@ -261,7 +264,7 @@ Gameplay (Feature):
   'The 3 Challenges Timer':
     options: [5,120]
     increments: 5
-    default: 30
+    default: 40
   'Raven Bar Level Start':
     options: [1,4]
     increments: 1
@@ -269,7 +272,7 @@ Gameplay (Feature):
   'Raven Bar Lives':
     options: [1,9]
     increments: 1
-    default: 5
+    default: 5 
   'Raven Bar Hits For Medallion':
     options: [1,50]
     increments: 1

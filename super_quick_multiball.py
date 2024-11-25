@@ -71,7 +71,7 @@ class SuperQuickMultiball(game.Mode):
 
             #var setup
             self.count = 0
-            self.jackpot_count = self.game.get_player_stats('qm_jackpots_collected')
+            self.jackpot_count = 0#self.game.get_player_stats('qm_jackpots_collected')
 
             #reset status flags
             self.multiball_running=False
@@ -100,13 +100,19 @@ class SuperQuickMultiball(game.Mode):
 
 
         def mode_started(self):
-            self.reset()
-
+            #set layers
             self.text_layer = dmd.TextLayer(14, 11, self.game.fonts['num_09Bx7'], "left", opaque=False)
             self.score_layer = ModeScoreLayer(90, 1, self.game.fonts['num_09Bx7'], self)
 
-            #close temple
-            self.game.temple.close()
+            #set mode player stats
+            self.game.set_player_stats('temple_mode_started',True)
+            
+            #close temple if needed
+            if self.game.get_player_stats('lock_lit'):
+               self.game.temple.close()
+
+            #reset vars
+            self.reset()
 
             #start multiball
             self.multiball_start(3)
@@ -453,7 +459,7 @@ class SuperQuickMultiball(game.Mode):
         def multiball_tracking(self):
 
             #end check
-            if self.balls_in_play==1 and self.multiball_running and not self.game.get_player_stats('lock_in_progress'):
+            if self.balls_in_play==1: #and self.multiball_running and not self.game.get_player_stats('lock_in_progress'):
                 #end tracking
                 self.multiball_running=False
                 self.multiball_started = False
@@ -528,7 +534,7 @@ class SuperQuickMultiball(game.Mode):
 
             #inc the counter
             self.jackpot_count+=1
-            self.game.set_player_stats('qm_jackpots_collected',self.jackpot_count)
+            #self.game.set_player_stats('sqm_jackpots_collected',self.jackpot_count)
 
             self.delay(name='reset_display',delay=3,handler=self.multiball)
 
@@ -579,21 +585,25 @@ class SuperQuickMultiball(game.Mode):
         #switch handlers
         #--------------------------
         def sw_captiveBallRear_inactive(self, sw):
+            if self.multiball_running:
+                self.jackpot_explode()
+
             return procgame.game.SwitchStop
 
 
         def sw_captiveBallFront_inactive_for_200ms(self, sw):
             if self.multiball_running:
+                self.jackpot_boost_value+=2000000
                 self.jackpot_explode()
 
             return procgame.game.SwitchStop
+
 
         def sw_templeStandup_active(self, sw):
             if self.multiball_running:
                 self.jackpot_explode()
 
             return procgame.game.SwitchStop
-
 
 
         def sw_shooterLane_active_for_500ms(self,sw):

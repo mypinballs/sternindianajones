@@ -53,7 +53,7 @@ class Mode_Select(game.Mode):
             self.game.sound.register_sound('scene_started', sound_path+'mode_started.aiff')
             self.game.sound.register_sound('scene_ended', sound_path+'mode_ended.aiff')
 
-            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleGrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','nukeTest','returnTheSkull','jonesVsAliens']
+            self.lamp_list = ['getTheIdol','streetsOfCairo','wellOfSouls','ravenBar','monkeyBrains','stealTheStones','mineCart','ropeBridge','castleBrunwald','tankChase','theThreeChallenges','chooseWisely','warehouseRaid','nukeTest','returnTheSkull','jonesVsAliens']
 
             #default mode bonus value
             self.mode_bonus_value = int(self.game.user_settings['Gameplay (Feature)']['Mode Bonus Value (Mil)'])*1000000 #2000000
@@ -83,7 +83,7 @@ class Mode_Select(game.Mode):
             self.jones_vs_aliens = Jones_Vs_Aliens(self.game, 95,self)
             self.ringmaster = Ringmaster(self.game, 95,self)
             self.final_adventure = Final_Adventure(self.game,150)
-            self.super_quick_multiball = SuperQuickMultiball(self.game,150)
+            self.super_quick_multiball = SuperQuickMultiball(self.game,51)#150
 
              #setup the switches which pause an active mode
             self.mode_pausing_switchnames = []

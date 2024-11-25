@@ -110,9 +110,9 @@ featureAudits:
   mineCartModeCompleted:
     label: 'Mine Cart Mode Completed'
   castleGrunwaldModeStarted:
-    label: 'Castle Grunwald Mode Started'
+    label: 'Castle Brunwald Mode Started'
   castleGrunwaldModeCompleted:
-    label: 'Castle Grunwald Mode Completed'
+    label: 'Castle Brunwald Mode Completed'
   tankChaseModeStarted:
     label: 'Tank Chase Mode Started'
   tankChaseModeCompleted:

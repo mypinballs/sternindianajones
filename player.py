@@ -3,8 +3,8 @@ import procgame.game
 
 class Player(procgame.game.Player):
 
-	def __init__(self, name):
-		super(Player, self).__init__(name)
+        def __init__(self, name):
+                super(Player, self).__init__(name)
 
                 #create player stats
                 self.player_stats = {}
@@ -93,7 +93,7 @@ class Player(procgame.game.Player):
                 self.player_stats['map_banks_completed']=0
                 self.player_stats['jva_ships_destroyed'] = 0
                 self.player_stats['jva_smart_bombs'] = 0
-		self.player_stats['jones_vs_aliens_score'] = 0
+                self.player_stats['jones_vs_aliens_score'] = 0
                 self.player_stats['warehouse_items_collected']=0
                 self.player_stats['warehouse_raid_score']=0
                 self.player_stats['skull_face_stones_removed']=0
@@ -118,3 +118,4 @@ class Player(procgame.game.Player):
                 self.player_stats['adventure_flags']= [False,False,False,False,False,False]
                 self.player_stats['adventure_smart_bombs'] = 0
                 self.player_stats['trough_issue_count'] = 0
+                self.player_stats['ball_start_score'] = 0

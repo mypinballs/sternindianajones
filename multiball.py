@@ -238,7 +238,8 @@ class Multiball(game.Mode):
 #
 #
         def launch_callback(self):
-            pass
+             #turn on ball save
+            self.game.ball_save.start(num_balls_to_save=3,allow_multiple_saves=True,time=10)
 
 
         def reset_lock(self):
@@ -325,7 +326,7 @@ class Multiball(game.Mode):
             self.game.set_player_stats('balls_locked',self.balls_locked)
 
             #turn on ball save
-            self.game.ball_save.start(num_balls_to_save=3,allow_multiple_saves=True,time=10)
+            #self.game.ball_save.start(num_balls_to_save=3,allow_multiple_saves=True,time=10)
 
             #restart the totem mode if quick multiball is not running and stacking therefore isnt happening
             if not self.game.get_player_stats('quick_multiball_running'):
@@ -791,26 +792,29 @@ class Multiball(game.Mode):
                 return procgame.game.SwitchStop
 
         def sw_subway_active(self, sw):
-            if not self.multiball_running and not self.game.get_player_stats('multiball_mode_started') and not self.game.get_player_stats('temple_mode_started') and not self.game.get_player_stats('dog_fight_running'):
-                if self.lock_lit:
-                    if self.game.switches.subway.time_since_change()>1: #add an extra check for switch bounce here
+            if self.game.switches.subway.time_since_change()>1:
+                if not self.multiball_started and not self.multiball_running and not self.game.get_player_stats('multiball_mode_started') and not self.game.get_player_stats('temple_mode_started') and not self.game.get_player_stats('dog_fight_running'):
+                    if self.lock_lit:
+                        #if self.game.switches.subway.time_since_change()>1: #add an extra check for switch bounce here
                         self.lock_ball()
-                else:
-                    self.cheat_display() #play the cheat anim :)
-            elif self.multiball_running:
-                #self.game.idol.hold()
-                self.game.temple.balls+=1
+                    else:
+                        self.cheat_display() #play the cheat anim :)
+                elif self.multiball_running:
+                    #self.game.idol.hold()
+                    self.game.temple.balls+=1 #not sure this is used for anything currently
 
-                if not self.super_jackpot_lit:
-                    self.jackpot_x+=1
-                    if self.jackpot_x==2:
-                        self.game.sound.play('prize_doubled')
-                    elif self.jackpot_x>=3:
-                        self.game.sound.play('prize_tripled')
-                else:
-                    self.super_jackpot_collected()
-            #else:
-                #self.game.idol.lock_release()
+                    if not self.super_jackpot_lit:
+                        if self.jackpot_x<3:
+                            self.jackpot_x+=1
+
+                        if self.jackpot_x==2:
+                            self.game.sound.play('prize_doubled')
+                        elif self.jackpot_x==3:
+                            self.game.sound.play('prize_tripled')
+                    else:
+                        self.super_jackpot_collected()
+                #else:
+                    #self.game.idol.lock_release()
 
 
 #        def sw_exitIdol_active(self,sw):
@@ -838,7 +842,7 @@ class Multiball(game.Mode):
 
 
         def sw_grailEject_active(self, sw):
-            if self.multiball_running:
+            if self.multiball_running and self.game.switches.grailEject.time_since_change()>1:
                 value = 2000000
                 self.jackpot_value+=value
                 self.game.screens.raise_jackpot(2,value)

@@ -21,161 +21,160 @@ sound_path = game_path +"sound/service/"
 music_path = game_path +"music/"
 
 class ServiceModeSkeleton(game.Mode):
-        """Service Mode List base class."""
-        def __init__(self, game, priority, font):
-                super(ServiceModeSkeleton, self).__init__(game, priority)
+	"""Service Mode List base class."""
+	def __init__(self, game, priority, font):
+		super(ServiceModeSkeleton, self).__init__(game, priority)
                 self.log = logging.getLogger('ij.service')
-                self.name = ""
+		self.name = ""
                 self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_bgnd.dmd').frames[0])
-                self.title_layer = dmd.TextLayer(1, 0, font, "left")
-                self.item_layer = dmd.TextLayer(1, 11, self.game.fonts['8x6'], "left")
-                self.instruction_layer = dmd.TextLayer(1, 25, font, "left")
+		self.title_layer = dmd.TextLayer(1, 0, font, "left")
+		self.item_layer = dmd.TextLayer(1, 11, self.game.fonts['8x6'], "left")
+		self.instruction_layer = dmd.TextLayer(1, 25, font, "left")
                 self.instruction_layer.composite_op = "blacksrc"
-                self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.instruction_layer])
-                self.no_exit_switch = game.machine_type == 'sternWhitestar'
+		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.instruction_layer])
+		self.no_exit_switch = game.machine_type == 'sternWhitestar'
 
-        def mode_started(self):
-                self.title_layer.set_text(str(self.name))
-                self.game.sound.play('service_enter')
+	def mode_started(self):
+		self.title_layer.set_text(str(self.name))
+		self.game.sound.play('service_enter')
 
-        def mode_stopped(self):
-                self.game.sound.play('service_exit')
+	def mode_stopped(self):
+		self.game.sound.play('service_exit')
 
-        def disable(self):
-                pass
+	def disable(self):
+		pass
 
-        def sw_down_active(self, sw):
-                if self.game.switches.enter.is_active():
-                        self.game.modes.remove(self)
-                        return True
+	def sw_down_active(self, sw):
+		if self.game.switches.enter.is_active():
+			self.game.modes.remove(self)
+			return True
 
-        def sw_exit_active(self, sw):
-                self.game.modes.remove(self)
+	def sw_exit_active(self, sw):
+		self.game.modes.remove(self)
                 #restart the lamp show if exiting out of the service mode front
                 if self.name.find(self.game.system_version)>0:
                     self.game.attract_mode.change_lampshow()                    
-                return True
+		return True
 
 class ServiceModeList(ServiceModeSkeleton):
-        """Service Mode List base class."""
-        def __init__(self, game, priority, font):
-                super(ServiceModeList, self).__init__(game, priority, font)
-                self.items = []
+	"""Service Mode List base class."""
+	def __init__(self, game, priority, font):
+		super(ServiceModeList, self).__init__(game, priority, font)
+		self.items = []
 
-        def mode_started(self):
-                super(ServiceModeList, self).mode_started()
+	def mode_started(self):
+		super(ServiceModeList, self).mode_started()
 
-                self.iterator = 0
-                self.change_item()
+		self.iterator = 0
+		self.change_item()
 
-        def change_item(self):
-                ctr = 0
+	def change_item(self):
+		ctr = 0
                 for item in self.items:
-                        if (ctr == self.iterator):
-                                self.item = item
-                        ctr += 1
-                self.max = ctr - 1
-                self.item_layer.set_text(str(self.iterator+1)+') '+str(self.item.name))
+			if (ctr == self.iterator):
+				self.item = item
+			ctr += 1
+		self.max = ctr - 1
+		self.item_layer.set_text(str(self.iterator+1)+') '+str(self.item.name))
 
-        def sw_up_active(self,sw):
-                if self.game.switches.enter.is_inactive():
-                        self.item.disable()
-                        if (self.iterator < self.max):
-                                self.iterator += 1
+	def sw_up_active(self,sw):
+		if self.game.switches.enter.is_inactive():
+			self.item.disable()
+			if (self.iterator < self.max):
+				self.iterator += 1
                         else:
                             self.iterator =0
-                        self.game.sound.play('service_next')
-                        self.change_item()
-                return True
+			self.game.sound.play('service_next')
+			self.change_item()
+		return True
 
-        def sw_down_active(self,sw):
-                if self.game.switches.enter.is_inactive():
-                        self.item.disable()
-                        if (self.iterator > 0):
-                                self.iterator -= 1
+	def sw_down_active(self,sw):
+		if self.game.switches.enter.is_inactive():
+			self.item.disable()
+			if (self.iterator > 0):
+				self.iterator -= 1
                         else:
                             self.iterator =self.max
-                        self.game.sound.play('service_previous')
-                        self.change_item()
-                elif self.no_exit_switch:
-                        self.exit()
-                return True
+			self.game.sound.play('service_previous')
+			self.change_item()
+		elif self.no_exit_switch:
+			self.exit()
+		return True
 
-        def sw_enter_active(self,sw):
-                self.game.modes.add(self.item)
-                return True
+	def sw_enter_active(self,sw):
+		self.game.modes.add(self.item)
+		return True
 
-        def exit(self):
-                self.item.disable()
-                self.game.modes.remove(self)
-                return True
+	def exit(self):
+		self.item.disable()
+		self.game.modes.remove(self)
+		return True
 
 
 class ServiceMode(ServiceModeList):
-        """Service Mode."""
+	"""Service Mode."""
         def __init__(self, game, priority, font,big_font, extra_tests=[]):
-                super(ServiceMode, self).__init__(game, priority,font)
-                #self.title_layer.set_text('Service Mode')
+		super(ServiceMode, self).__init__(game, priority,font)
+		#self.title_layer.set_text('Service Mode')
                 
                 #setup sounds
                 self.game.sound.register_sound('service_enter', sound_path+"menu_enter.wav")
-                self.game.sound.register_sound('service_exit', sound_path+"menu_exit.wav")
-                self.game.sound.register_sound('service_next', sound_path+"menu_up.wav")
-                self.game.sound.register_sound('service_previous', sound_path+"menu_down.wav")
-                self.game.sound.register_sound('service_switch_edge', sound_path+"menu_switch_edge.wav")
-                self.game.sound.register_sound('service_save', sound_path+"menu_save.wav")
-                self.game.sound.register_sound('service_cancel', sound_path+"menu_cancel.wav")
+		self.game.sound.register_sound('service_exit', sound_path+"menu_exit.wav")
+		self.game.sound.register_sound('service_next', sound_path+"menu_up.wav")
+		self.game.sound.register_sound('service_previous', sound_path+"menu_down.wav")
+		self.game.sound.register_sound('service_switch_edge', sound_path+"menu_switch_edge.wav")
+		self.game.sound.register_sound('service_save', sound_path+"menu_save.wav")
+		self.game.sound.register_sound('service_cancel', sound_path+"menu_cancel.wav")
                 self.game.sound.register_sound('service_reject', sound_path+"menu_reject.wav")
                 self.game.sound.register_sound('service_alert', sound_path+"service_alert.aiff")
                 self.game.sound.register_sound('service_start', sound_path+"service_startup.aiff")
                 
-                self.name = 'Service Mode - OS v'+str(self.game.system_version)
-                self.tests = Tests(self.game, self.priority+1, font, big_font, extra_tests)
-                self.items = [self.tests]
-                if len(self.game.settings) > 0: 
-                        self.settings = Settings(self.game, self.priority+1, font, big_font, 'Settings', self.game.settings)
-                        self.items.append(self.settings)
+		self.name = 'Service Mode - OS v'+str(self.game.system_version)
+		self.tests = Tests(self.game, self.priority+1, font, big_font, extra_tests)
+		self.items = [self.tests]
+		if len(self.game.settings) > 0: 
+			self.settings = Settings(self.game, self.priority+1, font, big_font, 'Settings', self.game.settings)
+			self.items.append(self.settings)
 
 
-                #if len(self.game.game_data) > 0: 
-                self.statistics = Statistics(self.game, self.priority+1, font, big_font, 'Statistics', self.game.game_data)
-                self.items.append(self.statistics)
+		#if len(self.game.game_data) > 0: 
+		self.statistics = Statistics(self.game, self.priority+1, font, big_font, 'Statistics', self.game.game_data)
+		self.items.append(self.statistics)
                 
                 self.utilities = Utilities(self.game, self.priority+1, font, big_font, 'Utilities')
-                self.items.append(self.utilities)
+		self.items.append(self.utilities)
                         
                         
 class Tests(ServiceModeList):
-        """Service Mode."""
-        def __init__(self, game, priority, font, big_font, extra_tests=[]):
-                super(Tests, self).__init__(game, priority,font)
-                #self.title_layer.set_text('Tests')
-                self.name = 'Tests'
-                self.lamp_test = LampTest(self.game, self.priority+1, font, big_font)
-                self.coil_test = CoilTest(self.game, self.priority+1, font, big_font)
+	"""Service Mode."""
+	def __init__(self, game, priority, font, big_font, extra_tests=[]):
+		super(Tests, self).__init__(game, priority,font)
+		#self.title_layer.set_text('Tests')
+		self.name = 'Tests'
+		self.lamp_test = LampTest(self.game, self.priority+1, font, big_font)
+		self.coil_test = CoilTest(self.game, self.priority+1, font, big_font)
                 self.ark_test = ArkTest(self.game, self.priority+1, font, big_font)
-                self.swordsman_test = SwordsmanTest(self.game, self.priority+1, font, big_font)
                 self.trough_test = TroughTest(self.game, self.priority+1, font, big_font)
-                self.switch_test = SwitchTest(self.game, self.priority+1, font, big_font)
-                self.items = [self.switch_test, self.lamp_test, self.coil_test,self.ark_test,self.swordsman_test,self.trough_test]
-                for test in extra_tests:
-                        self.items.append(test)
+		self.switch_test = SwitchTest(self.game, self.priority+1, font, big_font)
+		self.items = [self.switch_test, self.lamp_test, self.coil_test,self.ark_test,self.trough_test]
+		for test in extra_tests:
+			self.items.append(test)
 
                 
 class LampTest(ServiceModeList):
-        """Lamp Test"""
-        def __init__(self, game, priority, font, big_font):
-                super(LampTest, self).__init__(game, priority,font)
+	"""Lamp Test"""
+	def __init__(self, game, priority, font, big_font):
+		super(LampTest, self).__init__(game, priority,font)
                 #set mode name
-                self.name = "Lamp Test"
+		self.name = "Lamp Test"
 
                 #set layers
                 self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_bgnd.dmd').frames[0])
                 self.matrix_grid_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/stern_lamp_test_grid.dmd').frames[0])
-                self.matrix_grid_layer.composite_op = "blacksrc"
+		self.matrix_grid_layer.composite_op = "blacksrc"
                 self.matrix_grid_layer.target_x = 100
                 self.matrix_grid_layer.target_y = 0
-                #self.matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
+		#self.matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
                 #self.matrix_layer.composite_op = "blacksrc"
                 #self.matrix_layer.target_x = 128
                 #self.matrix_layer.target_y = 32
@@ -184,12 +183,12 @@ class LampTest(ServiceModeList):
                 self.matrix_layer.composite_op = "blacksrc"
                 self.title_layer = dmd.TextLayer(1, 0, font, "left")
                 self.instruction_layer = dmd.TextLayer(45, 0, font, "left")
-                self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
+		self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
                 self.drive_layer = dmd.TextLayer(1, 24, font, "left")
                 self.wire_layer = dmd.TextLayer(1, 18, self.game.fonts['7x4'], "left")
                 self.number_layer = dmd.TextLayer(99, 24, font, "right")
                 self.conn_layer = dmd.TextLayer(100, 24, font, "right")
-                self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.instruction_layer,self.item_layer,self.conn_layer,self.wire_layer,self.drive_layer,self.number_layer,self.conn_layer,self.matrix_grid_layer,self.matrix_layer])
+		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.instruction_layer,self.item_layer,self.conn_layer,self.wire_layer,self.drive_layer,self.number_layer,self.conn_layer,self.matrix_grid_layer,self.matrix_layer])
 
                 self.lamp_index = []
                 self.row_max = 10
@@ -225,7 +224,7 @@ class LampTest(ServiceModeList):
                         self.col_colour = colour_set
 
                 #setup the full lamp item list
-                self.items = sorted(self.game.lamps.items_not_tagged('gi'),key=lambda item: item.yaml_number)
+		self.items = sorted(self.game.lamps.items_not_tagged('gi'),key=lambda item: item.yaml_number)
                 
                 #setup for row/col tests
                 self.row_test_num = 1 #default
@@ -244,17 +243,17 @@ class LampTest(ServiceModeList):
                 self.action = 'repeat'
                 self.instruction_layer.set_text(' - Repeat')
                 
-                super(LampTest, self).mode_started()
-        
+		super(LampTest, self).mode_started()
+	
                 self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
 
         def mode_stopped(self):
                 self.cancel_delayed('repeat')
 
-        def change_item(self):
-                super(LampTest, self).change_item()
+	def change_item(self):
+		super(LampTest, self).change_item()
                 #self.log.debug("items total:"+str(len(self.items)))
-                ctr = 0
+		ctr = 0
                 for item in self.items:
                     if (ctr == self.iterator) and item.yaml_number.count('L')>0:
                         self.item = item
@@ -266,9 +265,9 @@ class LampTest(ServiceModeList):
         
         #special change method for column test as list is in different order
         def change_col_item(self):
-                super(LampTest, self).change_item()
+		super(LampTest, self).change_item()
                 #self.log.debug("items total:"+str(len(self.items)))
-                ctr = 0
+		ctr = 0
                 for item in self.col_items:
                     if (ctr == self.iterator) and item.yaml_number.count('L')>0:
                         self.item = item
@@ -285,14 +284,14 @@ class LampTest(ServiceModeList):
             self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_repeat)
             
         def process_auto(self):
-                if (self.action == 'repeat'):
+		if (self.action == 'repeat'):
                     self.item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
                     self.set_matrix()
                 elif (self.action == 'auto'):
                     self.item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
                     self.change_item()
                     if (self.iterator < self.max):
-                        self.iterator += 1
+			self.iterator += 1
                     else:
                         self.iterator =0
                 elif (self.action == 'all'):
@@ -333,7 +332,7 @@ class LampTest(ServiceModeList):
                     else:
                         self.col_test_num =1
                             
-                self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
+		self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
 
         
 #        def set_all_matrix(self):
@@ -416,62 +415,62 @@ class LampTest(ServiceModeList):
             self.lamp_index.pop(index)
 
 
-        def sw_enter_active(self,sw):
-                if (self.action == 'manual'):
-                        self.action = 'repeat'
-                        self.instruction_layer.set_text(' - Repeat')
-                elif (self.action == 'repeat'):
-                        self.action = 'auto'
-                        self.instruction_layer.set_text(' - Auto')
+	def sw_enter_active(self,sw):
+		if (self.action == 'manual'):
+			self.action = 'repeat'
+			self.instruction_layer.set_text(' - Repeat')
+		elif (self.action == 'repeat'):
+			self.action = 'auto'
+			self.instruction_layer.set_text(' - Auto')
                 elif (self.action == 'auto'):
-                        self.action = 'all'
+			self.action = 'all'
                         self.instruction_layer.set_text(' - All')
                 elif (self.action == 'all'):
-                        self.action = 'row'
+			self.action = 'row'
                         self.instruction_layer.set_text(' - Row')
                         self.iterator = 0
                 elif (self.action == 'row'):
-                        self.action = 'col'                  
+			self.action = 'col'                  
                         self.instruction_layer.set_text(' - Column')
                         self.iterator = 0
                 elif (self.action == 'col'):
-                        self.action = 'manual'
+			self.action = 'manual'
                         self.instruction_layer.set_text(' - Manual')
-                return True
+		return True
 
-        def sw_startButton_active(self,sw):
-                if (self.action == 'manual'):
-                        self.item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
+	def sw_startButton_active(self,sw):
+		if (self.action == 'manual'):
+			self.item.schedule(schedule=0x00ff00ff, cycle_seconds=2, now=True)
                         self.set_matrix()
-                return True
+		return True
 
 
 class CoilTest(ServiceModeList):
-        """Coil Test"""
-        def __init__(self, game, priority, font, big_font):
-                super(CoilTest, self).__init__(game, priority, font)
-                #set mode name
+	"""Coil Test"""
+	def __init__(self, game, priority, font, big_font):
+		super(CoilTest, self).__init__(game, priority, font)
+		#set mode name
                 self.name = "Coil Test"
 
                 #setup layers
                 self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_bgnd.dmd').frames[0])
                 self.matrix_grid_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/stern_coil_test_grid.dmd').frames[0])
-                self.matrix_grid_layer.composite_op = "blacksrc"
+		self.matrix_grid_layer.composite_op = "blacksrc"
                 self.matrix_grid_layer.target_x = 101
                 self.matrix_grid_layer.target_y = 1
-                self.matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
+		self.matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
                 self.matrix_layer.composite_op = "blacksrc"
                 self.matrix_layer.target_x = 128
                 self.matrix_layer.target_y = 32
                 self.title_layer = dmd.TextLayer(1, 0, font, "left")
-                self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
+		self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
                 self.wire_layer = dmd.TextLayer(1, 18, font, "left")
                 self.instruction_layer = dmd.TextLayer(45, 0, font, "left")
                 self.board_layer = dmd.TextLayer(1, 18, font, "left")
                 self.drive_layer = dmd.TextLayer(1, 24, font, "left")
                 self.conn_layer = dmd.TextLayer(100, 24, font, "right")
                 
-                self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.item_layer,self.wire_layer,self.board_layer,self.drive_layer,self.conn_layer,self.instruction_layer,self.matrix_grid_layer,self.matrix_layer])
+		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.item_layer,self.wire_layer,self.board_layer,self.drive_layer,self.conn_layer,self.instruction_layer,self.matrix_grid_layer,self.matrix_layer])
 
                 #connector setup
                 self.bank_colours = ['Brown','Blue','Purple','Black','Orange']
@@ -492,19 +491,19 @@ class CoilTest(ServiceModeList):
                              
                 self.log.debug("Coil Wire Colours Created:%s",self.wire_colour)
 
-                self.items = sorted(self.game.coils,key=lambda item: item.number) #self.game.coils   
+		self.items = sorted(self.game.coils,key=lambda item: item.number) #self.game.coils   
                 
-                self.max = len(self.items)
+		self.max = len(self.items)
                 self.log.debug("Max:"+str(self.max))
 
 
-        def mode_started(self):
-                super(CoilTest, self).mode_started()
-                self.action = 'manual'
+	def mode_started(self):
+		super(CoilTest, self).mode_started()
+		self.action = 'manual'
                 self.instruction_layer.set_text(' - Manual')
 
                 #check this line is needed
-                if self.game.lamps.has_key('start'): self.game.lamps.start.schedule(schedule=0xff00ff00, cycle_seconds=0, now=False)
+		if self.game.lamps.has_key('start'): self.game.lamps.start.schedule(schedule=0xff00ff00, cycle_seconds=0, now=False)
 
                 self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
 
@@ -515,7 +514,7 @@ class CoilTest(ServiceModeList):
 
         def change_item(self):
                 self.log.debug("items total:"+str(len(self.items)))
-                ctr = 0
+		ctr = 0
                 for item in self.items:
                     if (ctr == self.iterator):
                         self.item = item
@@ -526,8 +525,8 @@ class CoilTest(ServiceModeList):
                 self.set_matrix()
                 
                 
-        def process_auto(self):
-                if (self.action == 'repeat'):
+	def process_auto(self):
+		if (self.action == 'repeat'):
                     self.item.pulse()
                     self.set_matrix()
                 elif (self.action == 'auto'):
@@ -535,10 +534,10 @@ class CoilTest(ServiceModeList):
                     self.item.pulse()
                     self.set_matrix()
                     if (self.iterator < self.max):
-                        self.iterator += 1
+			self.iterator += 1
                     else:
                         self.iterator =0
-                self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
+		self.delay(name='repeat', event_type=None, delay=2.0, handler=self.process_auto)
 
 
         def set_matrix(self):
@@ -580,37 +579,37 @@ class CoilTest(ServiceModeList):
             self.matrix_layer.target_y = 32
 
 
-        def sw_enter_active(self,sw):
-                if (self.action == 'manual'):
-                        self.action = 'repeat'
-                        if self.game.lamps.has_key('start'): self.game.lamps.start.disable()
-                        self.instruction_layer.set_text(' - Repeat')
-                elif (self.action == 'repeat'):
-                        self.action = 'auto'
-                        if self.game.lamps.has_key('start'): self.game.lamps.start.disable()
-                        self.instruction_layer.set_text(' - Auto')
+	def sw_enter_active(self,sw):
+		if (self.action == 'manual'):
+			self.action = 'repeat'
+			if self.game.lamps.has_key('start'): self.game.lamps.start.disable()
+			self.instruction_layer.set_text(' - Repeat')
+		elif (self.action == 'repeat'):
+			self.action = 'auto'
+			if self.game.lamps.has_key('start'): self.game.lamps.start.disable()
+			self.instruction_layer.set_text(' - Auto')
                 elif (self.action == 'auto'):
-                        self.action = 'manual'
-                        if self.game.lamps.has_key('start'): self.game.lamps.start.schedule(schedule=0xff00ff00, cycle_seconds=0, now=False)
-                        self.instruction_layer.set_text(' - Manual')
+			self.action = 'manual'
+			if self.game.lamps.has_key('start'): self.game.lamps.start.schedule(schedule=0xff00ff00, cycle_seconds=0, now=False)
+			self.instruction_layer.set_text(' - Manual')
                         #self.cancel_delayed('repeat')
-                return True
+		return True
 
-        def sw_startButton_active(self,sw):
-                if (self.action == 'manual'):
-                        self.item.pulse(20)
+	def sw_startButton_active(self,sw):
+		if (self.action == 'manual'):
+			self.item.pulse(20)
                         self.set_matrix()
-                return True
+		return True
 
 class SwitchTest(ServiceModeSkeleton):
-        """Switch Test"""
-        def __init__(self, game, priority, font, big_font):
-                super(SwitchTest, self).__init__(game, priority,font)
-                self.name = "Switch Test"
+	"""Switch Test"""
+	def __init__(self, game, priority, font, big_font):
+		super(SwitchTest, self).__init__(game, priority,font)
+		self.name = "Switch Test"
                 #layer setup
                 self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_bgnd.dmd').frames[0])
                 self.matrix_grid_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/stern_switch_test_grid.dmd').frames[0])
-                self.matrix_grid_layer.composite_op = "blacksrc"
+		self.matrix_grid_layer.composite_op = "blacksrc"
                 self.matrix_grid_layer.target_x = 78
                 self.matrix_grid_layer.target_y = 1
                 self.matrix_layer_group = []
@@ -620,12 +619,12 @@ class SwitchTest(ServiceModeSkeleton):
                 self.direct_matrix_layer = dmd.GroupedLayer(128, 32, self.direct_matrix_layer_group)
                 self.direct_matrix_layer.composite_op = "blacksrc"
                 self.title_layer = dmd.TextLayer(1, 0, font, "left")
-                self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
+		self.item_layer = dmd.TextLayer(1, 9, big_font , "left")
                 self.row_layer = dmd.TextLayer(1, 18, font, "left")
                 self.column_layer = dmd.TextLayer(1, 24, font, "left")
                 self.number_layer = dmd.TextLayer(78, 24, font, "left")
                 
-                self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.item_layer, self.row_layer,self.column_layer,self.number_layer,self.matrix_grid_layer,self.matrix_layer,self.direct_matrix_layer])
+		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer,self.item_layer, self.row_layer,self.column_layer,self.number_layer,self.matrix_grid_layer,self.matrix_layer,self.direct_matrix_layer])
                 
                 #grid indexes setup
                 self.switch_index = []
@@ -651,14 +650,14 @@ class SwitchTest(ServiceModeSkeleton):
                
                 #self.direct_colours = ['Green','Brown','Red','Orange','Yellow','Black','Blue','Purple','Grey','Green','','']
                 
-                for switch in self.game.switches:
-                        if self.game.machine_type == 'sternWhitestar':
-                                add_handler = 1
-                        elif switch != self.game.switches.exit:
-                                add_handler = 1
-                        else:
-                                add_handler = 0
-                        if add_handler:
+		for switch in self.game.switches:
+			if self.game.machine_type == 'sternWhitestar':
+				add_handler = 1
+			elif switch != self.game.switches.exit:
+				add_handler = 1
+			else:
+				add_handler = 0
+			if add_handler:
                             self.add_switch_handler(name=switch.name, event_type='inactive', delay=None, handler=self.switch_handler)
                             self.add_switch_handler(name=switch.name, event_type='active', delay=None, handler=self.switch_handler)
                             self.log.debug("Added Switch:%s",switch.name)
@@ -672,8 +671,8 @@ class SwitchTest(ServiceModeSkeleton):
                     self.log.debug("Active Switch:%s",switch.name)
                     
                     
-        def switch_handler(self, sw):
-                if (sw.state):
+	def switch_handler(self, sw):
+		if (sw.state):
                     self.game.sound.play('service_switch_edge')
                 
                 matrix_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/matrix_square.dmd').frames[0])
@@ -681,7 +680,7 @@ class SwitchTest(ServiceModeSkeleton):
                 matrix_layer.target_x = 128
                 matrix_layer.target_y = 32
                 
-                self.item_layer.set_text(str(sw.label),color=dmd.YELLOW)
+		self.item_layer.set_text(str(sw.label),color=dmd.YELLOW)
 
                 x_offset = 80
                 
@@ -711,14 +710,12 @@ class SwitchTest(ServiceModeSkeleton):
                         self.matrix_layer_group.append(matrix_layer)
                         self.switch_index.append(sw_num)
                     else:
-                        try: #try except needed for first enter press
-                           matrix_layer.target_x = 128
-                           matrix_layer.target_y = 32
-                           num = self.switch_index.index(sw_num)
-                           self.matrix_layer_group.pop(num)
-                           self.switch_index.pop(num)
-                        except Exception, err:
-                            return
+                        matrix_layer.target_x = 128
+                        matrix_layer.target_y = 32
+                        num = self.switch_index.index(sw_num)
+                        self.matrix_layer_group.pop(num)
+                        self.switch_index.pop(num)
+                        
                     #self.log.info(self.matrix_layer_group)
                     #self.log.info(self.switch_index)
                     
@@ -762,16 +759,16 @@ class SwitchTest(ServiceModeSkeleton):
                     #self.log.info(self.direct_matrix_layer_group)
                     #self.log.info(self.direct_switch_index)
 
-                return True
+		return True
 
-        #def sw_enter_active(self,sw):
-        #        return True
+	#def sw_enter_active(self,sw):
+	#	return True
         
        
 class ArkTest(ServiceModeSkeleton):
     """docstring for ResetAudits"""
     def __init__(self, game, priority, font, big_font):
-        super(ArkTest, self).__init__(game, priority,font)
+	super(ArkTest, self).__init__(game, priority,font)
         self.log = logging.getLogger('ij.service.ark_test')
         self.name = 'Ark Test'
         
@@ -855,105 +852,13 @@ class ArkTest(ServiceModeSkeleton):
             self.cycle_ark()
         else:
             self.game.sound.play('service_cancel')
-        return game.SwitchStop
-
-class SwordsmanTest(ServiceModeSkeleton):
-    """docstring for ResetAudits"""
-    def __init__(self, game, priority, font, big_font):
-        super(SwordsmanTest, self).__init__(game, priority,font)
-        self.log = logging.getLogger('ij.service.swordsman_test')
-        self.name = 'Swordsman Test'
-        
-        self.switch_layer = dmd.TextLayer(1, 19, self.game.fonts['7x4'], "left")
-        
-        self.status = ''
-        self.info = ''
-        self.okToUpdate=False
-                
-                
-    def mode_started(self):
-        super(SwordsmanTest,self).mode_started()
-
-        self.item_layer.set_text("Swordsman is: "+self.game.swordsman.get_state(),color=dmd.YELLOW)
-        self.instruction_layer.set_text("Press Enter to Change Posn",color=dmd.GREEN)
-        self.okToUpdate=True
-        
-    
-    def mode_stopped(self):
-        super(SwordsmanTest,self).mode_stopped()
-        self.cancel_delayed('swordsman_test_display_update')
-        self.game.swordsman.cycle(False) #this cancels the cycle and also closes the swordsman
-         
-         
-    def process(self):
-        #setup display
-        self.bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/swordsman_test_bgnd.dmd').frames[0])
-        self.bgnd_layer.composite_op='blacksrc'
-        self.item_layer.y=9
-        self.item_layer.set_text("Cycling Swordsman",color=dmd.YELLOW)
-        self.item_layer.composite_op='blacksrc'
-        self.switch_layer.set_text(self.get_swordsman_sw_states(),color=dmd.MAGENTA)
-        self.instruction_layer.font = self.game.fonts['7x4']
-        self.instruction_layer.set_text("Do Not Power Off",color=dmd.RED)
-        
-        self.layer = dmd.GroupedLayer(128, 32, [self.title_layer, self.item_layer, self.instruction_layer, self.switch_layer,self.bgnd_layer])
-        
-        self.delay(name='swordsman_test_display_update',delay=1,handler=self.display_update)
-
-        self.game.swordsman.cycle()
-       
-        
-    def display_update(self):
-        self.item_layer.set_text("Cycling Swordsman",color=dmd.YELLOW)
-        self.switch_layer.set_text(self.get_swordsman_sw_states(),color=dmd.MAGENTA)
-        self.instruction_layer.set_text("Swordsman is: "+self.game.swordsman.get_state(),color=dmd.GREEN)
-        self.cancel_delayed('swordsman_test_display_update')
-        self.delay(name='swordsman_test_display_update',delay=0.25,handler=self.display_update)
-        
-        
-    def get_swordsman_sw_states(self):
-        if self.game.switches.swordsmanForward.is_active():
-            forward_text ="Closed"
-        else:
-            forward_text ="Open"
-        text = "Forward Sw: "+forward_text
-        
-        if self.game.switches.swordsmanBack.is_active():
-            home_text ="Closed"
-        else:
-            home_text ="Open"
-        text = text+ " Home Sw: "+home_text
-        
-        return text
-        
-        
-    def sw_swordsmanForward_active(self,sw):
-        self.display_update()
-        
-    def sw_swordsmanForward_inactive(self,sw):
-        self.display_update()
-        
-    def sw_swordsmanBack_active(self,sw):
-        self.display_update()
-        
-    def sw_swordsmanBack_inactive(self,sw):
-        self.display_update()
-        
-    def sw_enter_active(self,sw):
-        if self.okToUpdate:
-            self.busy = True
-             # if enter is pressed, run the test
-            self.process()
-        else:
-            self.game.sound.play('service_cancel')
-        return game.SwitchStop        
-
+        return game.SwitchStop	
               
               
 class TroughTest(ServiceModeSkeleton):
     """docstring for ResetAudits"""
     def __init__(self, game, priority, font, big_font):
-        super(TroughTest, self).__init__(game, priority,font)
+	super(TroughTest, self).__init__(game, priority,font)
         self.log = logging.getLogger('ij.service.trough_test')
         self.name = 'Trough Test'
         
@@ -1123,29 +1028,29 @@ class TroughTest(ServiceModeSkeleton):
             self.game.trough.launch_balls(1, self.launch_callback)
         else:
             self.game.sound.play('service_cancel')
-        return game.SwitchStop        
+        return game.SwitchStop	
           
             
             
 class Statistics(ServiceModeList):
-        """Service Mode."""
-        def __init__(self, game, priority, font, big_font, name, itemlist):
-                super(Statistics, self).__init__(game, priority,font)
+	"""Service Mode."""
+	def __init__(self, game, priority, font, big_font, name, itemlist):
+		super(Statistics, self).__init__(game, priority,font)
 
-                self.name = name
-                self.items = []
+		self.name = name
+		self.items = []
                 audits_list = self.game.displayed_audits
                 
-                #for section in sorted(itemlist.iterkeys()):
+		#for section in sorted(itemlist.iterkeys()):
                 for audits_section in audits_list.iterkeys():
                     self.log.info("Stats Section:"+str(audits_section))
                     self.items.append( AuditDisplay( self.game, priority + 1, font, big_font, section_key=audits_section,itemlist =audits_list[audits_section] ))
                                 
             
 class AuditDisplay(ServiceModeList):
-        """Service Mode."""
-        def __init__(self, game, priority, font, big_font, section_key, itemlist):
-                super(AuditDisplay, self).__init__(game, priority, font)
+	"""Service Mode."""
+	def __init__(self, game, priority, font, big_font, section_key, itemlist):
+		super(AuditDisplay, self).__init__(game, priority, font)
                 self.name = itemlist['label'] #name of section is set as a label, so the key is seperate
 
                 self.item_layer = dmd.TextLayer(1, 8, font, "left")
@@ -1153,282 +1058,282 @@ class AuditDisplay(ServiceModeList):
                 self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer])
 
                 self.items = []
-                for item in sorted(itemlist.iterkeys()):
+		for item in sorted(itemlist.iterkeys()):
                     if item!='label':
                         self.log.info("Stats Item:"+str(item))
                         audit_value = audits.display(self.game,section_key,item) #calc the required value from the audits database. formating is also handled in the audits class
                         self.items.append(AuditItem(name=str(itemlist[item]['label']).upper(), value=audit_value))    
    
 
-        def mode_started(self):
-                super(AuditDisplay, self).mode_started()
+	def mode_started(self):
+		super(AuditDisplay, self).mode_started()
 
 
-        def change_item(self):
-                super(AuditDisplay, self).change_item()
+	def change_item(self):
+		super(AuditDisplay, self).change_item()
                 self.value_layer.set_text(str(self.item.value))
 
 
-        def sw_enter_active(self, sw):
-                return True
+	def sw_enter_active(self, sw):
+		return True
             
 
 #class StatsDisplay(ServiceModeList):
-#        """Service Mode."""
-#        def __init__(self, game, priority, font, big_font, name, itemlist):
-#                super(StatsDisplay, self).__init__(game, priority, font)
-#                self.name = name
+#	"""Service Mode."""
+#	def __init__(self, game, priority, font, big_font, name, itemlist):
+#		super(StatsDisplay, self).__init__(game, priority, font)
+#		self.name = name
 #
 #                self.item_layer = dmd.TextLayer(1, 11, font, "left")
 #                self.value_layer = dmd.TextLayer(127, 11, big_font, "right")
 #                self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer])
 #
-#                self.items = []
-#                for item in sorted(itemlist.iterkeys()):
+#		self.items = []
+#		for item in sorted(itemlist.iterkeys()):
 #                    #self.log.info("Stats Item:"+str(item))
 #                    if type(itemlist[item])==type({}):
-#                        self.items.append( HighScoreItem(str(item), itemlist[item]['inits'], itemlist[item]['score']) )
+#			self.items.append( HighScoreItem(str(item), itemlist[item]['inits'], itemlist[item]['score']) )
 #                    else:
-#                        self.items.append( StatsItem(str(item), itemlist[item]) )
+#			self.items.append( StatsItem(str(item), itemlist[item]) )
 #
-#                
-#        def mode_started(self):
-#                super(StatsDisplay, self).mode_started()
+#		
+#	def mode_started(self):
+#		super(StatsDisplay, self).mode_started()
 #
-#        def change_item(self):
-#                super(StatsDisplay, self).change_item()
-#                try:
-#                        self.item.score
-#                except:
-#                        self.item.score = 'None'
+#	def change_item(self):
+#		super(StatsDisplay, self).change_item()
+#		try:
+#			self.item.score
+#		except:
+#			self.item.score = 'None'
 #
-#                if self.item.score == 'None':
-#                        self.value_layer.set_text(str(self.item.value))
-#                else:
-#                        self.value_layer.set_text(self.item.value + ": " + str(self.item.score))
+#		if self.item.score == 'None':
+#			self.value_layer.set_text(str(self.item.value))
+#		else:
+#			self.value_layer.set_text(self.item.value + ": " + str(self.item.score))
 #
-#        def sw_enter_active(self, sw):
-#                return True
+#	def sw_enter_active(self, sw):
+#		return True
 
 class AuditItem:
-        """Service Mode."""
-        def __init__(self, name, value):
-                self.name = name
-                self.value = value
+	"""Service Mode."""
+	def __init__(self, name, value):
+		self.name = name
+		self.value = value
 
-        def disable(self):
-                pass
+	def disable(self):
+		pass
 
 #class HighScoreItem:
-#        """Service Mode."""
-#        def __init__(self, name, value, score):
-#                self.name = name
-#                self.value = value
-#                self.score = score
+#	"""Service Mode."""
+#	def __init__(self, name, value, score):
+#		self.name = name
+#		self.value = value
+#		self.score = score
 #
-#        def disable(self):
-#                pass
+#	def disable(self):
+#		pass
 
 
 class Settings(ServiceModeList):
-        """Service Mode."""
-        def __init__(self, game, priority, font, big_font, name, itemlist):
-                super(Settings, self).__init__(game, priority,font)
-                #self.title_layer.set_text('Settings')
-                self.name = name
-                self.items = []
-                self.font = font
-                for x,section in enumerate(sorted(itemlist.iterkeys())):
-                        self.items.append( SettingsEditor( self.game, priority + 1, font, big_font, x,str(section),itemlist[section] ))
+	"""Service Mode."""
+	def __init__(self, game, priority, font, big_font, name, itemlist):
+		super(Settings, self).__init__(game, priority,font)
+		#self.title_layer.set_text('Settings')
+		self.name = name
+		self.items = []
+		self.font = font
+		for x,section in enumerate(sorted(itemlist.iterkeys())):
+			self.items.append( SettingsEditor( self.game, priority + 1, font, big_font, x,str(section),itemlist[section] ))
 
 class SettingsEditor(ServiceModeList):
-        """Service Mode."""
-        def __init__(self, game, priority, font, big_font, id,name, itemlist):
-                super(SettingsEditor, self).__init__(game, priority, font)
+	"""Service Mode."""
+	def __init__(self, game, priority, font, big_font, id,name, itemlist):
+		super(SettingsEditor, self).__init__(game, priority, font)
                 small_font = self.game.fonts['7x4']
                 self.bgnd_layer = dmd.FrameLayer(opaque=True, frame=dmd.Animation().load(game_path+'dmd/service_adjust_bgnd.dmd').frames[0])
-                self.title_layer = dmd.TextLayer(1, 0, font, "left")
-                self.item_layer = dmd.TextLayer(1, 8, small_font, "left")
+		self.title_layer = dmd.TextLayer(1, 0, font, "left")
+		self.item_layer = dmd.TextLayer(1, 8, small_font, "left")
                 self.value_layer = dmd.TextLayer(128, 15, big_font, "right")
-                self.instruction_layer = dmd.TextLayer(1, 26, small_font, "left")
+		self.instruction_layer = dmd.TextLayer(1, 26, small_font, "left")
                 self.instruction_layer.composite_op = "blacksrc"
-                self.no_exit_switch = game.machine_type == 'sternWhitestar'
-                #self.title_layer.set_text('Settings')
+		self.no_exit_switch = game.machine_type == 'sternWhitestar'
+		#self.title_layer.set_text('Settings')
                 
                 self.id=id+1
-                self.name = name
-                self.items = []
+		self.name = name
+		self.items = []
                 
-                self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer, self.instruction_layer])
-                for item in sorted(itemlist.iterkeys()):
-                        #self.items.append( EditItem(str(item), itemlist[item]['options'], itemlist[item]['value'] ) )
-                        if 'increments' in itemlist[item]:
-                                num_options = ((itemlist[item]['options'][1]-itemlist[item]['options'][0]) / itemlist[item]['increments'])+1
-                                option_list = []
-                                for i in range(0,int(num_options)):
-                                        option_list.append(itemlist[item]['options'][0] + (i * itemlist[item]['increments']))
-                                self.items.append( EditItem(str(item), option_list, self.game.user_settings[self.name][item]) )
-                        else:
-                                self.items.append( EditItem(str(item), itemlist[item]['options'], self.game.user_settings[self.name][item]) )
-                self.state = 'nav'
-                self.stop_blinking = True
-                self.item = self.items[0]
+		self.layer = dmd.GroupedLayer(128, 32, [self.bgnd_layer,self.title_layer, self.item_layer, self.value_layer, self.instruction_layer])
+		for item in sorted(itemlist.iterkeys()):
+			#self.items.append( EditItem(str(item), itemlist[item]['options'], itemlist[item]['value'] ) )
+			if 'increments' in itemlist[item]:
+				num_options = ((itemlist[item]['options'][1]-itemlist[item]['options'][0]) / itemlist[item]['increments'])+1
+				option_list = []
+				for i in range(0,int(num_options)):
+					option_list.append(itemlist[item]['options'][0] + (i * itemlist[item]['increments']))
+				self.items.append( EditItem(str(item), option_list, self.game.user_settings[self.name][item]) )
+			else:
+				self.items.append( EditItem(str(item), itemlist[item]['options'], self.game.user_settings[self.name][item]) )
+		self.state = 'nav'
+		self.stop_blinking = True
+		self.item = self.items[0]
                 
                 #add custom code here for display of procgame version match on name?
-                self.value_layer.set_text(str(self.item.value))
+		self.value_layer.set_text(str(self.item.value))
                 
-                self.option_index = self.item.options.index(self.item.value)
+		self.option_index = self.item.options.index(self.item.value)
 
-        def mode_started(self):
-                super(SettingsEditor, self).mode_started()
+	def mode_started(self):
+		super(SettingsEditor, self).mode_started()
 
-        def mode_stopped(self):
-                self.game.sound.play('service_exit')
+	def mode_stopped(self):
+		self.game.sound.play('service_exit')
 
-        def sw_enter_active(self, sw):
-                if not self.no_exit_switch:
-                        self.process_enter()
-                return True
+	def sw_enter_active(self, sw):
+		if not self.no_exit_switch:
+			self.process_enter()
+		return True
 
-        def process_enter(self):
-                if self.state == 'nav':
-                        self.state = 'edit'
-                        self.blink = True
-                        self.stop_blinking = False
-                        self.delay(name='blink', event_type=None, delay=.3, handler=self.blinker)
-                else:
-                        self.state = 'nav'
-                        self.instruction_layer.set_text("Change saved",color=dmd.GREEN)
-                        self.delay(name='change_complete', event_type=None, delay=1, handler=self.change_complete)
-                        self.game.sound.play('service_save')
-                        self.game.user_settings[self.name][self.item.name]=self.item.value
-                        self.stop_blinking = True
-                        self.game.save_settings()
+	def process_enter(self):
+		if self.state == 'nav':
+			self.state = 'edit'
+			self.blink = True
+			self.stop_blinking = False
+			self.delay(name='blink', event_type=None, delay=.3, handler=self.blinker)
+		else:
+			self.state = 'nav'
+			self.instruction_layer.set_text("Change saved",color=dmd.GREEN)
+			self.delay(name='change_complete', event_type=None, delay=1, handler=self.change_complete)
+			self.game.sound.play('service_save')
+			self.game.user_settings[self.name][self.item.name]=self.item.value
+			self.stop_blinking = True
+			self.game.save_settings()
 
-        def sw_exit_active(self, sw):
-                self.process_exit()
-                return True
+	def sw_exit_active(self, sw):
+		self.process_exit()
+		return True
 
-        def process_exit(self):
-                if self.state == 'nav':
-                        self.game.modes.remove(self)
-                else:
-                        self.state = 'nav'
-                        self.value_layer.set_text(str(self.item.value))
-                        self.stop_blinking = True
-                        self.game.sound.play('service_cancel')
-                        self.instruction_layer.set_text("Change cancelled",color=dmd.GREEN)
-                        self.delay(name='change_complete', event_type=None, delay=1, handler=self.change_complete)
-                        
-        def sw_up_active(self, sw):
-                if self.game.switches.enter.is_inactive():
-                        self.process_up()
+	def process_exit(self):
+		if self.state == 'nav':
+			self.game.modes.remove(self)
+		else:
+			self.state = 'nav'
+			self.value_layer.set_text(str(self.item.value))
+			self.stop_blinking = True
+			self.game.sound.play('service_cancel')
+			self.instruction_layer.set_text("Change cancelled",color=dmd.GREEN)
+			self.delay(name='change_complete', event_type=None, delay=1, handler=self.change_complete)
+			
+	def sw_up_active(self, sw):
+		if self.game.switches.enter.is_inactive():
+			self.process_up()
 
-                else:
-                        self.process_enter()
-                return True
+		else:
+			self.process_enter()
+		return True
 
-        def process_up(self):
-                if self.state == 'nav':
-                        self.item.disable()
-                        if (self.iterator < self.max):
-                                self.iterator += 1
+	def process_up(self):
+		if self.state == 'nav':
+			self.item.disable()
+			if (self.iterator < self.max):
+				self.iterator += 1
                         else:
                             self.iterator =0
 
-                        self.game.sound.play('service_next')
-                        self.change_item()
-                else:
-                        if self.option_index < (len(self.item.options) - 1):
-                                self.option_index += 1
-                                self.item.value = self.item.options[self.option_index]
-                                self.value_layer.set_text(str(self.item.value))
-                                
+			self.game.sound.play('service_next')
+			self.change_item()
+		else:
+			if self.option_index < (len(self.item.options) - 1):
+				self.option_index += 1
+				self.item.value = self.item.options[self.option_index]
+				self.value_layer.set_text(str(self.item.value))
+				
 
-        def sw_down_active(self, sw):
-                if self.game.switches.enter.is_inactive():
-                        self.process_down()
-                else:
-                        self.process_exit()
-                return True
+	def sw_down_active(self, sw):
+		if self.game.switches.enter.is_inactive():
+			self.process_down()
+		else:
+			self.process_exit()
+		return True
 
-        def process_down(self):
-                if self.state == 'nav':
-                        self.item.disable()
-                        if (self.iterator > 0):
-                                self.iterator -= 1
+	def process_down(self):
+		if self.state == 'nav':
+			self.item.disable()
+			if (self.iterator > 0):
+				self.iterator -= 1
                         else:
                             self.iterator =self.max
                             
-                        self.game.sound.play('service_previous')
-                        self.change_item()
-                else:
-                        if self.option_index > 0:
-                                self.option_index -= 1
-                                self.item.value = self.item.options[self.option_index]
-                                self.value_layer.set_text(str(self.item.value))
+			self.game.sound.play('service_previous')
+			self.change_item()
+		else:
+			if self.option_index > 0:
+				self.option_index -= 1
+				self.item.value = self.item.options[self.option_index]
+				self.value_layer.set_text(str(self.item.value))
 
-        def change_item(self):
-                ctr = 0
+	def change_item(self):
+		ctr = 0
                 for item in self.items:
-                        if ctr == self.iterator:
-                                self.item = item
-                        ctr += 1
-                self.max = ctr - 1
-                self.item_layer.set_text(str(self.id)+'.'+str(self.iterator+1)+') '+str(self.item.name))
-                self.value_layer.set_text(str(self.item.value))
+			if ctr == self.iterator:
+				self.item = item
+			ctr += 1
+		self.max = ctr - 1
+		self.item_layer.set_text(str(self.id)+'.'+str(self.iterator+1)+') '+str(self.item.name))
+		self.value_layer.set_text(str(self.item.value))
                 self.log.info('Setting :%s',self.item.name)
-                self.option_index = self.item.options.index(self.item.value)
-                        
-        def disable(self):
-                pass
+		self.option_index = self.item.options.index(self.item.value)
+			
+	def disable(self):
+		pass
 
-        def blinker(self):
-                if self.blink: 
-                        self.value_layer.set_text(str(self.item.value))
-                        self.blink = False
-                else:
-                        self.value_layer.set_text("")
-                        self.blink = True
-                if not self.stop_blinking:
-                        self.delay(name='blink', event_type=None, delay=.3, handler=self.blinker)
-                else:
-                        self.value_layer.set_text(str(self.item.value))
-        
-        def change_complete(self):
-                self.instruction_layer.set_text("")
-                
+	def blinker(self):
+		if self.blink: 
+			self.value_layer.set_text(str(self.item.value))
+			self.blink = False
+		else:
+			self.value_layer.set_text("")
+			self.blink = True
+		if not self.stop_blinking:
+			self.delay(name='blink', event_type=None, delay=.3, handler=self.blinker)
+		else:
+			self.value_layer.set_text(str(self.item.value))
+	
+	def change_complete(self):
+		self.instruction_layer.set_text("")
+		
 class EditItem:
-        """Service Mode."""
-        def __init__(self, name, options, value):
-                self.name = name
-                self.options = options
-                self.value = value
+	"""Service Mode."""
+	def __init__(self, name, options, value):
+		self.name = name
+		self.options = options
+		self.value = value
 
-        def disable(self):
-                pass
+	def disable(self):
+		pass
             
             
 class Utilities(ServiceModeList):
-        """Service Mode."""
-        def __init__(self, game, priority, font, big_font, name):
-                super(Utilities, self).__init__(game, priority,font)
-                
-                self.name = name
+	"""Service Mode."""
+	def __init__(self, game, priority, font, big_font, name):
+		super(Utilities, self).__init__(game, priority,font)
+		
+		self.name = name
                 self.end_game = EndGame(self.game, self.priority+1, font, big_font)
-                self.software_update = SoftwareUpdate(self.game, self.priority+1, font, big_font)
+		self.software_update = SoftwareUpdate(self.game, self.priority+1, font, big_font)
                 self.log_download = LogsDownload(self.game, self.priority+1, font, big_font)
                 self.set_date_time = SetDateTime(self.game, self.priority+1, font, big_font)
                 self.reset_audits = ResetAudits(self.game, self.priority+1, font, big_font)
                 self.reboot_game = Reboot(self.game, self.priority+1, font, big_font)
-                self.items = [self.end_game,self.software_update,self.log_download,self.reset_audits,self.reboot_game,self.set_date_time]
+		self.items = [self.end_game,self.software_update,self.log_download,self.reset_audits,self.reboot_game,self.set_date_time]
                 
                 
 #mode to manually update the game software
 class SoftwareUpdate(ServiceModeSkeleton):
 
     def __init__(self, game, priority, font, big_font):
-        super(SoftwareUpdate, self).__init__(game, priority,font)
+	super(SoftwareUpdate, self).__init__(game, priority,font)
         self.log = logging.getLogger('ij.software_update')
         
         self.usb_location = config.value_for_key_path('usb_path')
@@ -1453,8 +1358,8 @@ class SoftwareUpdate(ServiceModeSkeleton):
         
         
     def mode_started(self):
-        super(SoftwareUpdate,self).mode_started()
-        self.update()
+	super(SoftwareUpdate,self).mode_started()
+	self.update()
 
 
     def update(self):
@@ -1573,7 +1478,7 @@ class SoftwareUpdate(ServiceModeSkeleton):
 class LogsDownload(ServiceModeSkeleton):
 
     def __init__(self, game, priority, font, big_font):
-        super(LogsDownload, self).__init__(game, priority,font)
+	super(LogsDownload, self).__init__(game, priority,font)
         self.log = logging.getLogger('ij.service.logs_download')
         
         self.usb_location = config.value_for_key_path('usb_path')
@@ -1587,8 +1492,8 @@ class LogsDownload(ServiceModeSkeleton):
 
 
     def mode_started(self):
-        super(LogsDownload,self).mode_started()
-        self.update()
+	super(LogsDownload,self).mode_started()
+	self.update()
 
 
     def update(self):
@@ -1662,7 +1567,7 @@ class LogsDownload(ServiceModeSkeleton):
 class ResetAudits(ServiceModeSkeleton):
     """docstring for ResetAudits"""
     def __init__(self, game, priority, font, big_font):
-        super(ResetAudits, self).__init__(game, priority,font)
+	super(ResetAudits, self).__init__(game, priority,font)
         self.log = logging.getLogger('ij.service.reset_audits')
         self.name = 'Reset Audits'
         self.status = ''
@@ -1708,7 +1613,7 @@ class ResetAudits(ServiceModeSkeleton):
 class EndGame(ServiceModeSkeleton):
     """docstring for ResetAudits"""
     def __init__(self, game, priority, font, big_font):
-        super(EndGame, self).__init__(game, priority,font)
+	super(EndGame, self).__init__(game, priority,font)
         self.log = logging.getLogger('ij.service.end_game')
         self.name = 'End Game'
         self.status = ''
@@ -1756,45 +1661,45 @@ class EndGame(ServiceModeSkeleton):
 class Reboot(ServiceModeSkeleton):
 
     def __init__(self, game, priority, font, big_font):
-        super(Reboot, self).__init__(game, priority,font)
+	super(Reboot, self).__init__(game, priority,font)
         self.log = logging.getLogger('ij.restart')
         self.name = 'Reboot Game'
         
         
     def mode_started(self):
-        super(Reboot,self).mode_started()
+	super(Reboot,self).mode_started()
         self.okToUpdate = True
         self.item_layer.set_text("Game will be restarted",color=dmd.YELLOW)
-        self.instruction_layer.set_text("Press Enter to Confirm",color=dmd.GREEN)
+	self.instruction_layer.set_text("Press Enter to Confirm",color=dmd.GREEN)
 
 
     def reboot(self):
-        self.stop_proc()
+	self.stop_proc()
 
-        # Import and run the startup script, further execution of this script is halted until the run_loop is stopped.
-        import game
-        game.main()
+	# Import and run the startup script, further execution of this script is halted until the run_loop is stopped.
+	import game
+	game.main()
 
-        # Reset mode & restart P-ROC / pyprocgame
-        self.restart_proc()
+	# Reset mode & restart P-ROC / pyprocgame
+	self.restart_proc()
 
 
     def stop_proc(self):
 
         self.game.sound.stop_music()
-        self.game.end_run_loop()
-        while len(self.game.dmd.frame_handlers) > 0:
-                del self.game.dmd.frame_handlers[0]
-        del self.game.proc
+	self.game.end_run_loop()
+	while len(self.game.dmd.frame_handlers) > 0:
+		del self.game.dmd.frame_handlers[0]
+	del self.game.proc
 
 
     def restart_proc(self):
-        self.game.proc = self.game.create_pinproc()
-        self.game.proc.reset(1)
-        self.game.load_config(self.game.yamlpath)
-        self.game.dmd.frame_handlers.append(self.game.proc.dmd_draw)
-        self.game.dmd.frame_handlers.append(self.game.set_last_frame)
-        self.game.run_loop()
+	self.game.proc = self.game.create_pinproc()
+	self.game.proc.reset(1)
+	self.game.load_config(self.game.yamlpath)
+	self.game.dmd.frame_handlers.append(self.game.proc.dmd_draw)
+	self.game.dmd.frame_handlers.append(self.game.set_last_frame)
+	self.game.run_loop()
     
     
     def sw_enter_active(self,sw):
@@ -1813,7 +1718,7 @@ class Reboot(ServiceModeSkeleton):
 class SetDateTime(ServiceModeSkeleton):
 
     def __init__(self, game, priority, font, big_font):
-        super(SetDateTime, self).__init__(game, priority,font)
+	super(SetDateTime, self).__init__(game, priority,font)
         self.log = logging.getLogger('ij.set_date_time')
         self.name = 'Set Date & Time'
         
@@ -1827,8 +1732,8 @@ class SetDateTime(ServiceModeSkeleton):
         
         
     def mode_started(self):
-        super(SetDateTime,self).mode_started()
-        self.instruction_layer.set_text("+- To Change,Enter to Confirm",color=dmd.GREEN)
+	super(SetDateTime,self).mode_started()
+	self.instruction_layer.set_text("+- To Change,Enter to Confirm",color=dmd.GREEN)
         self.adjust_layer.set_text("PRESS ENTER TO BEGIN",blink_frames=8,color=dmd.CYAN)
 
 
@@ -1887,21 +1792,21 @@ class SetDateTime(ServiceModeSkeleton):
 #mode for coin door opening & showing game health
 class CoinDoor(game.Mode):
 
-        def __init__(self, game):
-                super(CoinDoor, self).__init__(game, priority=999)
+	def __init__(self, game):
+		super(CoinDoor, self).__init__(game, priority=999)
 
                 self.log = logging.getLogger('ij.coindoor')
-        
-                self.name = "Coin Door"
+	
+		self.name = "Coin Door"
                 self.bgnd_layer = dmd.FrameLayer(opaque=False, frame=dmd.Animation().load(game_path+'dmd/coindoor_bgnd.dmd').frames[0])
                 self.bgnd_layer.composite_op='blacksrc'
                 self.info_layer_top = dmd.TextLayer(64, -1, self.game.fonts['9px_az'], "center")
                 self.info_layer_bottom = dmd.TextLayer(64, 9, self.game.fonts['9px_az'], "center")
-                self.status_layer_top = dmd.TextLayer(64, 20, self.game.fonts['4px_az'] , "center")
+		self.status_layer_top = dmd.TextLayer(64, 20, self.game.fonts['4px_az'] , "center")
                 self.status_layer_bottom = dmd.TextLayer(64, 26, self.game.fonts['4px_az'] , "center")
                 self.status_layer_top.composite_op='blacksrc'
                 self.status_layer_bottom.composite_op='blacksrc'
-                self.layer = dmd.GroupedLayer(128, 32, [self.info_layer_bottom,self.info_layer_top,self.status_layer_bottom,self.status_layer_top,self.bgnd_layer])
+		self.layer = dmd.GroupedLayer(128, 32, [self.info_layer_bottom,self.info_layer_top,self.status_layer_bottom,self.status_layer_top,self.bgnd_layer])
 
                 self.info_message=[]
                 self.status_messages =[]
@@ -1914,8 +1819,8 @@ class CoinDoor(game.Mode):
         def reset(self):
                 self.sound_counter = 0
 
-        def mode_started(self):
-                super(CoinDoor, self).mode_started()
+	def mode_started(self):
+		super(CoinDoor, self).mode_started()
 
                 #reset
                 self.reset()
@@ -1984,17 +1889,17 @@ class CoinDoor(game.Mode):
                 self.delay(name='update_status', event_type=None, delay=update_interval, handler=self.update)
 
 
-        def layer_info(self):
+	def layer_info(self):
                 self.log.info("updating game status messages")
-                params = {}
-                #params['messageTop'] = "COIN DOOR IS OPEN"
+		params = {}
+		#params['messageTop'] = "COIN DOOR IS OPEN"
                 #params['messageMiddle']="COILS AND FLASHERS"
                 #params['messageBottom']="ARE DISABLED"
-                params['thestatus'] = self.status
-                return ('content-coin-door_r1', params)
+		params['thestatus'] = self.status
+		return ('content-coin-door_r1', params)
 
-        #def sw_coinDoorClosed_active(self, sw):
+	#def sw_coinDoorClosed_active(self, sw):
         def sw_statusInterlock50v_inactive(self, sw):
-                self.game.modes.remove(self)
+		self.game.modes.remove(self)
         
        
